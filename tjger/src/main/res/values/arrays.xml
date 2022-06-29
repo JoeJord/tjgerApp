@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="gamespeed_values">
+		<item>gamespeed_slow</item>
+		<item>gamespeed_normal</item>
+        <item>gamespeed_fast</item>
+	</string-array>
+    <string-array name="gamespeed_labels">
+        <item>@string/gamespeed_slow</item>
+        <item>@string/gamespeed_normal</item>
+        <item>@string/gamespeed_fast</item>
+    </string-array>
+    <string-array name="statepanel_values">
+        <item>statepanel_auto</item>
+        <item>statepanel_bottom</item>
+        <item>statepanel_top</item>
+        <item>statepanel_left</item>
+        <item>statepanel_right</item>
+        <item>statepanel_none</item>
+    </string-array>
+    <string-array name="statepanel_labels">
+        <item>@string/statepanel_auto</item>
+        <item>@string/statepanel_bottom</item>
+        <item>@string/statepanel_top</item>
+        <item>@string/statepanel_left</item>
+        <item>@string/statepanel_right</item>
+        <item>@string/statepanel_none</item>
+    </string-array>
+</resources>

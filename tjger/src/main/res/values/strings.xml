@@ -1,3 +1,95 @@
 <resources>
-    <string name="app_name">tjgerApp</string>
+
+    <string name="app_name">tjger</string>
+    <string name="default_player_name">Player</string>
+    <string name="default_human_name">You</string>
+    <string name="player_number">Number of players</string>
+    <string name="player_name">Name of the 1st player</string>
+    <string name="player_piececolor">Color of the 1st player</string>
+    <string name="human_number">Number of Human Players</string>
+    <string name="computer_type">Computer difficulty</string>
+    <string name="type_human">Human</string>
+    <string name="type_computer">Computer</string>
+    <string name="type_easy">Computer easy</string>
+    <string name="type_normal">Computer medium</string>
+    <string name="type_medium">Computer medium</string>
+    <string name="type_hard">Computer hard</string>
+    
+    <string name="err_writegame">Error writing the game state!</string>
+    <string name="err_readgame">Error reading the game state!</string>
+    <string name="err_startgame">Error when starting new game!</string>
+    <string name="err_newround">Error when starting new round!</string>
+    <string name="err_newturn">Error when starting new turn!</string>
+    <string name="err_neednames">Player needs a name!</string>
+    <string name="err_namewrong">Name has invalid character \'%s\' !</string>
+    
+    <string name="game_new">New Game</string>
+    <string name="game_resume">Resume Game</string>
+    <string name="game_next">Next Game</string>
+    <string name="game_close">Close Game</string>
+    <string name="dlg_new_game">Game Settings</string>
+    <string name="action_gameinfo">Game Statistics</string>
+    <string name="help_tjger">About tjger</string>
+    <string name="help_gamehints">Game hints</string>
+    <string name="dlg_notshowagain">Do not show hints automatically</string>
+    <string name="help_instructions">Game instructions</string>    
+    <string name="help_instructionsurl">gameinstructions.html</string>
+    <string name="settings_parts">Game Look</string>
+    <string name="category_sound_graphics">Sound and Graphics</string>
+    <string name="settings_playsound">Play sound</string>
+    <string name="settings_drawshadows">Draw shadows</string>
+    <string name="settings_drawreflections">Draw reflections</string>
+    <string name="settings_statepanel">Players information</string>
+    <string name="statepanel_values">Players information</string>
+    <string name="statepanel_auto">Auto (bottom/right)</string>
+    <string name="statepanel_bottom">Bottom</string>
+    <string name="statepanel_top">Top</string>
+    <string name="statepanel_left">Left</string>
+    <string name="statepanel_right">Right</string>
+    <string name="statepanel_none">Not visible</string>
+    <string name="category_game">Game</string>
+    <string name="settings_gamespeed">Game speed</string>
+    <string name="gamespeed_values">Game speed</string>
+    <string name="gamespeed_slow">Slow</string>
+    <string name="gamespeed_normal">Normal</string>
+    <string name="gamespeed_fast">Fast</string>
+
+    <string name="game_cardset">Cards set</string>
+    <string name="game_cover">Cover</string>
+    <string name="game_pieceset">Pieces</string>
+    <string name="game_board">Game board</string>
+    <string name="game_backcolor">Background color</string>
+    <string name="game_background">Background</string>
+    <string name="game_arrangement">Arrangement</string>
+    <string name="arrangement_userdefined">&#8230;</string>
+            
+    <string name="status_roundfinished">Round finished</string>        
+    <string name="status_gamefinished">Game finished</string>  
+    
+    <string name="dlg_newgame">New game</string>
+    <string name="dlg_rules">Game rules</string>
+    <string name="dlg_players">Players</string>
+    <string name="dlg_choosecolor">Choose color</string>
+    <string name="dlg_chooseimage">Choose image</string>
+    <string name="dlg_asktosave">Save settings?</string>
+    <string name="dlg_turnfinished">Turn finished</string>
+    <string name="dlg_roundfinished">Round finished</string>
+    <string name="dlg_gamefinished">Game finished</string>
+    <string name="dlg_currentgame">Current game</string>
+    <string name="dlg_gamestatistics">Current players</string>
+    <string name="dlg_highscore">High score</string>
+    <string name="dlg_score">Score</string>
+    <string name="dlg_removescore">Remove score</string>
+    <string name="dlg_removestatistics">Remove statistics</string>
+    <string name="dlg_iswinner">%s is the winner!</string>  
+    <string name="dlg_iswinner_you">%s are the winner!</string>  
+    <string name="dlg_drawgame">Draw game!</string>  
+    <string name="hint_dontshow">Do not show hints automatically any more</string>
+
+    <string name="tooltip_scoreturn">Score of the current turn</string>
+    <string name="tooltip_scoreround">Score of the current round</string>
+    <string name="tooltip_scoregame">Total score</string>
+    <string name="tooltip_gamesplayed">Number of played games</string>
+    <string name="tooltip_gameswon">Number of won games</string>
+    
 </resources>

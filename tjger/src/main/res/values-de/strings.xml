@@ -1,0 +1,95 @@
+<resources>
+
+    <string name="app_name">tjger</string>
+    <string name="default_player_name">Spieler</string>
+    <string name="default_human_name">Du</string>
+    <string name="player_number">Anzahl der Spieler</string>
+    <string name="player_name">Name des 1. Spielers</string>
+    <string name="player_piececolor">Farbe des 1. Spielers</string>
+    <string name="human_number">Anzahl menschliche Spieler</string>
+    <string name="computer_type">Schwierigkeitsgrad</string>
+    <string name="type_human">Mensch</string>
+    <string name="type_computer">Computer</string>
+    <string name="type_easy">Computer leicht</string>
+    <string name="type_normal">Computer mittel</string>
+    <string name="type_medium">Computer mittel</string>
+    <string name="type_hard">Computer schwer</string>
+    
+    <string name="err_writegame">Fehler beim Schreiben des Spielstands!</string>
+    <string name="err_readgame">Fehler beim Lesen des Spielstands!</string>
+    <string name="err_startgame">Fehler beim Starten des Spiels!</string>
+    <string name="err_newround">Fehler beim Starten einer neuen Runde!</string>
+    <string name="err_newturn">Fehler beim Starten eines neuen Spiels!</string>
+    <string name="err_neednames">Spieler ben&#246;tigt einen Namen!</string>
+    <string name="err_namewrong">Name hat ung&#252;ltiges Zeichen \'%s\' !</string>
+    
+    <string name="game_new">Neues Spiel</string>
+    <string name="game_resume">Spiel fortsetzen</string>
+    <string name="game_next">N&#228;chstes Spiel</string>
+    <string name="game_close">Spiel beenden</string>
+    <string name="dlg_new_game">Spieleinstellungen</string>
+    <string name="action_gameinfo">Spielstatistik</string>
+    <string name="help_tjger">&#220;ber tjger</string>
+    <string name="help_gamehints">Spielhinweise</string>
+    <string name="dlg_notshowagain">Hinweise nicht automatisch zeigen</string>
+    <string name="help_instructions">Spielanleitung</string>    
+    <string name="help_instructionsurl">spielanleitung.html</string>
+    <string name="settings_parts">Aussehen des Spiels</string>
+    <string name="category_sound_graphics">Ton und Grafik</string>
+    <string name="settings_playsound">Ton abspielen</string>
+    <string name="settings_drawshadows">Zeichne Schatten</string>
+    <string name="settings_drawreflections">Zeichne Spiegelungen</string>
+    <string name="settings_statepanel">Spielerinformation</string>
+    <string name="statepanel_values">Spielerinformation</string>
+    <string name="statepanel_auto">Auto (unten/rechts)</string>
+    <string name="statepanel_bottom">Unten</string>
+    <string name="statepanel_top">Oben</string>
+    <string name="statepanel_left">Links</string>
+    <string name="statepanel_right">Rechts</string>
+    <string name="statepanel_none">Ausblenden</string>
+    <string name="category_game">Spiel</string>
+    <string name="settings_gamespeed">Geschwindigkeit</string>
+    <string name="gamespeed_values">Geschwindigkeit</string>
+    <string name="gamespeed_slow">Langsam</string>
+    <string name="gamespeed_normal">Normal</string>
+    <string name="gamespeed_fast">Schnell</string>
+
+    <string name="game_cardset">Kartenset</string>
+    <string name="game_cover">Deckblatt</string>
+    <string name="game_pieceset">Spielsteine</string>
+    <string name="game_board">Spielbrett</string>
+    <string name="game_backcolor">Hintergrundfarbe</string>
+    <string name="game_background">Hintergrund</string>
+    <string name="game_arrangement">Zusammenstellung</string>
+    <string name="arrangement_userdefined">&#8230;</string>
+            
+    <string name="status_roundfinished">Runde beendet</string>        
+    <string name="status_gamefinished">Spiel beendet</string>  
+    
+    <string name="dlg_newgame">Neues Spiel</string>
+    <string name="dlg_rules">Spielregeln</string>
+    <string name="dlg_players">Spieler</string>
+    <string name="dlg_choosecolor">Farbe w&#228;hlen</string>
+    <string name="dlg_chooseimage">Bild w&#228;hlen</string>
+    <string name="dlg_asktosave">Einstellungen speichern?</string>
+    <string name="dlg_turnfinished">Spielzug beendet</string>
+    <string name="dlg_roundfinished">Runde beendet</string>
+    <string name="dlg_gamefinished">Spiel beendet</string>
+    <string name="dlg_currentgame">Aktuelles Spiel</string>
+    <string name="dlg_gamestatistics">AKtuelle Spieler</string>
+    <string name="dlg_highscore">High Score</string>
+    <string name="dlg_score">Punkte</string>
+    <string name="dlg_removescore">Punkte l&#246;schen</string>
+    <string name="dlg_removestatistics">Statistik l&#246;schen</string>
+    <string name="dlg_iswinner">%s hat gewonnen!</string>  
+    <string name="dlg_iswinner_you">%s hast gewonnen!</string>  
+    <string name="dlg_drawgame">Unentschieden!</string>  
+    <string name="hint_dontshow">Zeige Hinweise nicht mehr automatisch an</string>
+
+    <string name="tooltip_scoreturn">Punkte des aktuellen Spielzugs</string>
+    <string name="tooltip_scoreround">Punkte der aktuellen Runde</string>
+    <string name="tooltip_scoregame">Gesamtpunkte</string>
+    <string name="tooltip_gamesplayed">Anzahl der gespielten Spiele</string>
+    <string name="tooltip_gameswon">Anzahl der gewonnenen Spiele</string>
+    
+</resources>

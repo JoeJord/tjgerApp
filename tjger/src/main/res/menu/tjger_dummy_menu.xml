@@ -1,0 +1,13 @@
+<!-- Add all actions that are not visible in the Android menu into a dummy menu to have according ids -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.tjger.MainFrame" >
+    
+    <item android:id="@+id/game_new" android:title="@string/game_new"/>
+    <item android:id="@+id/game_resume" android:title="@string/game_resume"/>
+    <item android:id="@+id/game_close" android:title="@string/game_close"/>
+    <item android:id="@+id/dlg_new_game" android:title="@string/dlg_new_game"/>
+    <item android:id="@+id/action_gameinfo" android:title="@string/action_gameinfo"/>
+    <item android:id="@+id/settings_parts" android:title="@string/settings_parts"></item>
+    
+</menu>
