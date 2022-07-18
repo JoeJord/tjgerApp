@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.tjger"
     android:versionCode="1"
     android:versionName="1.0"
@@ -12,9 +11,7 @@
 
         <activity
             android:name="at.hagru.hgbase.HGBasePreferenceActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            tools:replace="android:screenOrientation"/>
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity
             android:name="com.tjger.gui.NewGameDialog"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
