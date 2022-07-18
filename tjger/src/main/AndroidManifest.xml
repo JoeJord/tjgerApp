@@ -18,8 +18,7 @@
         <activity
             android:name="com.tjger.gui.NewGameDialog"
             android:screenOrientation="portrait"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            tools:replace="android:screenOrientation"/>
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
 
     </application>
 
