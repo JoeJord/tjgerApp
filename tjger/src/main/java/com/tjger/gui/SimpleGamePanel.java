@@ -1,19 +1,5 @@
 package com.tjger.gui;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.tjger.game.completed.GameConfig;
-import com.tjger.game.completed.GameManager;
-import com.tjger.game.completed.playingfield.PlayingField;
-import com.tjger.gui.completed.Background;
-import com.tjger.gui.completed.Board;
-import com.tjger.gui.completed.ImageReflection;
-import com.tjger.gui.completed.ImageShadow;
-import com.tjger.gui.completed.Part;
-import com.tjger.lib.ConstantValue;
-import com.tjger.lib.PartUtil;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -32,7 +18,23 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
-import android.widget.ImageView;
+
+import androidx.appcompat.widget.AppCompatImageView;
+
+import com.tjger.game.completed.GameConfig;
+import com.tjger.game.completed.GameManager;
+import com.tjger.game.completed.playingfield.PlayingField;
+import com.tjger.gui.completed.Background;
+import com.tjger.gui.completed.Board;
+import com.tjger.gui.completed.ImageReflection;
+import com.tjger.gui.completed.ImageShadow;
+import com.tjger.gui.completed.Part;
+import com.tjger.lib.ConstantValue;
+import com.tjger.lib.PartUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.android.awt.Polygon;
 import at.hagru.hgbase.android.awt.Rectangle;
@@ -42,30 +44,30 @@ import at.hagru.hgbase.lib.HGBaseTools;
 
 /**
  * A simple game panel that is thought just for viewing the panel.
- * 
+ *
  * @author hagru
  */
-public class SimpleGamePanel extends ImageView {
+public class SimpleGamePanel extends AppCompatImageView {
 
     final private GameManager gameManager;
     final private GameConfig gameConfig;
-    private Paint currentPaint = new Paint();
+    private final Paint currentPaint = new Paint();
     private ImageShadow nextImageShadow;
     private ImageReflection nextImageReflection;
     private boolean noReflectionForMultipleParts;
     // store all black images in a map for performance reasons
-    private Map<String, Bitmap> blackImages = new HashMap<>();
-	
+    private final Map<String, Bitmap> blackImages = new HashMap<>();
+
     @SuppressLint("RtlHardcoded")
     protected enum EffectType {
-        NORMAL, TOP, LEFT, RIGHT;
+        NORMAL, TOP, LEFT, RIGHT
     }
-    
-	public SimpleGamePanel(Activity activity) {
-		super(activity);
+
+    public SimpleGamePanel(Activity activity) {
+        super(activity);
         this.gameManager = GameManager.getInstance();
-        this.gameConfig = gameManager.getGameConfig();	
-	}
+        this.gameConfig = gameManager.getGameConfig();
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -73,13 +75,13 @@ public class SimpleGamePanel extends ImageView {
         paintComponent(canvas);
     }
 
-	/**
+    /**
      * @return The game manager.
      */
     public GameManager getGameManager() {
         return this.gameManager;
     }
-    
+
     /**
      * @return The game configuration.
      */
@@ -90,23 +92,22 @@ public class SimpleGamePanel extends ImageView {
     /**
      * @return the current paint object
      * @see #changeColor
-     * @see #changeFont
      * @see #changeStyle
      */
     protected Paint getCurrentPaint() {
-    	return currentPaint;
+        return currentPaint;
     }
-    
+
     /**
      * For the simple panel just return 100%. <p>
      * If the image view is fitted to the view by Android, this zoom factor is ignored.
-     *   
+     *
      * @return The current zoom factor.
      */
     public double getZoomFactor() {
-		return 1.0;
-    }    
-    
+        return 1.0;
+    }
+
     /**
      * @param value A size value (x, y, width, height).
      * @return The zoom dependent transformation of this value.
@@ -142,21 +143,20 @@ public class SimpleGamePanel extends ImageView {
     /**
      * Repaints the game panel in an extra thread that should work from non UI-threads.<p>
      * NOTE: use {@link #invalidate()} to perform a repaint from a UI thread.
-     * 
      */
     public void repaint() {
-    	postInvalidate();
+        postInvalidate();
     }
-    
+
     /**
      * Paint all parts on the panel. Calls methods to paint background, board and parts.
-     * 
+     *
      * @param g the canvas object
      */
     protected void paintComponent(Canvas g) {
         paintBackground(g);
         paintBoard(g);
-        paintParts(g);        
+        paintParts(g);
     }
 
     /**
@@ -164,7 +164,7 @@ public class SimpleGamePanel extends ImageView {
      *
      * @param g The canvas object.
      */
-    protected void paintParts(Canvas g) { }    
+    protected void paintParts(Canvas g) { }
 
     /**
      * Is called by <code>paintComponent(Graphics)</code>.
@@ -183,7 +183,7 @@ public class SimpleGamePanel extends ImageView {
         if (board!=null) {
             drawPart(board.getXPos(), board.getYPos(), board.getZoom(), board, g);
         }
-    }    
+    }
 
     /**
      * Is called by <code>paintComponent(Canvas)</code>.
@@ -193,8 +193,8 @@ public class SimpleGamePanel extends ImageView {
     protected void paintBackground(Canvas g) {
         paintBackgroundColor(gameConfig.getActiveBackgroundColor(), g);
         paintBackgroundImage(gameConfig.getActiveBackground(), g);
-    }   
-    
+    }
+
     /**
      * @param backColor the background color to paint, may be null
      * @param g the canvas object
@@ -205,7 +205,7 @@ public class SimpleGamePanel extends ImageView {
             Style oldStyle = setStyle(true);
             g.drawRect(new RectF(0, 0, this.getWidth(), this.getHeight()), currentPaint);
             currentPaint.setStyle(oldStyle);
-        }        
+        }
     }
 
     /**
@@ -244,7 +244,6 @@ public class SimpleGamePanel extends ImageView {
             }
         }
     }
-    
 
     /**
      * Draws the specified part at the specified position.
@@ -400,7 +399,7 @@ public class SimpleGamePanel extends ImageView {
         }
         noReflectionForMultipleParts = false;
     }
-    
+
     /**
      * Draws the specified parts.
      *
@@ -521,7 +520,7 @@ public class SimpleGamePanel extends ImageView {
      * The zoom is considered, too.
      */
     public void drawImage(int x, int y, int percentSize, double angle, Bitmap img, Canvas g) {
-    	drawImage(x, y, percentSize, angle, img, g, false);
+        drawImage(x, y, percentSize, angle, img, g, false);
     }
 
 
@@ -537,25 +536,25 @@ public class SimpleGamePanel extends ImageView {
             int height = (int) ((ignoreZoom)? img.getHeight() * (percentSize/100.0) : transform(img.getHeight() * (percentSize/100.0)));
             int tx = newX + width/2;
             int ty = newY + height/2;
-			if (!HGBaseTools.isEqual(angle, 0.0)) {
-            	g.save();
-            	g.rotate((float) angle, tx, ty);
+            if (!HGBaseTools.isEqual(angle, 0.0)) {
+                g.save();
+                g.rotate((float) angle, tx, ty);
             }
             // test whether to draw a shadow
-			if (nextImageShadow != null) {
+            if (nextImageShadow != null) {
                 nextImageShadow = transformShadow(nextImageShadow, angle);
                 drawImageShadow(img, nextImageShadow, newX, newY, width, height, g, ignoreZoom);
                 nextImageShadow = null;
             }
             // test whether to draw a reflection
-			if (nextImageReflection != null) {
+            if (nextImageReflection != null) {
                 drawImageReflection(img, nextImageReflection, newX, newY, width, height, angle, g, ignoreZoom);
                 nextImageReflection = null;
             }
             // draw the image with the correct size
-			g.drawBitmap(img, null, new Rect(newX, newY, newX+width, newY+height), null);
-			if (!HGBaseTools.isEqual(angle, 0.0)) {
-            	g.restore();
+            g.drawBitmap(img, null, new Rect(newX, newY, newX+width, newY+height), null);
+            if (!HGBaseTools.isEqual(angle, 0.0)) {
+                g.restore();
             }
         }
     }
@@ -585,7 +584,7 @@ public class SimpleGamePanel extends ImageView {
      */
     void checkShadowForPart(Part part) {
         ImageShadow shadow = part.getShadow();
-		if (shadow != null && HGBaseConfig.getBoolean(ConstantValue.CONFIG_DRAW_SHADOWS, false)) {
+        if (shadow != null && HGBaseConfig.getBoolean(ConstantValue.CONFIG_DRAW_SHADOWS, false)) {
             drawNextImageWithShadow(shadow);
         }
     }
@@ -618,8 +617,8 @@ public class SimpleGamePanel extends ImageView {
         // create a black image
         Bitmap blackImg = createBlackImage(img);
         // paint it with the given transparency
-        Paint paint = new Paint();    
-        paint.setAlpha((int) (shadow.getAlpha() * 255));        
+        Paint paint = new Paint();
+        paint.setAlpha((int) (shadow.getAlpha() * 255));
         int shadowX = (ignoreZoom)? shadow.getShadowX() : transform(shadow.getShadowX());
         int shadowY = (ignoreZoom)? shadow.getShadowY() : transform(shadow.getShadowY());
         g.drawBitmap(blackImg, null, new Rect(x+shadowX, y+shadowY, x+width+shadowX, y+height+shadowY), paint);
@@ -654,17 +653,17 @@ public class SimpleGamePanel extends ImageView {
      */
     private Bitmap createBlackImage(Bitmap img) {
         Bitmap blackImg = blackImages.get(img.toString());
-        if (blackImg==null) {    	
-	    	BitmapCanvas blackCanvas = new BitmapCanvas(img.getWidth(), img.getHeight());
-	    	float[] blackMask = new float[] { 0.1f, 0, 0, 0, 0, 
-	    	                      			  0, 0.1f, 0, 0, 0,
-	    	                      			  0, 0, 0.1f, 0, 0,
-	    	                      			  0, 0, 0, 1, 0};
-	    	Paint paint = new Paint();
-	    	paint.setColorFilter(new ColorMatrixColorFilter(new ColorMatrix(blackMask)));
-	    	blackCanvas.drawBitmap(img, 0, 0, paint);    	
-	    	blackImg = blackCanvas.getBitmap();
-	    	blackImages.put(img.toString(), blackImg);
+        if (blackImg==null) {
+            BitmapCanvas blackCanvas = new BitmapCanvas(img.getWidth(), img.getHeight());
+            float[] blackMask = new float[] { 0.1f, 0, 0, 0, 0,
+                                          0, 0.1f, 0, 0, 0,
+                                          0, 0, 0.1f, 0, 0,
+                                          0, 0, 0, 1, 0};
+            Paint paint = new Paint();
+            paint.setColorFilter(new ColorMatrixColorFilter(new ColorMatrix(blackMask)));
+            blackCanvas.drawBitmap(img, 0, 0, paint);
+            blackImg = blackCanvas.getBitmap();
+            blackImages.put(img.toString(), blackImg);
         }
         return blackImg;
     }
@@ -679,7 +678,7 @@ public class SimpleGamePanel extends ImageView {
      * @param width the new width for resizing.
      * @param height the new height for resizing.
      * @param angle the angle the image is rotated by
-     * @param the canvas object.
+     * @param g the canvas object.
      * @param ignoreZoom indicates whether zoom shall be ignored.
      */
     private void drawImageReflection(Bitmap img, ImageReflection reflection, int x, int y, int width, int height, double angle, Canvas g, boolean ignoreZoom) {
@@ -695,33 +694,29 @@ public class SimpleGamePanel extends ImageView {
         Bitmap reflectionImg = rg.getBitmap();
         // draw the reflection depending on the angle
         if (reflectionType==EffectType.NORMAL) {
-        	rg.drawBitmap(img, new Rect(0, (int)(img.getHeight()*(1-reflection.getImageHeight())), img.getWidth(), img.getHeight()), 
-        					   new Rect(0, 0, imageWidth, imageHeight), null);
+            rg.drawBitmap(img, new Rect(0, (int)(img.getHeight()*(1-reflection.getImageHeight())), img.getWidth(), img.getHeight()), new Rect(0, 0, imageWidth, imageHeight), null);
             fillGradientTransparency(true, reflection.getAlphaStart(), reflection.getAlphaEnd(), imageWidth, imageHeight, rg);
             reflectionImg = flipReflectionImage(true, reflectionImg);
             reflectionY = reflectionY + height + reflectionGap;
         } else if (reflectionType==EffectType.TOP) {
-        	rg.drawBitmap(img, new Rect(0, 0, img.getWidth(), (int)(img.getHeight()*reflection.getImageHeight())), 
-					           new Rect(0, 0, imageWidth, imageHeight), null);
+            rg.drawBitmap(img, new Rect(0, 0, img.getWidth(), (int)(img.getHeight()*reflection.getImageHeight())), new Rect(0, 0, imageWidth, imageHeight), null);
             fillGradientTransparency(true, reflection.getAlphaEnd(), reflection.getAlphaStart(), imageWidth, imageHeight, rg);
             reflectionImg = flipReflectionImage(true, reflectionImg);
             reflectionY = reflectionY - reflectionHeight - reflectionGap;
         } else if (reflectionType==EffectType.LEFT) {
-        	rg.drawBitmap(img, new Rect(0, 0, (int)(img.getWidth()*reflection.getImageHeight()), img.getHeight()), 
-        					   new Rect(0, 0, imageWidth, imageHeight), null);
+            rg.drawBitmap(img, new Rect(0, 0, (int)(img.getWidth()*reflection.getImageHeight()), img.getHeight()), new Rect(0, 0, imageWidth, imageHeight), null);
             fillGradientTransparency(false, reflection.getAlphaEnd(), reflection.getAlphaStart(), imageWidth, imageHeight, rg);
             reflectionImg = flipReflectionImage(false, reflectionImg);
             reflectionX = reflectionX - reflectionHeight - reflectionGap;
         } else if (reflectionType==EffectType.RIGHT) {
-        	rg.drawBitmap(img, new Rect((int)(img.getWidth()*(1-reflection.getImageHeight())), 0, img.getWidth(), img.getHeight()), 
-        					   new Rect(0, 0, imageWidth, imageHeight), null);
+           rg.drawBitmap(img, new Rect((int)(img.getWidth()*(1-reflection.getImageHeight())), 0, img.getWidth(), img.getHeight()),  new Rect(0, 0, imageWidth, imageHeight), null);
            fillGradientTransparency(false, reflection.getAlphaStart(), reflection.getAlphaEnd(), imageWidth, imageHeight, rg);
            reflectionImg = flipReflectionImage(false, reflectionImg);
            reflectionX = reflectionX + width + reflectionGap;
         }
         // draw the reflection image
         g.drawBitmap(reflectionImg, reflectionX, reflectionY, null);
-    }    
+    }
 
     /**
      * Flips the reflection image and returns the transformed one.
@@ -731,15 +726,15 @@ public class SimpleGamePanel extends ImageView {
      * @return the new image with the transformation.
      */
     private Bitmap flipReflectionImage(boolean vertical, Bitmap image) {
-    	Matrix m = new Matrix();
-    	if (vertical) {
-    		m.preScale(1, -1);    		
-    	} else {
-    		m.preScale(-1, 1);
-    	}
-        return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), m, false);    	
-    }   
-    
+        Matrix m = new Matrix();
+        if (vertical) {
+            m.preScale(1, -1);
+        } else {
+            m.preScale(-1, 1);
+        }
+        return Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), m, false);
+    }
+
     /**
      * Fills a rectangle with gradient transparency.
      *
@@ -751,16 +746,16 @@ public class SimpleGamePanel extends ImageView {
      * @param g2 the graphics object
      */
     private void fillGradientTransparency(boolean vertical, float alphaStart, float alphaEnd, int width, int height, Canvas g2) {
-    	Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-    	p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-    	Shader shader = new LinearGradient(0, 0, (!vertical)? width : 0, (vertical)? height : 0,
-    			                           new Color(0.0f, 0.0f, 0.0f, alphaEnd).getColorCode(), 
-    			                           new Color(0.0f, 0.0f, 0.0f, alphaStart).getColorCode(), Shader.TileMode.CLAMP);
-    	p.setShader(shader);
-    	// the bitmap is dynamically generated beforehand
-    	g2.drawRect(0, 0, width, height, p);    	
-    }    
-    
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+        Shader shader = new LinearGradient(0, 0, (!vertical)? width : 0, (vertical)? height : 0,
+                                     new Color(0.0f, 0.0f, 0.0f, alphaEnd).getColorCode(),
+                                     new Color(0.0f, 0.0f, 0.0f, alphaStart).getColorCode(), Shader.TileMode.CLAMP);
+        p.setShader(shader);
+        // the bitmap is dynamically generated beforehand
+        g2.drawRect(0, 0, width, height, p);
+    }
+
     /**
      * Returns the effect type depending on the angle.
      *
@@ -780,7 +775,7 @@ public class SimpleGamePanel extends ImageView {
         }
         return EffectType.NORMAL;
     }
-    
+
     /**
      * Draw a line zoom dependent.
      */
@@ -792,7 +787,7 @@ public class SimpleGamePanel extends ImageView {
      * Draw a rectangle zoom dependent.
      */
     public void drawRect(int x, int y, int width, int height, boolean filled, Canvas g) {
-    	Style oldStyle = setStyle(filled);
+        Style oldStyle = setStyle(filled);
         g.drawRect(new RectF(transform(x), transform(y), transform(x+width), transform(y+height)), currentPaint);
         currentPaint.setStyle(oldStyle);
     }
@@ -801,11 +796,11 @@ public class SimpleGamePanel extends ImageView {
      * Draw an oval zoom dependent.
      */
     public void drawOval(int x, int y, int width, int height, boolean filled, Canvas g) {
-    	Style oldStyle = setStyle(filled);
+        Style oldStyle = setStyle(filled);
         g.drawOval(new RectF(transform(x), transform(y), transform(x+width), transform(y+height)), currentPaint);
         currentPaint.setStyle(oldStyle);
-    }    
-    
+    }
+
     /**
      * Draw an arc zoom dependent.
      */
@@ -815,31 +810,31 @@ public class SimpleGamePanel extends ImageView {
         g.drawArc(rect, startAngle, arcAngle, false, currentPaint);
         currentPaint.setStyle(oldStyle);
     }
-    
+
     /**
      * Draw the given polygon zoom dependent.<p>
-     * NOTE: The parameter {@code filled} is not currently implemented. 
+     * NOTE: The parameter {@code filled} is not currently implemented.
      */
     public void drawPolygon(Polygon p, boolean filled, Canvas g) {
-		if (p != null && p.npoints > 0) {
-	    	p.addPoint(p.xpoints[0], p.ypoints[0]);
-			float[] xy = new float[p.npoints * 4];
-			for (int i = 0; i < p.npoints - 1; i++) {
-				xy[i * 4] = transform(p.xpoints[i]);
-				xy[i * 4 + 1] = transform(p.ypoints[i]);
-				xy[i * 4 + 2] = transform(p.xpoints[i + 1]);
-				xy[i * 4 + 3] = transform(p.ypoints[i + 1]);
-			}
+        if (p != null && p.npoints > 0) {
+            p.addPoint(p.xpoints[0], p.ypoints[0]);
+            float[] xy = new float[p.npoints * 4];
+            for (int i = 0; i < p.npoints - 1; i++) {
+                xy[i * 4] = transform(p.xpoints[i]);
+                xy[i * 4 + 1] = transform(p.ypoints[i]);
+                xy[i * 4 + 2] = transform(p.xpoints[i + 1]);
+                xy[i * 4 + 3] = transform(p.ypoints[i + 1]);
+            }
             Style oldStyle = setStyle(filled);
             g.drawLines(xy, currentPaint);
             currentPaint.setStyle(oldStyle);
         }
     }
-    
+
     /**
      * Draws an arrow from the x1/y1 to the x2/y2 position. The line of the error will be a single line with
      * size 1.
-     * 
+     *
      * @param x1 the starting x
      * @param y1 the starting y
      * @param x2 the target x
@@ -862,23 +857,23 @@ public class SimpleGamePanel extends ImageView {
         Polygon p = new Polygon(new int[] {x2, x2-size, x2-size, x2}, new int[] {y2, y2-size, y2+size, y2}, 4);
         drawPolygon(p, true, g);
         g.restore();
-    }    
-    
+    }
+
     /**
      * Draws a text zoom dependent.
-     * 
+     *
      * @param text the text to draw.
      * @param x the x position.
      * @param y the y position.
      * @param g the canvas to draw on
      */
     public void drawString(String text, int x, int y, Canvas g) {
-    	drawString(text, x, y, Align.LEFT, g);
-    }    
-    
+        drawString(text, x, y, Align.LEFT, g);
+    }
+
     /**
      * Draws a text zoom dependent.
-     * 
+     *
      * @param text the text to draw.
      * @param x the x position.
      * @param y the y position.
@@ -886,7 +881,7 @@ public class SimpleGamePanel extends ImageView {
      * @param g the canvas to draw on
      */
     public void drawString(String text, int x, int y, Align alignment, Canvas g) {
-        float oldFontSize = currentPaint.getTextSize(); 
+        float oldFontSize = currentPaint.getTextSize();
         float zoomFontSize = (float)Math.floor(oldFontSize * getZoomFactor());
         changeFontSize(zoomFontSize);
         int newX = transform(x);
@@ -894,11 +889,11 @@ public class SimpleGamePanel extends ImageView {
         currentPaint.setTextAlign(alignment);
         g.drawText(text, 0, text.length(), newX, newY, currentPaint);
         changeFontSize(oldFontSize);
-    }    
+    }
 
     /**
      * Draw the text with center alignment, relative from the given x/y position.
-     * 
+     *
      * @param text the text to draw.
      * @param x the x position.
      * @param y the y position.
@@ -919,9 +914,8 @@ public class SimpleGamePanel extends ImageView {
      */
     public void drawString(String text, PlayingField field, String positionId, Align hAlignment, Canvas g) {
         Rectangle rect = field.getFieldRectangle(field.getField(positionId));
-	Point drawPos = PartUtil.getDrawingPosition(rect.x, rect.y, hAlignment, ConstantValue.ALIGN_BOTTOM,
-		rect.width, rect.height, true);
-	drawString(text, drawPos.x, drawPos.y, hAlignment, g);
+        Point drawPos = PartUtil.getDrawingPosition(rect.x, rect.y, hAlignment, ConstantValue.ALIGN_BOTTOM, rect.width, rect.height, true);
+        drawString(text, drawPos.x, drawPos.y, hAlignment, g);
     }
 
     /**
@@ -929,8 +923,8 @@ public class SimpleGamePanel extends ImageView {
      * @return the old size
      */
     public float changeFontSize(float size) {
-    	float oldSize = currentPaint.getTextSize();
-    	currentPaint.setTextSize(size);
+        float oldSize = currentPaint.getTextSize();
+        currentPaint.setTextSize(size);
         return oldSize;
     }
 
@@ -939,18 +933,18 @@ public class SimpleGamePanel extends ImageView {
      * @return the old style
      */
     public Typeface changeFontStyle(Typeface style) {
-    	Typeface oldStyle = currentPaint.getTypeface();
-    	currentPaint.setTypeface(style);
+        Typeface oldStyle = currentPaint.getTypeface();
+        currentPaint.setTypeface(style);
         return oldStyle;
     }
-    
+
     /**
      * Convenient method to change the color.
-     * 
+     *
      * @param newColor the new color
      */
     public void setColor(Color newColor) {
-    	changeColor(newColor);
+        changeColor(newColor);
     }
 
     /**
@@ -961,31 +955,31 @@ public class SimpleGamePanel extends ImageView {
         Color oldColor = new Color(currentPaint.getColor());
         currentPaint.setColor(newColor.getColorCode());
         return oldColor;
-    }    
-    
+    }
+
     /**
      * @param newStyle the new style
      * @return the old style
      */
     public Style changeStyle(Style newStyle) {
-    	Style oldStyle = currentPaint.getStyle();
-    	currentPaint.setStyle(newStyle);
-    	return oldStyle;
+        Style oldStyle = currentPaint.getStyle();
+        currentPaint.setStyle(newStyle);
+        return oldStyle;
     }
-    
+
     /**
      * Sets the style to fill (and stroke) or stroke only.
-     * 
+     *
      * @param filled true to fill and stroke
      * @return the old style
      */
     public Style setStyle(boolean filled) {
         if (filled) {
-        	return changeStyle(Style.FILL_AND_STROKE);
+            return changeStyle(Style.FILL_AND_STROKE);
         } else {
-        	return changeStyle(Style.STROKE);
-        }    	
-    }    
+            return changeStyle(Style.STROKE);
+        }
+    }
 
     /**
      * Returns the center position of the game field.
@@ -993,8 +987,7 @@ public class SimpleGamePanel extends ImageView {
      * @return The center position of the game field.
      */
     protected Point getCenterPos() {
-        Point center = new Point(getFieldWidth() / 2, getFieldHeight() / 2);
-        return center;
+        return new Point(getFieldWidth() / 2, getFieldHeight() / 2);
     }
 
     /**
@@ -1013,5 +1006,5 @@ public class SimpleGamePanel extends ImageView {
      */
     protected int getFieldWidth() {
         return gameConfig.getFieldWidth();
-    }    
+    }
  }
