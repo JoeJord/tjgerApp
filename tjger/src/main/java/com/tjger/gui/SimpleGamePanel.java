@@ -19,6 +19,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.tjger.game.completed.GameConfig;
@@ -785,11 +786,29 @@ public class SimpleGamePanel extends AppCompatImageView {
 
     /**
      * Draw a rectangle zoom dependent.
+     *
+     * @param x The x coordinate where to draw the rectangle.
+     * @param y The y coordinate where to draw the rectangle.
+     * @param width The width of the rectangle to draw.
+     * @param height The height of the rectangle to draw.
+     * @param filled Flag, if the rectangle should be filled.
+     * @param g The canvas where to draw the rectangle.
      */
     public void drawRect(int x, int y, int width, int height, boolean filled, Canvas g) {
         Style oldStyle = setStyle(filled);
         g.drawRect(new RectF(transform(x), transform(y), transform(x+width), transform(y+height)), currentPaint);
         currentPaint.setStyle(oldStyle);
+    }
+
+    /**
+     * Draw a rectangle zoom dependent.
+     *
+     * @param rect The rectangle to draw.
+     * @param filled Flag, if the rectangle should be filled.
+     * @param g The canvas where to draw the rectangle.
+     */
+    public void drawRect(@NonNull Rectangle rect, boolean filled, Canvas g) {
+        drawRect(rect.x, rect.y, rect.width, rect.height, filled, g);
     }
 
     /**
