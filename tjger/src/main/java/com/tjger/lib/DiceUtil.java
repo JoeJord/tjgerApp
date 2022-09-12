@@ -14,7 +14,7 @@ public class DiceUtil {
 
     final public static int DEFAULT_MIN = 1;
     final public static int DEFAULT_MAX = 6;
-    private static Random diceRandom = new Random(new Date().getTime());
+    private static final Random diceRandom = new Random(new Date().getTime());
     
     private DiceUtil() {
     	super();
