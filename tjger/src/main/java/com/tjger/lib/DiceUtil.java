@@ -55,6 +55,7 @@ public class DiceUtil {
      * @return An array with the result.
      * @throws IllegalArgumentException if {@code minValue} is below 0 or {@code maxValue} is below 0 or {@code maxValue} is lower {@code minValue} or a value in {@code values} is not between {@code minValue} and {@code maxValue}.
      */
+    @NonNull
     public static int[] countValues(int minValue, int maxValue, @NonNull int[] values)
             throws IllegalArgumentException {
         if ((minValue < 0) || (maxValue < 0) || (maxValue < minValue)) {
@@ -82,6 +83,7 @@ public class DiceUtil {
      * @return An array with the result.
      * @throws IllegalArgumentException if a value in {@code values} is not between 1 and 6.
      */
+    @NonNull
     public static int[] countValues(@NonNull int[] values) throws IllegalArgumentException {
         return countValues(DEFAULT_MIN, DEFAULT_MAX, values);
     }
