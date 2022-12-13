@@ -33,7 +33,9 @@ import com.tjger.gui.completed.Part;
 import com.tjger.lib.ConstantValue;
 import com.tjger.lib.PartUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import at.hagru.hgbase.android.awt.Color;
@@ -62,6 +64,13 @@ public class SimpleGamePanel extends AppCompatImageView {
   @SuppressLint("RtlHardcoded")
   protected enum EffectType {
     NORMAL, TOP, LEFT, RIGHT
+  }
+
+  /**
+   * The possible styles to wrap a string.
+   */
+  public enum WrapStyle {
+    NONE, CHARACTER, WORD
   }
 
   public SimpleGamePanel(Activity activity) {
@@ -126,6 +135,17 @@ public class SimpleGamePanel extends AppCompatImageView {
   }
 
   /**
+   * Returns the zoom dependent transformation of the specified rectangle.
+   *
+   * @param rect The rectangle to transform.
+   * @return The zoom dependent transformation of the specified rectangle.
+   */
+  @NonNull
+  protected Rectangle transform(@NonNull Rectangle rect) {
+    return new Rectangle(transform(rect.x), transform(rect.y), transform(rect.width), transform(rect.height));
+  }
+
+  /**
    * @param value A real value on the screen.
    * @return The zoom dependent invert transformation for the game field.
    */
@@ -139,6 +159,50 @@ public class SimpleGamePanel extends AppCompatImageView {
    */
   public int invertTransform(double value) {
     return (int) (value / getZoomFactor());
+  }
+
+  /**
+   * Returns the x coordinate to align an element horizontal in the specified area.
+   *
+   * @param hAlignment The horizontal alignment in the specified position (ConstantValue.ALIGN_LEFT, ConstantValue.ALIGN_CENTER, ConstantValue.ALIGN_RIGHT).
+   * @param area       The area in which the element should be aligned horizontal.
+   * @return The x coordinate to align an element horizontal in the specified area.
+   */
+  protected int getXAreaHorizontalAlignment(@NonNull Paint.Align hAlignment, @NonNull Rectangle area) {
+    return (hAlignment == Paint.Align.CENTER) ? area.x + (area.width / 2) : ((hAlignment == Paint.Align.RIGHT) ? area.x + area.width : area.x);
+  }
+
+  /**
+   * Returns a rectangle that surrounds the specified string.
+   *
+   * @param string The string to be measured.
+   * @return A rectangle that surrounds the specified string.
+   */
+  @NonNull
+  protected Rectangle getStringBounds(@NonNull String string) {
+    Rect bounds = new Rect();
+    currentPaint.getTextBounds(string, 0, string.length(), bounds);
+    return new Rectangle(bounds);
+  }
+
+  /**
+   * Returns the width of the specified string.
+   *
+   * @param string The string to be measured.
+   * @return The width of the specified string.
+   */
+  protected int getStringWidth(String string) {
+    return getStringBounds(string).width;
+  }
+
+  /**
+   * Returns the height of the specified string.
+   *
+   * @param string The string to be measured.
+   * @return The height of the specified string.
+   */
+  protected int getStringHeight(String string) {
+    return getStringBounds(string).height;
   }
 
   /**
@@ -919,13 +983,109 @@ public class SimpleGamePanel extends AppCompatImageView {
    * @param text       The text to draw.
    * @param field      The playing field.
    * @param positionId The id of the position in the playing field.
-   * @param hAlignment The horizontal alignment relative to the specified position (ConstantValue.LEFT, ConstantValue.CENTER, ConstantValue.RIGHT).
+   * @param hAlignment The horizontal alignment relative to the specified position (ConstantValue.ALIGN_LEFT, ConstantValue.ALIGN_CENTER, ConstantValue.ALIGN_RIGHT).
    * @param g          The canvas object.
    */
   public void drawString(String text, PlayingField field, String positionId, Align hAlignment, Canvas g) {
     Rectangle rect = field.getFieldRectangle(field.getField(positionId));
     Point drawPos = PartUtil.getDrawingPosition(rect.x, rect.y, hAlignment, ConstantValue.ALIGN_BOTTOM, rect.width, rect.height, true);
     drawString(text, drawPos.x, drawPos.y, hAlignment, g);
+  }
+
+  /**
+   * Draws the specified text into the specified area with the specified wrap style and horizontal alignment.
+   *
+   * @param text       The text to draw.
+   * @param area       The area where the text should be drawn.
+   * @param wrapStyle  The style how to wrap the text in the area.
+   * @param hAlignment The horizontal alignment in the area (ConstantValue.ALIGN_LEFT, ConstantValue.ALIGN_CENTER, ConstantValue.ALIGN_RIGHT).
+   * @param g          The canvas object.
+   */
+  public void drawString(@NonNull String text, @NonNull Rectangle area, @NonNull WrapStyle wrapStyle, @NonNull Paint.Align hAlignment, @NonNull Canvas g) {
+    float oldFontSize = currentPaint.getTextSize();
+    float zoomFontSize = (float) Math.floor(oldFontSize * getZoomFactor());
+    changeFontSize(zoomFontSize);
+
+    Rectangle newRect = transform(area);
+    int textHeight = getStringHeight(text);
+
+    int x = getXAreaHorizontalAlignment(hAlignment, newRect);
+    int y = newRect.y + textHeight;
+    currentPaint.setTextAlign(hAlignment);
+
+    String[] lines = wrapText(text, newRect.width, wrapStyle);
+    for (String line : lines) {
+      g.drawText(line, 0, line.length(), x, y, currentPaint);
+      y += textHeight;
+    }
+
+    changeFontSize(oldFontSize);
+  }
+
+  /**
+   * Returns the index of the next possible wrap position.
+   *
+   * @param text      The text to wrap.
+   * @param fromIndex The index where to start from.
+   * @param wrapStyle The style how to wrap the text.
+   * @return The index of the next possible wrap position.
+   */
+  protected int getNextWrapIndex(@NonNull String text, int fromIndex, @NonNull WrapStyle wrapStyle) {
+    if (wrapStyle == WrapStyle.CHARACTER) {
+      return fromIndex;
+    } else if (wrapStyle == WrapStyle.WORD) {
+      int nextIndex = text.indexOf(' ', fromIndex);
+      return (nextIndex > -1) ? nextIndex + 1 : text.length();
+    } else {
+      return text.length();
+    }
+  }
+
+  /**
+   * Returns the portion of the specified text which fits into the specified width under consideration of the specified wrap style.
+   *
+   * @param text      The text to wrap.
+   * @param maxWidth  The maximum width the portion may have.
+   * @param wrapStyle The style how to wrap the text.
+   * @return The portion of the specified text which fits into the specified width under consideration of the specified wrap style.
+   */
+  protected String getFittingLine(@NonNull String text, int maxWidth, @NonNull WrapStyle wrapStyle) {
+    String line = null;
+    int fromIndex = 0;
+    int lastFittingIndex = -1;
+    do {
+      int nextWrapIndex = getNextWrapIndex(text, fromIndex, wrapStyle);
+      int width = getStringWidth(text.substring(0, nextWrapIndex).trim());
+      if (width > maxWidth) {
+        line = text.substring(0, (lastFittingIndex >= 0) ? lastFittingIndex : nextWrapIndex);
+      } else {
+        lastFittingIndex = nextWrapIndex;
+      }
+      fromIndex = nextWrapIndex + 1;
+    } while ((fromIndex <= text.length()) && (line == null));
+    if (line == null) {
+      line = text;
+    }
+    return line;
+  }
+
+  /**
+   * Wraps the specified text to that it fits into the specified width.
+   *
+   * @param text      The text to wrap.
+   * @param maxWidth  The maximum width one line may have.
+   * @param wrapStyle The style how to wrap the text.
+   * @return The specified text wrapped into as much lines as needed.
+   */
+  protected String[] wrapText(@NonNull String text, int maxWidth, @NonNull WrapStyle wrapStyle) {
+    List<String> lines = new ArrayList<>();
+    String remaining = text;
+    while (remaining.length() > 0) {
+      String line = getFittingLine(remaining, maxWidth, wrapStyle);
+      lines.add(line.trim());
+      remaining = remaining.substring(line.length());
+    }
+    return lines.toArray(new String[0]);
   }
 
   /**
