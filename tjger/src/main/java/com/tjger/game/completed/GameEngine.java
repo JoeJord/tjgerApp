@@ -734,39 +734,41 @@ final public class GameEngine {
         }
     }
 
-	/**
-	 * @param isMoveComplete true if move is complete
-	 * @param turnFinished true if turn is finished
-	 * @param rules the game rules
-	 */
-	public void proceedGameAfterMove(boolean isMoveComplete, boolean turnFinished, GameRules rules) {
-		// look if the game is still active or not and to the next move
-		if (isActiveRound() && isActiveGame()) {
-		    if (isMoveComplete) {
-		        // get the next player
-		        currentPlayer = getIndexOfPlayer(rules.getNextPlayer(getCurrentPlayer(), getGameState()));
-		    }
-		    // if turn was finished, start a new turn
-		    if (turnFinished) {
-		        currentTurn++;
-		        currentMove.set(0);
-		    }
-		    // do the move of the next player
-		    if (currentMove.get() == 0) {
-		        delayNewTurn(getGameConfig().getDelayTurnWithSpeedFactor());
-		    } else {
-		        currentMove.incrementAndGet();
-		        delayDoPlayerMove(getGameConfig().getDelayMoveWithSpeedFactor());
-		    }
-		} else if (isActiveGame()) {
-		    // the round is finished, but the game is still active - check
-		    // if there shall be an interruption
-		    if (!getGameConfig().isInterruptAfterRound()) {
-		        // if there should not be an interruption, call newRound()
-		        delayNewRound(getGameConfig().getDelayRoundWithSpeedFactor());
-		    }
-		}
-	}
+    /**
+     * @param isMoveComplete true if move is complete
+     * @param turnFinished   true if turn is finished
+     * @param rules          the game rules
+     */
+    public void proceedGameAfterMove(boolean isMoveComplete, boolean turnFinished, GameRules rules) {
+        // look if the game is still active or not and to the next move
+        if (isActiveRound() && isActiveGame()) {
+            if (isMoveComplete) {
+                // get the next player
+                currentPlayer = getIndexOfPlayer(rules.getNextPlayer(getCurrentPlayer(), getGameState()));
+            }
+            // if turn was finished, start a new turn
+            if (turnFinished) {
+                currentTurn++;
+                currentMove.set(0);
+            }
+            // do the move of the next player
+            if (currentMove.get() == 0) {
+                delayNewTurn(getGameConfig().getDelayTurnWithSpeedFactor());
+            } else {
+                if (isMoveComplete) {
+                    currentMove.incrementAndGet();
+                }
+                delayDoPlayerMove(getGameConfig().getDelayMoveWithSpeedFactor());
+            }
+        } else if (isActiveGame()) {
+            // the round is finished, but the game is still active - check
+            // if there shall be an interruption
+            if (!getGameConfig().isInterruptAfterRound()) {
+                // if there should not be an interruption, call newRound()
+                delayNewRound(getGameConfig().getDelayRoundWithSpeedFactor());
+            }
+        }
+    }
 
     /**
      * @param move The move to test if the move is complete.
