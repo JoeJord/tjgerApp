@@ -1,11 +1,13 @@
 package com.tjger;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import android.app.Dialog;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
 
 import com.tjger.game.GamePlayer;
 import com.tjger.game.completed.GameConfig;
@@ -28,16 +30,12 @@ import com.tjger.gui.internal.TjgerWelcome;
 import com.tjger.lib.ConstantValue;
 import com.tjger.lib.GameConfigurationException;
 
-import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ListView;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 import at.hagru.hgbase.HGBaseWelcomeActivity;
@@ -59,11 +57,11 @@ import at.hagru.hgbase.lib.xml.HGBaseXMLTools;
  *
  * @author hagru
  */
-abstract public class MainFrame extends HGBaseWelcomeActivity {
+public abstract class MainFrame extends HGBaseWelcomeActivity {
 
     public static final String AUTOSAVE_FILENAME = "autosave.xml";
 
-    public static enum ZoomType {
+    public enum ZoomType {
         ZOOM_FIT_ONLY, /* The game panel fits on the screen only. */
         ZOOM_SCROLL_VH, /*
          * Allows zooming, scrolling is only possible vertically
@@ -194,7 +192,7 @@ abstract public class MainFrame extends HGBaseWelcomeActivity {
      * @param statusBar
      *            the optional status bar, may be null
      */
-    final protected void setPanels(MainMenu mainMenu, MainPanel mainPanel, GamePanel gamePanel,
+    protected final void setPanels(MainMenu mainMenu, MainPanel mainPanel, GamePanel gamePanel,
                                    MainStatusBar statusBar) {
         MainFrame.mainMenu = mainMenu;
         MainFrame.mainPanel = mainPanel;
@@ -293,9 +291,9 @@ abstract public class MainFrame extends HGBaseWelcomeActivity {
      */
     protected Map<Integer, MenuItem> removeSoundSettingFromNavigationDrawer(Map<Integer, MenuItem> itemMap) {
         int soundMenuId = getSoundSettingsMenuId();
-        if (itemMap.containsKey(Integer.valueOf(soundMenuId))) {
-            Map<Integer, MenuItem> itemMapWithoutSound = new LinkedHashMap<Integer, MenuItem>(itemMap);
-            itemMapWithoutSound.remove(Integer.valueOf(soundMenuId));
+        if (itemMap.containsKey(soundMenuId)) {
+            Map<Integer, MenuItem> itemMapWithoutSound = new LinkedHashMap<>(itemMap);
+            itemMapWithoutSound.remove(soundMenuId);
             return itemMapWithoutSound;
         } else {
             return itemMap;
@@ -448,13 +446,7 @@ abstract public class MainFrame extends HGBaseWelcomeActivity {
         getGameManager().resetNewGameInformation();
         onSetNewGameInformation(getGameManager(), numPlayers);
         if (getGameManager().getGameEngine().startGame(numPlayers) != 0) {
-            HGBaseDialog.showErrorDialog(this, "err_startgame", new OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    activateFragment(mainMenu);
-                }
-            });
+            HGBaseDialog.showErrorDialog(this, "err_startgame", (dialog, which) -> activateFragment(mainMenu));
         }
     }
 
@@ -469,13 +461,7 @@ abstract public class MainFrame extends HGBaseWelcomeActivity {
         if (active != null) {
             getGameManager().getGameEngine().setActivePlayers(active.clone());
             if (getGameManager().getGameEngine().newGame() != 0) {
-                HGBaseDialog.showErrorDialog(this, "err_startgame", new OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        activateFragment(mainMenu);
-                    }
-                });
+                HGBaseDialog.showErrorDialog(this, "err_startgame", (dialog, which) -> activateFragment(mainMenu));
             }
         }
     }
@@ -510,13 +496,7 @@ abstract public class MainFrame extends HGBaseWelcomeActivity {
     private void onGameResumeAfterGamePanelWasCreated() {
         Element root = HGBaseXMLTools.readXML(AUTOSAVE_FILENAME);
         if (root == null || getGameManager().loadGame(root) != 0) {
-            HGBaseDialog.showErrorDialog(this, "err_readgame", new OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    activateFragment(mainMenu);
-                }
-            });
+            HGBaseDialog.showErrorDialog(this, "err_readgame", (dialog, which) -> activateFragment(mainMenu));
         }
     }
 
