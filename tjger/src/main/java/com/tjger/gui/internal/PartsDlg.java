@@ -50,12 +50,12 @@ public class PartsDlg extends HGBaseConfigDialog implements OnSharedPreferenceCh
     private boolean backColorDefined;
     private boolean completeArrangement;
     private boolean onChangeArrangement;
-    final private IntBooleanStringMap indexMapStandard;
-    final private IntBooleanStringMap indexMapUserDef;
-    final private String[] userParts;
-    final private String[] userPartSets;
-    final private String[] cardSetTypes;
-    final private String[] colorTypes;
+    private final IntBooleanStringMap indexMapStandard;
+    private final IntBooleanStringMap indexMapUserDef;
+    private final String[] userParts;
+    private final String[] userPartSets;
+    private final String[] cardSetTypes;
+    private final String[] colorTypes;
 
     public PartsDlg() {
         super(HGBaseText.getText("settings_parts").replace('.', ' '));
@@ -91,7 +91,6 @@ public class PartsDlg extends HGBaseConfigDialog implements OnSharedPreferenceCh
         addComboBox(ConstantValue.CONFIG_BOARD, config.getBoards(), config.getActiveBoard(), cbList, true);
         addComboBox(ConstantValue.CONFIG_COVER, config.getCovers(), config.getActiveCover(), cbList, true);
 
-        //addComboBox(ConstantValue.CONFIG_CARDSET, config.getCardSets(), config.getActiveCardSet(), cbList, true);
         for (String cardType : cardSetTypes) {
             addComboBox(cardType, config.getCardSets(cardType), config.getActiveCardSet(cardType), cbList, true);
         }
@@ -213,7 +212,6 @@ public class PartsDlg extends HGBaseConfigDialog implements OnSharedPreferenceCh
             changePartOfArrangement(indexOf(ConstantValue.CONFIG_BOARD, true), a.getBoard());
             changePartOfArrangement(indexOf(ConstantValue.CONFIG_PIECESET, true), a.getPieceSet());
             changePartOfArrangement(indexOf(ConstantValue.CONFIG_COVER, true), a.getCover());
-            //changePartOfArrangement(indexOf(ConstantValue.CONFIG_CARDSET, true), a.getCardSet());
             for (String cardSetType : cardSetTypes) {
                 changePartOfArrangement(indexOf(cardSetType, true), a.getCardSet(cardSetType));
             }
@@ -347,7 +345,6 @@ public class PartsDlg extends HGBaseConfigDialog implements OnSharedPreferenceCh
             }
             // store the index of the new part
             IntBooleanStringMap indexMap = (standardType) ? indexMapStandard : indexMapUserDef;
-            //indexMap.set(id, cbList.indexOf(cbHelp));
             indexMap.set(id, cbList.size() - 1);
         }
     }
@@ -406,52 +403,104 @@ public class PartsDlg extends HGBaseConfigDialog implements OnSharedPreferenceCh
     /**
      * Test if the given arrangement is that one, that is selected.
      *
-     * @param arrange The arrangement to test.
+     * @param arrangement The arrangement to test.
      * @return True if the selected values fit to the given arrangement.
      */
-    private boolean isGivenArrangement(Arrangement arrange) {
-        if (arrange == null) {
+    private boolean isGivenArrangement(Arrangement arrangement) {
+        if (arrangement == null) {
             return false;
         }
-        // test the standard parts
-        Background back = arrange.getBackground();
-        Board board = arrange.getBoard();
-        PieceSet piece = arrange.getPieceSet();
-        Cover cover = arrange.getCover();
-        //CardSet cards = arrange.getCardSet();
-        if (!isPartOk(back, indexOf(ConstantValue.CONFIG_BACKGROUND, true)) || !isPartOk(board, indexOf(ConstantValue.CONFIG_BOARD, true)) || !isPartOk(piece, indexOf(ConstantValue.CONFIG_PIECESET, true)) || !isPartOk(cover, indexOf(ConstantValue.CONFIG_COVER, true)) /*||
-            !isPartOk(cards, indexOf(ConstantValue.CONFIG_CARDSET, true))*/) {
+        if (!belongsStandardPartToArrangement(arrangement)) {
             return false;
-        } else {
-            // test for the card sets
-            for (String cardSetType : cardSetTypes) {
-                CardSet cards = arrange.getCardSet(cardSetType);
-                if (!isPartOk(cards, indexOf(cardSetType, true))) {
-                    return false;
-                }
-            }
-            // test the user defined parts and part sets
-            for (String userPart : userParts) {
-                if (!isPartOk(arrange.getPart(userPart), indexOf(userPart, false))) {
-                    return false;
-                }
-            }
-            for (String userPartSet : userPartSets) {
-                if (!isPartOk(arrange.getPartSet(userPartSet), indexOf(userPartSet, false))) {
-                    return false;
-                }
-            }
-            // test the colors
-            if (configColorList != null) {
-                for (int i = 0; i < configColorList.length; i++) {
-                    Color c = getArrangementColorByIndex(arrange, i);
-                    if (c != null && !c.equals(configColorList[i].getColor())) {
-                        return false;
-                    }
-                }
-            }
-            return true;
         }
+        if (!belongsCardsetToArrangement(arrangement)) {
+            return false;
+        }
+        if (!belongsUserPartToArrangement(arrangement)) {
+            return false;
+        }
+        if (!belongsUserPartsetToArrangement(arrangement)) {
+            return false;
+        }
+        return belongsColorToArrangement(arrangement);
+    }
+
+    /**
+     * Returns {@code true} if all of the selected standard parts belong to the specified arrangement.
+     *
+     * @param arrangement The arrangement to check.
+     * @return {@code true} if all of the selected standard parts belong to the specified arrangement.
+     */
+    private boolean belongsStandardPartToArrangement(Arrangement arrangement) {
+        Background back = arrangement.getBackground();
+        Board board = arrangement.getBoard();
+        PieceSet piece = arrangement.getPieceSet();
+        Cover cover = arrangement.getCover();
+        return isPartOk(back, indexOf(ConstantValue.CONFIG_BACKGROUND, true)) && isPartOk(board, indexOf(ConstantValue.CONFIG_BOARD, true)) && isPartOk(piece, indexOf(ConstantValue.CONFIG_PIECESET, true)) && isPartOk(cover, indexOf(ConstantValue.CONFIG_COVER, true));
+    }
+
+    /**
+     * Returns {@code true} if all of the selected card sets belong to the specified arrangement.
+     *
+     * @param arrangement The arrangement to check.
+     * @return {@code true} if all of the selected card sets belong to the specified arrangement.
+     */
+    private boolean belongsCardsetToArrangement(Arrangement arrangement) {
+        for (String cardSetType : cardSetTypes) {
+            CardSet cards = arrangement.getCardSet(cardSetType);
+            if (!isPartOk(cards, indexOf(cardSetType, true))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns {@code true} if all of the selected user parts belong to the specified arrangement.
+     *
+     * @param arrangement The arrangement to check.
+     * @return {@code true} if all of the selected user parts belong to the specified arrangement.
+     */
+    private boolean belongsUserPartToArrangement(Arrangement arrangement) {
+        for (String userPart : userParts) {
+            if (!isPartOk(arrangement.getPart(userPart), indexOf(userPart, false))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns {@code true} if all of the selected user part sets belong to the specified arrangement.
+     *
+     * @param arrangement The arrangement to check.
+     * @return {@code true} if all of the selected user part sets belong to the specified arrangement.
+     */
+    private boolean belongsUserPartsetToArrangement(Arrangement arrangement) {
+        for (String userPartSet : userPartSets) {
+            if (!isPartOk(arrangement.getPartSet(userPartSet), indexOf(userPartSet, false))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns {@code true} if the selected color belongs to the specified arrangement.
+     *
+     * @param arrangement The arrangement to check.
+     * @return {@code true} if the selected color belongs to the specified arrangement.
+     */
+    private boolean belongsColorToArrangement(Arrangement arrangement) {
+        if (configColorList != null) {
+            for (int i = 0; i < configColorList.length; i++) {
+                Color c = getArrangementColorByIndex(arrangement, i);
+                if (c != null && !c.equals(configColorList[i].getColor())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -468,7 +517,7 @@ public class PartsDlg extends HGBaseConfigDialog implements OnSharedPreferenceCh
      */
     private class PartsComboBox {
 
-        final private ListPreference preference;
+        private final ListPreference preference;
         private final Part[] parts;
 
         public PartsComboBox(String id, Part[] parts, Part activePart) {
