@@ -19,6 +19,7 @@ import com.tjger.lib.ArrayUtil;
 import com.tjger.lib.ConstantValue;
 
 import android.widget.ImageView.ScaleType;
+
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseTools;
@@ -29,7 +30,7 @@ import at.hagru.hgbase.lib.internal.IntBooleanStringMap;
  *
  * @author hagru
  */
-final public class GameConfig {
+public final class GameConfig {
 
     public static final int STANDARD_ZOOM = 100;
     public static final int ORDERBY_NONE = 0;
@@ -46,13 +47,12 @@ final public class GameConfig {
 
     private static final int CONFIG_STANDARD_WIDTH = 800;
     private static final int CONFIG_STANDARD_HEIGHT = 480;
-    
+
     private static final GameConfig INSTANCE = new GameConfig();
 
     /*
      * All data needs to be package-protected for the game config file reader.
-     */
-    boolean proVersion;
+     */ boolean proVersion;
     String fullscreenMode;
     boolean advertisements;
     String advertisementURL;
@@ -63,20 +63,20 @@ final public class GameConfig {
     Background[] backgrounds;
     Board[] boards;
     Cover[] covers;
-    Map<String,List<CardSet>> cardSetsMap;
+    Map<String, List<CardSet>> cardSetsMap;
     PieceSet[] pieceSets;
     Arrangement[] arrangements;
-    Map<String,Color> colors; // the color types as key and the default color (or null) as value
-    Map<String,List<Part>> partMap; // for all other parts
-    Map<String,List<PartSet>> partSetMap; // for all other part sets
-    Map<String,String> extendPartMap; // for extending part
-    Map<String,String> extendPartSetMap; // for extending part and partset
-    Map<String,String> extendCvpMap; // for extending color value part
+    Map<String, Color> colors; // the color types as key and the default color (or null) as value
+    Map<String, List<Part>> partMap; // for all other parts
+    Map<String, List<PartSet>> partSetMap; // for all other part sets
+    Map<String, String> extendPartMap; // for extending part
+    Map<String, String> extendPartSetMap; // for extending part and partset
+    Map<String, String> extendCvpMap; // for extending color value part
     boolean completeArrangement;
     int minZoom;
     int maxZoom;
-    Map<String,String> extensionMap;
-    Map<String,String> pathMap;
+    Map<String, String> extensionMap;
+    Map<String, String> pathMap;
     boolean networkPossible;
     int networkPort;
     int minPlayers;
@@ -107,7 +107,7 @@ final public class GameConfig {
     boolean localGameStateTurn;
     boolean localGameStateRound;
     boolean localGameStateGame;
-    LinkedHashMap<String,String> hintsMap;
+    LinkedHashMap<String, String> hintsMap;
     int delayRound;
     int delayTurn;
     int delayMove;
@@ -138,25 +138,25 @@ final public class GameConfig {
     public boolean hasErrors() {
         return this.hasErrors;
     }
-    
+
     /**
      * @return True if the game is currently the pro version, i.e., the pro attribute is set.
      */
     public boolean isProVersion() {
         return this.proVersion;
     }
-    
+
     /**
      * Returns the fullscreen mode.
      *
      * @return The fullscreen mode.
      */
     public String getFullscreenMode() {
-	return this.fullscreenMode;
+        return this.fullscreenMode;
     }
 
     /**
-     * @return True if advertisements shall be shown, i.e., it's not the pro version and the advertisements attribute is set. 
+     * @return True if advertisements shall be shown, i.e., it's not the pro version and the advertisements attribute is set.
      */
     public boolean hasAdvertisements() {
         return this.advertisements && !isProVersion();
@@ -168,16 +168,16 @@ final public class GameConfig {
      * @return The advertisement URL.
      */
     public String getAdvertisementURL() {
-	return advertisementURL;
+        return advertisementURL;
     }
-    
+
     /**
      * Returns the URL of the page, which should be displayed if the advertisement page could not be loaded.
      *
      * @return The URL of the page, which should be displayed if the advertisement page could not be loaded.
      */
     public String getAdvertisementErrorPageURL() {
-	return advertisementErrorPageURL;
+        return advertisementErrorPageURL;
     }
 
     /**
@@ -186,7 +186,7 @@ final public class GameConfig {
      * @return The percentage of the screen width, how much the advertisement view should have.
      */
     public int getAdvertisementWidthPercent() {
-	return advertisementWidthPercent;
+        return advertisementWidthPercent;
     }
 
     /**
@@ -195,7 +195,7 @@ final public class GameConfig {
      * @return The percentage of the screen height, how much the advertisement view should have.
      */
     public int getAdvertisementHeightPercent() {
-	return advertisementHeightPercent;
+        return advertisementHeightPercent;
     }
 
     /**
@@ -231,7 +231,7 @@ final public class GameConfig {
      */
     public int getActiveZoom() {
         int zoom = HGBaseConfig.getInt(ConstantValue.CONFIG_ZOOM);
-        if (zoom!=HGBaseTools.INVALID_INT && zoom>=getMinZoom() && zoom<=getMaxZoom()) {
+        if (zoom != HGBaseTools.INVALID_INT && zoom >= getMinZoom() && zoom <= getMaxZoom()) {
             return zoom;
         } else {
             return getStandardZoom();
@@ -243,7 +243,7 @@ final public class GameConfig {
      */
     public int getStandardZoom() {
         int zoom = STANDARD_ZOOM;
-        if (zoom>=getMinZoom() && zoom<=getMaxZoom()) {
+        if (zoom >= getMinZoom() && zoom <= getMaxZoom()) {
             return zoom;
         } else {
             return (getMinZoom() + getMaxZoom()) / 2;
@@ -263,12 +263,12 @@ final public class GameConfig {
     public int getMaxPlayers() {
         return maxPlayers;
     }
-    
+
     /**
      * @return the default number of players.
      */
     public int getDefaultPlayers() {
-    	return defaultPlayers;
+        return defaultPlayers;
     }
 
     /**
@@ -287,6 +287,7 @@ final public class GameConfig {
     public int getHighScoreLength() {
         return highScoreLength;
     }
+
     /**
      * @return True, if only the winner shall get an entry in the highscore list.
      */
@@ -316,18 +317,21 @@ final public class GameConfig {
     public boolean isRememberGames() {
         return rememberGames;
     }
+
     /**
      * @param remember True to remember the played and won games.
      */
     public void setRememberGames(boolean remember) {
         rememberGames = remember;
     }
+
     /**
      * @return True, if scores shall be kept between games.
      */
     public boolean isRememberScores() {
         return rememberScores;
     }
+
     /**
      * @param remember True to remember the scores between games.
      */
@@ -354,7 +358,7 @@ final public class GameConfig {
      */
     public int getNetworkPort() {
         int port = HGBaseConfig.getInt(ConstantValue.CONFIG_NETWORKPORT);
-        if (port!=HGBaseTools.INVALID_INT) {
+        if (port != HGBaseTools.INVALID_INT) {
             return port;
         }
         return networkPort;
@@ -366,30 +370,35 @@ final public class GameConfig {
     public boolean isLocalGameStateGame() {
         return localGameStateGame;
     }
+
     /**
      * @param local True to call the method resetGame locally during network games.
      */
     public void setLocalGameStateGame(boolean local) {
         localGameStateGame = local;
     }
+
     /**
      * @return True if the resetRound method of the game state shall be called local during network games.
      */
     public boolean isLocalGameStateRound() {
         return localGameStateRound;
     }
+
     /**
      * @param local True to call the method resetRound locally during network games.
      */
     public void setLocalGameStateRound(boolean local) {
         localGameStateRound = local;
     }
+
     /**
      * @return True if the resetTurn method of the game state shall be called local during network games.
      */
     public boolean isLocalGameStateTurn() {
         return localGameStateTurn;
     }
+
     /**
      * @param local True to call the method resetTurn locally during network games.
      */
@@ -403,7 +412,7 @@ final public class GameConfig {
     public Arrangement[] getArrangements() {
         return HGBaseTools.clone(arrangements);
     }
-    
+
     /**
      * @return the background color, may be null
      */
@@ -451,7 +460,7 @@ final public class GameConfig {
      * @return A list with all existing card set types.
      */
     public String[] getCardSetTypes() {
-        return cardSetsMap.keySet().toArray(new String[cardSetsMap.size()]);
+        return cardSetsMap.keySet().toArray(new String[0]);
     }
 
     /**
@@ -467,9 +476,9 @@ final public class GameConfig {
      */
     public Arrangement getArrangement(String name) {
         Part part = getPartByName(getArrangements(), name);
-		if (part != null) {
-			return (Arrangement) part;
-		}
+        if (part != null) {
+            return (Arrangement) part;
+        }
         return null;
     }
 
@@ -479,8 +488,8 @@ final public class GameConfig {
      */
     public Background getBackground(String name) {
         Part part = getPartByName(getBackgrounds(), name);
-        if (part!=null) {
-            return (Background)part;
+        if (part != null) {
+            return (Background) part;
         }
         return null;
     }
@@ -491,8 +500,8 @@ final public class GameConfig {
      */
     public Board getBoard(String name) {
         Part part = getPartByName(getBoards(), name);
-        if (part!=null) {
-            return (Board)part;
+        if (part != null) {
+            return (Board) part;
         }
         return null;
     }
@@ -503,8 +512,8 @@ final public class GameConfig {
      */
     public Cover getCover(String name) {
         Part part = getPartByName(getCovers(), name);
-        if (part!=null) {
-            return (Cover)part;
+        if (part != null) {
+            return (Cover) part;
         }
         return null;
     }
@@ -522,9 +531,9 @@ final public class GameConfig {
      * @param name Name of the card set.
      * @return The card set or null.
      */
-    public CardSet getCardSet(String tpye, String name) {
-        Part part = getPartByName(getCardSets(tpye), name);
-        return (CardSet)part;
+    public CardSet getCardSet(String type, String name) {
+        Part part = getPartByName(getCardSets(type), name);
+        return (CardSet) part;
     }
 
 
@@ -534,7 +543,7 @@ final public class GameConfig {
      */
     public PieceSet getPieceSet(String name) {
         Part part = getPartByName(getPieceSets(), name);
-        return (PieceSet)part;
+        return (PieceSet) part;
     }
 
     /**
@@ -542,14 +551,13 @@ final public class GameConfig {
      */
     public Arrangement getActiveArrangement() {
         String name = getActivePartName(getArrangements(), ConstantValue.CONFIG_ARRANGEMENT);
-        if (HGBaseConfig.existsKey(ConstantValue.CONFIG_ARRANGEMENT) &&
-        	!name.equals(HGBaseConfig.get(ConstantValue.CONFIG_ARRANGEMENT))) {
-        	// if there is a user defined arrangement, a dummy id was stored
+        if (HGBaseConfig.existsKey(ConstantValue.CONFIG_ARRANGEMENT) && !name.equals(HGBaseConfig.get(ConstantValue.CONFIG_ARRANGEMENT))) {
+            // if there is a user defined arrangement, a dummy id was stored
             return null;
         }
         return getArrangement(name);
     }
-    
+
     /**
      * @return the active background color or null if no color is set
      */
@@ -646,7 +654,7 @@ final public class GameConfig {
      * @return The part set or null.
      */
     public PartSet getPartSet(String type, String name) {
-        return (PartSet)getPartByName(getPartSets(type), name);
+        return (PartSet) getPartByName(getPartSets(type), name);
     }
 
     /**
@@ -674,18 +682,18 @@ final public class GameConfig {
         String name = getActivePartName(getParts(type), type);
         return getPart(type, name);
     }
-    
+
     /**
      * Returns the active part from a user defined part set.
-     * 
+     *
      * @param partSetType the user defined part set
-     * @param partColor the user defined part color
-     * @param sequence the sequence of the part
+     * @param partColor   the user defined part color
+     * @param sequence    the sequence of the part
      * @return the active part or null
      */
     public Part getActivePartFromSet(String partSetType, String partColor, int sequence) {
         PartSet ps = getActivePartSet(partSetType);
-        return (ps == null)? null : ps.getPart(partColor, sequence);
+        return (ps == null) ? null : ps.getPart(partColor, sequence);
     }
 
     /**
@@ -704,7 +712,7 @@ final public class GameConfig {
      * @return A list with all possible color types.
      */
     public String[] getColorTypes() {
-        return colors.keySet().toArray(new String[colors.size()]);
+        return colors.keySet().toArray(new String[0]);
     }
 
     /**
@@ -713,7 +721,7 @@ final public class GameConfig {
      */
     public Color getActiveColor(String colorType) {
         Color c = HGBaseConfig.getColor(colorType);
-        return (c == null)? getDefaultColor(colorType) : c;
+        return (c == null) ? getDefaultColor(colorType) : c;
     }
 
     /**
@@ -728,29 +736,27 @@ final public class GameConfig {
      * Sets the width of the game field. The value will <b>NOT</b> be written
      * back to the configuration file.
      *
-     * @param fieldWidth
-     *            The width of the game field.
+     * @param fieldWidth The width of the game field.
      */
     public void setFieldWidth(int fieldWidth) {
-	this.fieldWidth = fieldWidth;
+        this.fieldWidth = fieldWidth;
     }
 
     /**
      * Sets the height of the game field. The value will <b>NOT</b> be written
      * back to the configuration file.
      *
-     * @param fieldHeight
-     *            The height of the game field.
+     * @param fieldHeight The height of the game field.
      */
     public void setFieldHeight(int fieldHeight) {
-	this.fieldHeight = fieldHeight;
+        this.fieldHeight = fieldHeight;
     }
 
     /**
      * @return The width of the game field.
      */
     public int getFieldWidth() {
-        return (fieldWidth>0)? fieldWidth : getFieldWidth(getActiveBoard(), getActiveBackground());
+        return (fieldWidth > 0) ? fieldWidth : getFieldWidth(getActiveBoard(), getActiveBackground());
     }
 
     /**
@@ -759,25 +765,21 @@ final public class GameConfig {
      * @return The width of the game field.
      */
     public int getFieldWidth(Board board, Background back) {
-        int wBoard = (board==null)
-        		? 0 
-        		: (int) (board.getImage().getWidth()*board.getZoom()/100.0) + 2*board.getXPos();
-        if (wBoard==1) {
+        int wBoard = (board == null) ? 0 : (int) (board.getImage().getWidth() * board.getZoom() / 100.0) + 2 * board.getXPos();
+        if (wBoard == 1) {
             wBoard = 0;
         }
-        int wBack = (back==null || back.getImage()==null || back.isRepeatMode())
-        		? 0 
-        		: (int) (back.getImage().getWidth()*back.getZoom()/100.0);
+        int wBack = (back == null || back.getImage() == null || back.isRepeatMode()) ? 0 : (int) (back.getImage().getWidth() * back.getZoom() / 100.0);
         if (wBoard > wBack) {
             return wBoard;
         }
         if (wBack > wBoard) {
             return wBack;
         }
-        if (wBack>fieldWidth) {
+        if (wBack > fieldWidth) {
             return wBack; // wBack==wBoard
         }
-        if (fieldWidth>0) {
+        if (fieldWidth > 0) {
             return fieldWidth;
         }
         return CONFIG_STANDARD_WIDTH;
@@ -787,7 +789,7 @@ final public class GameConfig {
      * @return The height of the game field.
      */
     public int getFieldHeight() {
-        return (fieldHeight > 0)? fieldHeight : getFieldHeight(getActiveBoard(), getActiveBackground());
+        return (fieldHeight > 0) ? fieldHeight : getFieldHeight(getActiveBoard(), getActiveBackground());
     }
 
     /**
@@ -796,15 +798,11 @@ final public class GameConfig {
      * @return The height of the game field.
      */
     public int getFieldHeight(Board board, Background back) {
-        int hBoard = (board==null)
-        		? 0 
-        		: (int)(board.getImage().getHeight()*board.getZoom()/100.0) + 2*board.getYPos();
+        int hBoard = (board == null) ? 0 : (int) (board.getImage().getHeight() * board.getZoom() / 100.0) + 2 * board.getYPos();
         if (hBoard == 1) {
             hBoard = 0;
         }
-        int hBack = (back==null || back.getImage()==null || back.isRepeatMode())
-        		? 0 
-        		: (int) (back.getImage().getHeight()*back.getZoom()/100.0);
+        int hBack = (back == null || back.getImage() == null || back.isRepeatMode()) ? 0 : (int) (back.getImage().getHeight() * back.getZoom() / 100.0);
         if (hBoard > hBack) {
             return hBoard;
         }
@@ -822,64 +820,64 @@ final public class GameConfig {
     }
 
     /**
-     * @param map The map to look for a list.
+     * @param map  The map to look for a list.
      * @param type The part or partset type.
      * @return A list, can be empty.
      */
-    private List<Part> getPartsFromMap(Map<String,List<Part>> map, String type) {
-    	List<Part> list = map.get(type);
-    	return (list!=null)? list : new ArrayList<Part>();
+    private List<Part> getPartsFromMap(Map<String, List<Part>> map, String type) {
+        List<Part> list = map.get(type);
+        return (list != null) ? list : new ArrayList<>();
     }
 
     /**
-     * @param map The map to look for a list.
+     * @param map  The map to look for a list.
      * @param type The part or partset type.
      * @return A list, can be empty.
      */
-    private List<PartSet> getPartSetsFromMap(Map<String,List<PartSet>> map, String type) {
-    	List<PartSet> list = map.get(type);
-    	return (list!=null)? list : new ArrayList<PartSet>();
+    private List<PartSet> getPartSetsFromMap(Map<String, List<PartSet>> map, String type) {
+        List<PartSet> list = map.get(type);
+        return (list != null) ? list : new ArrayList<>();
     }
 
     /**
-     * @param map The map to look for a list.
+     * @param map  The map to look for a list.
      * @param type The part or partset type.
      * @return A list, can be empty.
      */
-    private List<CardSet> getCardSetsFromMap(Map<String,List<CardSet>> map, String type) {
-    	List<CardSet> list = map.get(type);
-    	return (list!=null)? list : new ArrayList<CardSet>();
+    private List<CardSet> getCardSetsFromMap(Map<String, List<CardSet>> map, String type) {
+        List<CardSet> list = map.get(type);
+        return (list != null) ? list : new ArrayList<>();
     }
 
     /**
      * @param parts An array with a sort of parts.
-     * @param name Name of the active part.
+     * @param name  Name of the active part.
      * @return The active part or null.
      */
     private Part getPartByName(Part[] parts, String name) {
-    	if (HGBaseTools.hasContent(name)) {
-	        int index = getIndexOfPart(parts, name);
-	        if (index>=0 && parts.length>index) {
-	            return parts[index];
-	        }
-    	}
+        if (HGBaseTools.hasContent(name)) {
+            int index = getIndexOfPart(parts, name);
+            if (index >= 0 && parts.length > index) {
+                return parts[index];
+            }
+        }
         return null;
     }
 
     /**
      * @param parts An array with a sort of parts.
-     * @param name Name of the part configuration.
+     * @param configKey  Name of the part configuration.
      * @return The name of the active part configuration or "".
      */
     private String getActivePartName(Part[] parts, String configKey) {
         String name = HGBaseConfig.get(configKey);
         int index = getIndexOfPart(parts, name);
-        if (index>=0 && index<parts.length && !parts[index].isHidden()) {
+        if (index >= 0 && index < parts.length && !parts[index].isHidden()) {
             return parts[index].getName();
         }
-        for (int i=0; i<parts.length; i++) {
-            if (!parts[i].isHidden()) {
-                return parts[i].getName();
+        for (Part part : parts) {
+            if (!part.isHidden()) {
+                return part.getName();
             }
         }
         return EMPTY_STRING;
@@ -887,7 +885,7 @@ final public class GameConfig {
 
     /**
      * @param parts Array with parts (Background, Board, CardSet).
-     * @param name Name of the part that is searched.
+     * @param name  Name of the part that is searched.
      * @return index of the item or -1 if it was not found.
      */
     private int getIndexOfPart(Part[] parts, String name) {
@@ -901,7 +899,7 @@ final public class GameConfig {
      */
     public String getImageExtension(String pieceType) {
         if (extensionMap.containsKey(pieceType)) {
-            return extensionMap.get(pieceType).toString();
+            return extensionMap.get(pieceType);
         } else {
             return EMPTY_STRING;
         }
@@ -913,7 +911,7 @@ final public class GameConfig {
      */
     public String getImagePath(String pieceType) {
         if (pathMap.containsKey(pieceType)) {
-            return pathMap.get(pieceType).toString();
+            return pathMap.get(pieceType);
         } else {
             return EMPTY_STRING;
         }
@@ -939,42 +937,49 @@ final public class GameConfig {
     public boolean isChangedAfterMove() {
         return changedAfterMove;
     }
+
     /**
      * @param changed True to set the game changed after every move.
      */
     public void setChangedAfterMove(boolean changed) {
         changedAfterMove = changed;
     }
+
     /**
      * @return True, if the game state is changed as soon as a game starts.
      */
     public boolean isChangedOnNewGame() {
         return changedOnNewGame;
     }
+
     /**
      * @param changed True to set the game changed as soon as a game starts.
      */
     public void setChangedOnNewGame(boolean changed) {
         changedOnNewGame = changed;
     }
+
     /**
      * @return True, if the game state is changed at the beginning of every round.
      */
     public boolean isChangedOnNewRound() {
         return changedOnNewRound;
     }
+
     /**
      * @param changed True to set the game changed at the beginning of every round.
      */
     public void setChangedOnNewRound(boolean changed) {
         changedOnNewRound = changed;
     }
+
     /**
      * @return True, if the game state is changed on every new turn.
      */
     public boolean isChangedOnNewTurn() {
         return changedOnNewTurn;
     }
+
     /**
      * @param changed True to set the game changed on every new turn.
      */
@@ -988,30 +993,35 @@ final public class GameConfig {
     public boolean showDialogAfterTurn() {
         return dialogAfterTurn;
     }
+
     /**
      * @param show True to show a dialog after a turn, otherwise false.
      */
     public void setDialogAfterTurn(boolean show) {
         dialogAfterTurn = show;
     }
+
     /**
      * @return True, if there a dialog after each round shall appear.
      */
     public boolean showDialogAfterRound() {
         return dialogAfterRound;
     }
+
     /**
      * @param show True to show a dialog after a round, otherwise false.
      */
     public void setDialogAfterRound(boolean show) {
         dialogAfterRound = show;
     }
+
     /**
      * @return True, if there a dialog after the shall appear.
      */
     public boolean showDialogAfterGame() {
         return dialogAfterGame;
     }
+
     /**
      * @param show True to show a dialog after a game, otherwise false.
      */
@@ -1025,6 +1035,7 @@ final public class GameConfig {
     public boolean isInterruptAfterRound() {
         return interruptAfterRound;
     }
+
     /**
      * @param interrupt True to interrupt the game after every round.
      */
@@ -1033,7 +1044,7 @@ final public class GameConfig {
     }
 
     /**
-     * @param The color value part's type (e.g. CONFIG_CARDSET).
+     * @param type The color value part's type (e.g. CONFIG_CARDSET).
      * @return The mode to sort (ORDERBY_NONE, ORDERBY_COLOR, ORDERBY_VALUE).
      */
     public int getOrderby(String type) {
@@ -1050,14 +1061,14 @@ final public class GameConfig {
     public String getHintsSetting(String setting) {
         return hintsMap.get(setting);
     }
-    
+
     /**
      * Returns a list of all hint keys.
-     * 
+     *
      * @return a list of all hint keys, may be empty
      */
     public String[] getHintsSettingKeys() {
-    	return hintsMap.keySet().toArray(new String[hintsMap.size()]);
+        return hintsMap.keySet().toArray(new String[0]);
     }
 
     /**
@@ -1066,55 +1077,63 @@ final public class GameConfig {
     public int getDelayRound() {
         return delayRound;
     }
+
     /**
      * @param delay The delay before a new round.
      */
     public void setDelayRound(int delay) {
-        delayRound = (delay>0)? delay : 0;
+        delayRound = Math.max(delay, 0);
     }
+
     /**
      * @return the delay before a round considering the game speed factor.
      */
     public int getDelayRoundWithSpeedFactor() {
-        return (int)(getDelayRound()*getGameSpeedFactor());
+        return (int) (getDelayRound() * getGameSpeedFactor());
     }
+
     /**
      * @return The delay before a new turn.
      */
     public int getDelayTurn() {
         return delayTurn;
     }
+
     /**
      * @param delay The delay before a new turn.
      */
     public void setDelayTurn(int delay) {
-        delayTurn = (delay>0)? delay : 0;
+        delayTurn = Math.max(delay, 0);
     }
+
     /**
      * @return the delay before a turn considering the game speed factor.
      */
     public int getDelayTurnWithSpeedFactor() {
-        return (int)(getDelayTurn()*getGameSpeedFactor());
+        return (int) (getDelayTurn() * getGameSpeedFactor());
     }
+
     /**
      * @return The delay before a new move.
      */
     public int getDelayMove() {
         return delayMove;
     }
+
     /**
      * @param delay The delay before a new move.
      */
     public void setDelayMove(int delay) {
-        delayMove = (delay>0)? delay : 0;
+        delayMove = Math.max(delay, 0);
     }
+
     /**
      * @return the delay before a move considering the game speed factor.
      */
     public int getDelayMoveWithSpeedFactor() {
-        return (int)(getDelayMove()*getGameSpeedFactor());
+        return (int) (getDelayMove() * getGameSpeedFactor());
     }
-    
+
     /**
      * @return the delay time for a computer player, with respect to the thinking time
      * @see SimpleComputerPlayer
@@ -1122,18 +1141,20 @@ final public class GameConfig {
     public int getDelayPlayer() {
         return delayPlayer;
     }
+
     /**
      * @param delay The delay for a computer player.
      */
     public void setDelayPlayer(int delay) {
-        delayPlayer = (delay>0)? delay : 0;
+        delayPlayer = Math.max(delay, 0);
     }
+
     /**
      * @return the delay for a computer player considering the game speed factor.
      */
     public int getDelayPlayerWithSpeedFactor() {
-        return (int)(getDelayMove()*getGameSpeedFactor());
-    }    
+        return (int) (getDelayMove() * getGameSpeedFactor());
+    }
 
     /**
      * @param factor the factor is set by the main menu.
@@ -1155,19 +1176,21 @@ final public class GameConfig {
     public boolean isRecordedOnNewGame() {
         return recordOnNewGame;
     }
+
     /**
      * @return True, if the game state shall be recorded at the beginning of every round.
      */
     public boolean isRecordedOnNewRound() {
         return recordOnNewRound;
     }
+
     /**
      * @return True, if the game state shall be recorded at the beginning of every turn.
      */
     public boolean isRecordedOnNewTurn() {
         return recordOnNewTurn;
     }
-    
+
     /**
      * @return a user defined name for the xml root or an empty string for default xml structure for a game.
      */
@@ -1182,12 +1205,12 @@ final public class GameConfig {
      * @see ScaleType
      */
     public ScaleType getMainMenuImageScaleType() {
-	ScaleType scaleType;
-	try {
-	    scaleType = ScaleType.valueOf(mainMenuImageScaleType);
-	} catch (Exception e) {
-	    scaleType = null;
-	}
-	return scaleType;
+        ScaleType scaleType;
+        try {
+            scaleType = ScaleType.valueOf(mainMenuImageScaleType);
+        } catch (Exception e) {
+            scaleType = null;
+        }
+        return scaleType;
     }
 }
