@@ -60,32 +60,14 @@ import at.hagru.hgbase.lib.xml.HGBaseXMLTools;
 public abstract class MainFrame extends HGBaseWelcomeActivity {
 
     public static final String AUTOSAVE_FILENAME = "autosave.xml";
-
-    public enum ZoomType {
-        ZOOM_FIT_ONLY, /* The game panel fits on the screen only. */
-        ZOOM_SCROLL_VH, /*
-         * Allows zooming, scrolling is only possible vertically
-         * or horizontally.
-         */
-        ZOOM_SCROLL_ANY /*
-         * Allows zooming, the scrolling is possibly in any
-         * direction (experimental, does not work well).
-         */
-    }
-
     private static MainFrame instance; // hold the instance of this main frame
-    private static MainMenu mainMenu; // needs to be static, otherwise it makes
-    // troubles with Android
-    private static MainPanel mainPanel; // needs to be static, otherwise it
-    // makes troubles with Android
-    private GameManager gameManager; // needs to be static, otherwise it makes
-    // troubles with Android
+    private static MainMenu mainMenu; // needs to be static, otherwise it makes troubles with Android
+    private static MainPanel mainPanel; // needs to be static, otherwise it makes troubles with Android
     private final ZoomType zoomType;
+    private GameManager gameManager; // needs to be static, otherwise it makes troubles with Android
     private Fragment activeFragment;
     private MainStatusBar statusBar;
-    private boolean isResumeGame; // is necessary because new/resume game has a
-    // part before and after creation of
-    // main/game panel
+    private boolean isResumeGame; // is necessary because new/resume game has a part before and after creation of main/game panel
     private boolean isBlockMenu;
 
     public MainFrame(ZoomType zoomType) {
@@ -165,10 +147,8 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
     /**
      * Register the default menu items for the menu of the activity.
      *
-     * @param menuId
-     *            the menu id
-     * @param action
-     *            the action to call for the corresponding menu item
+     * @param menuId the menu id
+     * @param action the action to call for the corresponding menu item
      */
     protected void registerAction(String menuId, IMenuAction action) {
         int resId = HGBaseResources.getResourceIdByName(menuId, HGBaseResources.ID);
@@ -182,18 +162,13 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * <p>
      * Should be called by the method {@link #onCreatePostWelcome()}.
      *
-     * @param mainMenu
-     *            the main menu to set, i.e., the starting view with basic
-     *            commands
-     * @param mainPanel
-     *            the main panel
-     * @param gamePanel
-     *            the game panel, will get part of the main panel
-     * @param statusBar
-     *            the optional status bar, may be null
+     * @param mainMenu  the main menu to set, i.e., the starting view with basic
+     *                  commands
+     * @param mainPanel the main panel
+     * @param gamePanel the game panel, will get part of the main panel
+     * @param statusBar the optional status bar, may be null
      */
-    protected final void setPanels(MainMenu mainMenu, MainPanel mainPanel, GamePanel gamePanel,
-                                   MainStatusBar statusBar) {
+    protected final void setPanels(MainMenu mainMenu, MainPanel mainPanel, GamePanel gamePanel, MainStatusBar statusBar) {
         MainFrame.mainMenu = mainMenu;
         MainFrame.mainPanel = mainPanel;
         mainPanel.setGamePanel(gamePanel);
@@ -206,13 +181,12 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
 
     @Override
     public View getContentView() {
-        View mainPanelRoot = (mainPanel == null)? null : mainPanel.getRootLayout();
-        return (mainPanelRoot == null)? super.getContentView() : mainPanelRoot;
+        View mainPanelRoot = (mainPanel == null) ? null : mainPanel.getRootLayout();
+        return (mainPanelRoot == null) ? super.getContentView() : mainPanelRoot;
     }
 
     /**
-     * @param fragment
-     *            the fragment to activate
+     * @param fragment the fragment to activate
      */
     protected void activateFragment(Fragment fragment) {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -230,7 +204,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
 
     /**
      * @return true if the main panel is visible, false otherwise (the main menu
-     *         should be visible then)
+     * should be visible then)
      */
     protected boolean isMainPanelVisible() {
         return (activeFragment != null && activeFragment == mainPanel);
@@ -261,8 +235,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
     }
 
     /**
-     * @param block
-     *            True to block menu action, false to allow them.
+     * @param block True to block menu action, false to allow them.
      */
     protected void blockMenuActions(boolean block) {
         this.isBlockMenu = block;
@@ -284,10 +257,9 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
     }
 
     /**
-     * @param itemMap
-     *            the original menu item map
+     * @param itemMap the original menu item map
      * @return the new menu item map without sound menu or the original one if
-     *         no sound menu item exists
+     * no sound menu item exists
      */
     protected Map<Integer, MenuItem> removeSoundSettingFromNavigationDrawer(Map<Integer, MenuItem> itemMap) {
         int soundMenuId = getSoundSettingsMenuId();
@@ -311,13 +283,11 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * Shows the hint dialog for the given type (see ConstantValue.HINT_LIST),
      * if the user wants to see this dialogs.
      *
-     * @param hintType
-     *            The hint type.
+     * @param hintType The hint type.
      */
     public void showHintsDialog(String hintType) {
         GameConfig config = getGameManager().getGameConfig();
-        if (!HGBaseConfig.getBoolean(ConstantValue.CONFIG_HINT_DONTSHOW)
-                && HGBaseTools.hasContent(config.getHintsSetting(hintType))) {
+        if (!HGBaseConfig.getBoolean(ConstantValue.CONFIG_HINT_DONTSHOW) && HGBaseTools.hasContent(config.getHintsSetting(hintType))) {
             GameDialogs dlg = GameDialogFactory.getInstance().createGameDialogs(this);
             GameEngine engine = getGameManager().getGameEngine();
             dlg.showGameHintsDialog(this, hintType, engine, config);
@@ -340,7 +310,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
 
     /**
      * @return The main menu of tjger, i.e. the starting vie (NOT the Android
-     *         menu)
+     * menu)
      */
     public MainMenu getMainMenu() {
         return mainMenu;
@@ -357,13 +327,11 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * Used to set the new game information. These values are typically set by
      * configuration values ({@link HGBaseConfig}).
      *
-     * @param manager
-     *            the game manager
-     * @param numPlayers
-     *            the number of players that will take part at the new game
+     * @param manager    the game manager
+     * @param numPlayers the number of players that will take part at the new game
      * @see #setNewGameInformationFromIntegerConfig(GameManager, String, int)
      * @see #setNewGameInformationFromBooleanConfig(GameManager, String,
-     *      boolean)
+     * boolean)
      * @see #setNewGameInformationFromStringConfig(GameManager, String, String)
      * @see GameManager#setNewGameInformation(String, int)
      * @see GameManager#setNewGameInformation(String, boolean)
@@ -376,45 +344,33 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
     /**
      * Sets a new game integer information from the configuration.
      *
-     * @param manager
-     *            the game manager
-     * @param configKey
-     *            the configuration key
-     * @param defaultValue
-     *            the default value
+     * @param manager      the game manager
+     * @param configKey    the configuration key
+     * @param defaultValue the default value
      */
-    protected final void setNewGameInformationFromIntegerConfig(GameManager manager, String configKey,
-                                                                int defaultValue) {
+    protected final void setNewGameInformationFromIntegerConfig(GameManager manager, String configKey, int defaultValue) {
         manager.setNewGameInformation(configKey, HGBaseConfig.getInt(configKey, defaultValue));
     }
 
     /**
      * Sets a new game boolean information from the configuration.
      *
-     * @param manager
-     *            the game manager
-     * @param configKey
-     *            the configuration key
-     * @param defaultValue
-     *            the default value
+     * @param manager      the game manager
+     * @param configKey    the configuration key
+     * @param defaultValue the default value
      */
-    protected final void setNewGameInformationFromBooleanConfig(GameManager manager, String configKey,
-                                                                boolean defaultValue) {
+    protected final void setNewGameInformationFromBooleanConfig(GameManager manager, String configKey, boolean defaultValue) {
         manager.setNewGameInformation(configKey, HGBaseConfig.getBoolean(configKey, defaultValue));
     }
 
     /**
      * Sets a new game string information from the configuration.
      *
-     * @param manager
-     *            the game manager
-     * @param configKey
-     *            the configuration key
-     * @param defaultValue
-     *            the default value
+     * @param manager      the game manager
+     * @param configKey    the configuration key
+     * @param defaultValue the default value
      */
-    protected final void setNewGameInformationFromStringConfig(GameManager manager, String configKey,
-                                                               String defaultValue) {
+    protected final void setNewGameInformationFromStringConfig(GameManager manager, String configKey, String defaultValue) {
         manager.setNewGameInformation(configKey, HGBaseConfig.get(configKey, defaultValue));
     }
 
@@ -483,7 +439,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * Switch to the main panel from the main menu.
      */
     public void onGameResume() {
-        if (isAutosaveFileAvailable()) {
+        if (isResumeGameAllowed()) {
             setChanged(false);
             isResumeGame = true;
             activateFragment(mainPanel);
@@ -506,8 +462,44 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      */
     public void checkResumeGame() {
         if (getMainMenu() != null) {
-            getMainMenu().setEnabledResume(isAutosaveFileAvailable());
+            getMainMenu().setEnabledResume(isResumeGameAllowed());
         }
+    }
+
+    /**
+     * Enable/disable the new game button depending if it is allowed to start a new game.
+     */
+    public void checkNewGame() {
+        if (getMainMenu() != null) {
+            getMainMenu().setEnabledNewGame(isNewGameAllowed());
+        }
+    }
+
+    /**
+     * Returns {@code true} if it is allowed to resume a game.
+     *
+     * @return {@code true} if it is allowed to resume a game.
+     */
+    public boolean isResumeGameAllowed() {
+        return (isAutosaveFileAvailable()) && ((isProVersion()) || (!isProTeaserPartSelected()));
+    }
+
+    /**
+     * Returns {@code true} if it is allowed to start a new game.
+     *
+     * @return {@code true} if it is allowed to start a new game.
+     */
+    public boolean isNewGameAllowed() {
+        return (isProVersion()) || (!isProTeaserPartSelected());
+    }
+
+    /**
+     * Returns {@code true} if at least one of the selected parts is a teaser for the pro version of the app.
+     *
+     * @return {@code true} if at least one of the selected parts is a teaser for the pro version of the app.
+     */
+    private boolean isProTeaserPartSelected() {
+        return getGameConfig().isProTeaserPartSelected();
     }
 
     /**
@@ -550,7 +542,6 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
     }
 
     /**
-     *
      * @return true if there is an auto save file, otherwise false
      */
     public boolean isAutosaveFileAvailable() {
@@ -561,8 +552,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
     /**
      * Plays a sound if the configuration is set.
      *
-     * @param sound
-     *            Sound identification as it is defined in the settings file.
+     * @param sound Sound identification as it is defined in the settings file.
      */
     public void playAudio(String sound) {
         if (HGBaseConfig.getBoolean(ConstantValue.CONFIG_PLAYSOUND, true)) {
@@ -616,5 +606,17 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
         }
 
         return mode;
+    }
+
+    public enum ZoomType {
+        ZOOM_FIT_ONLY, /* The game panel fits on the screen only. */
+        ZOOM_SCROLL_VH, /*
+         * Allows zooming, scrolling is only possible vertically
+         * or horizontally.
+         */
+        ZOOM_SCROLL_ANY /*
+         * Allows zooming, the scrolling is possibly in any
+         * direction (experimental, does not work well).
+         */
     }
 }

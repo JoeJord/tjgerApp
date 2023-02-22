@@ -1,10 +1,10 @@
 package com.tjger.gui.completed;
 
+import com.tjger.lib.ArrayUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.tjger.lib.ArrayUtil;
 
 /**
  * A card set.
@@ -17,8 +17,8 @@ public class CardSet extends PartSet {
         this(ConstantValue.CONFIG_CARDSET, name, hidden);
     }*/
 
-    public CardSet(String cardSetType, String name, boolean hidden) {
-        super(cardSetType, name, hidden);
+    public CardSet(String cardSetType, String name, boolean hidden, boolean proTeaser) {
+        super(cardSetType, name, hidden, proTeaser);
     }
 
     /**
@@ -46,9 +46,9 @@ public class CardSet extends PartSet {
     }
 
     /**
-     * @param color A color of the card set.
+     * @param color         A color of the card set.
      * @param sequenceStart The starting sequence.
-     * @param sequenceEnd The ending sequence.
+     * @param sequenceEnd   The ending sequence.
      * @return All cards from the starting to the ending sequence (both included).
      */
     public Card[] getCards(String color, int sequenceStart, int sequenceEnd) {
@@ -70,14 +70,14 @@ public class CardSet extends PartSet {
     }
 
     /**
-     * @param color A color of the card set.
+     * @param color    A color of the card set.
      * @param sequence A sequence of a card.
      * @return The card with the given color and value or null if it was not found.
      */
     public Card getCard(String color, int sequence) {
         ColorValuePart c = super.getPart(color, sequence);
         if (c instanceof Card) {
-            return (Card)c;
+            return (Card) c;
         }
         return null;
     }

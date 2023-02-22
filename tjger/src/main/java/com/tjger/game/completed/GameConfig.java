@@ -1,9 +1,6 @@
 package com.tjger.game.completed;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import android.widget.ImageView.ScaleType;
 
 import com.tjger.game.SimpleComputerPlayer;
 import com.tjger.gui.completed.Arrangement;
@@ -18,7 +15,10 @@ import com.tjger.gui.completed.PieceSet;
 import com.tjger.lib.ArrayUtil;
 import com.tjger.lib.ConstantValue;
 
-import android.widget.ImageView.ScaleType;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.lib.HGBaseConfig;
@@ -733,6 +733,13 @@ public final class GameConfig {
     }
 
     /**
+     * @return The width of the game field.
+     */
+    public int getFieldWidth() {
+        return (fieldWidth > 0) ? fieldWidth : getFieldWidth(getActiveBoard(), getActiveBackground());
+    }
+
+    /**
      * Sets the width of the game field. The value will <b>NOT</b> be written
      * back to the configuration file.
      *
@@ -740,23 +747,6 @@ public final class GameConfig {
      */
     public void setFieldWidth(int fieldWidth) {
         this.fieldWidth = fieldWidth;
-    }
-
-    /**
-     * Sets the height of the game field. The value will <b>NOT</b> be written
-     * back to the configuration file.
-     *
-     * @param fieldHeight The height of the game field.
-     */
-    public void setFieldHeight(int fieldHeight) {
-        this.fieldHeight = fieldHeight;
-    }
-
-    /**
-     * @return The width of the game field.
-     */
-    public int getFieldWidth() {
-        return (fieldWidth > 0) ? fieldWidth : getFieldWidth(getActiveBoard(), getActiveBackground());
     }
 
     /**
@@ -790,6 +780,16 @@ public final class GameConfig {
      */
     public int getFieldHeight() {
         return (fieldHeight > 0) ? fieldHeight : getFieldHeight(getActiveBoard(), getActiveBackground());
+    }
+
+    /**
+     * Sets the height of the game field. The value will <b>NOT</b> be written
+     * back to the configuration file.
+     *
+     * @param fieldHeight The height of the game field.
+     */
+    public void setFieldHeight(int fieldHeight) {
+        this.fieldHeight = fieldHeight;
     }
 
     /**
@@ -865,8 +865,8 @@ public final class GameConfig {
     }
 
     /**
-     * @param parts An array with a sort of parts.
-     * @param configKey  Name of the part configuration.
+     * @param parts     An array with a sort of parts.
+     * @param configKey Name of the part configuration.
      * @return The name of the active part configuration or "".
      */
     private String getActivePartName(Part[] parts, String configKey) {
@@ -1157,17 +1157,17 @@ public final class GameConfig {
     }
 
     /**
-     * @param factor the factor is set by the main menu.
-     */
-    public void setGameSpeedFactor(double factor) {
-        gameSpeed = factor;
-    }
-
-    /**
      * @return the game speed factor (e.g. used by the delay for move, turn, etc.).
      */
     public double getGameSpeedFactor() {
         return gameSpeed;
+    }
+
+    /**
+     * @param factor the factor is set by the main menu.
+     */
+    public void setGameSpeedFactor(double factor) {
+        gameSpeed = factor;
     }
 
     /**
@@ -1212,5 +1212,34 @@ public final class GameConfig {
             scaleType = null;
         }
         return scaleType;
+    }
+
+    /**
+     * Returns {@code true} if at least one selected part is only available in the pro version but should be shown in the free version as teaser for the the pro version.
+     *
+     * @return {@code true} if at least one selected part is only available in the pro version but should be shown in the free version as teaser for the the pro version.
+     */
+    public boolean isProTeaserPartSelected() {
+        ArrayList<Part> partsToCheck = new ArrayList<>();
+        partsToCheck.add(getActiveArrangement());
+        partsToCheck.add(getActiveBackground());
+        partsToCheck.add(getActiveBoard());
+        partsToCheck.add(getActiveCardSet());
+        partsToCheck.add(getActiveCover());
+        for (String cardSetType : getCardSetTypes()) {
+            partsToCheck.add(getActiveCardSet(cardSetType));
+        }
+        for (String partType : getPartTypes()) {
+            partsToCheck.add(getActivePart(partType));
+        }
+        for (String partSetType : getPartSetTypes()) {
+            partsToCheck.add(getActivePartSet(partSetType));
+        }
+        for (Part part : partsToCheck) {
+            if ((part != null) && (part.isProTeaser())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -1,10 +1,10 @@
 package com.tjger.gui.completed;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.tjger.lib.ArrayUtil;
 import com.tjger.lib.ConstantValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import at.hagru.hgbase.lib.HGBaseTools;
 
@@ -15,8 +15,8 @@ import at.hagru.hgbase.lib.HGBaseTools;
  */
 public class PieceSet extends PartSet {
 
-    public PieceSet(String name, boolean hidden) {
-        super(ConstantValue.CONFIG_PIECESET, name, hidden);
+    public PieceSet(String name, boolean hidden, boolean proTeaser) {
+        super(ConstantValue.CONFIG_PIECESET, name, hidden, proTeaser);
     }
 
     /**
@@ -44,9 +44,9 @@ public class PieceSet extends PartSet {
     }
 
     /**
-     * @param color A color of the piece set.
+     * @param color         A color of the piece set.
      * @param sequenceStart The starting sequence.
-     * @param sequenceEnd The ending sequence.
+     * @param sequenceEnd   The ending sequence.
      * @return All pieces from the starting to the ending sequence (both included).
      */
     public Piece[] getPieces(String color, int sequenceStart, int sequenceEnd) {
@@ -58,25 +58,25 @@ public class PieceSet extends PartSet {
      * @return A list with pieces.
      */
     private List<Piece> transform(List<ColorValuePart> listCvp) {
-    	List<Piece> listPiece = new ArrayList<>();
-    	for (ColorValuePart cvp : listCvp) {
-    		if (cvp instanceof Piece) {
-    			listPiece.add((Piece)cvp);
-    		}
-    	}
-    	return listPiece;
+        List<Piece> listPiece = new ArrayList<>();
+        for (ColorValuePart cvp : listCvp) {
+            if (cvp instanceof Piece) {
+                listPiece.add((Piece) cvp);
+            }
+        }
+        return listPiece;
     }
 
 
     /**
-     * @param color A color of the piece set.
+     * @param color    A color of the piece set.
      * @param sequence A sequence of a piece.
      * @return The piece with the given color and value or null if it was not found.
      */
     public Piece getPiece(String color, int sequence) {
         ColorValuePart p = super.getPart(color, sequence);
         if (p instanceof Piece) {
-            return (Piece)p;
+            return (Piece) p;
         }
         return null;
     }

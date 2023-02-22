@@ -1,8 +1,9 @@
 package com.tjger.gui.completed;
 
+import android.graphics.Bitmap;
+
 import com.tjger.lib.ConstantValue;
 
-import android.graphics.Bitmap;
 import at.hagru.hgbase.lib.HGBaseTools;
 
 /**
@@ -11,18 +12,18 @@ import at.hagru.hgbase.lib.HGBaseTools;
  * @author hagru
  */
 public class Board extends Part {
-    
+
     final private int xPos;
     final private int yPos;
     final private int zoom;
 
-    public Board(String name, Bitmap image, int xPos, int yPos, boolean hidden, int zoom) {
-        super(ConstantValue.CONFIG_BOARD, name, image, hidden);
+    public Board(String name, Bitmap image, int xPos, int yPos, boolean hidden, int zoom, boolean proTeaser) {
+        super(ConstantValue.CONFIG_BOARD, name, image, hidden, proTeaser);
         this.xPos = xPos;
         this.yPos = yPos;
-        this.zoom = (zoom>0)? zoom : 100;
+        this.zoom = (zoom > 0) ? zoom : 100;
     }
-    
+
     /* (non-Javadoc)
      * @see tjger.gui.completed.Part#equals(java.lang.Object)
      */
@@ -30,14 +31,14 @@ public class Board extends Part {
     public boolean equals(Object o2) {
         return (HGBaseTools.equalClass(this, o2) && this.toString().equals(o2.toString()));
     }
-    
+
     /**
      * @return The starting x-position for painting the board.
      */
     public int getXPos() {
         return xPos;
     }
-    
+
     /**
      * @return The starting y-position for painting the board.
      */

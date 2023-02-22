@@ -1,10 +1,10 @@
 package com.tjger.gui.completed;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.tjger.game.completed.GameConfig;
 import com.tjger.lib.ConstantValue;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.lib.HGBaseTools;
@@ -21,13 +21,13 @@ public class Arrangement extends Part {
     final private String board;
     final private String cover;
     final private String pieceSet;
-    final private Map<String,String> mapCardSets = new LinkedHashMap<>();
-    final private Map<String,String> mapParts = new LinkedHashMap<>();
-    final private Map<String,String> mapPartSets = new LinkedHashMap<>();
-    final private Map<String,Color> mapColors = new LinkedHashMap<>();
+    final private Map<String, String> mapCardSets = new LinkedHashMap<>();
+    final private Map<String, String> mapParts = new LinkedHashMap<>();
+    final private Map<String, String> mapPartSets = new LinkedHashMap<>();
+    final private Map<String, Color> mapColors = new LinkedHashMap<>();
 
-    public Arrangement(String name, Color defaultBackColor, String defaultBack, String defaultBoard, String defaultPieceSet, String defaultCover, String cardSet) {
-        super(ConstantValue.CONFIG_ARRANGEMENT, name, null, false);
+    public Arrangement(String name, Color defaultBackColor, String defaultBack, String defaultBoard, String defaultPieceSet, String defaultCover, String cardSet, boolean proTeaser) {
+        super(ConstantValue.CONFIG_ARRANGEMENT, name, null, false, proTeaser);
         this.backgroundColor = defaultBackColor;
         this.background = defaultBack;
         this.board = defaultBoard;
@@ -45,19 +45,19 @@ public class Arrangement extends Part {
     public boolean equals(Object o2) {
         return (HGBaseTools.equalClass(this, o2) && this.toString().equals(o2.toString()));
     }
-    
+
     /**
      * @return the background color defined for the arrangement, or the default background color or null
      */
     public Color getBackgroundColor() {
         if (backgroundColor == null) {
-        	BackgroundColor backColor = GameConfig.getInstance().getBackgroundColor();
-        	return (backColor == null) ? null : backColor.getDefaultColor();
+            BackgroundColor backColor = GameConfig.getInstance().getBackgroundColor();
+            return (backColor == null) ? null : backColor.getDefaultColor();
         } else {
             return backgroundColor;
         }
     }
-    
+
     /**
      * @return The default background or null.
      */
@@ -149,7 +149,7 @@ public class Arrangement extends Part {
 
     /**
      * @param colorType A color type.
-     * @param color The color for this arrangement.
+     * @param color     The color for this arrangement.
      */
     public void setColor(String colorType, Color color) {
         mapColors.put(colorType, color);

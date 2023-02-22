@@ -91,5 +91,7 @@
     <string name="tooltip_scoregame">Gesamtpunkte</string>
     <string name="tooltip_gamesplayed">Anzahl der gespielten Spiele</string>
     <string name="tooltip_gameswon">Anzahl der gewonnenen Spiele</string>
-    
+
+    <string name="teaser_part_warning">Es wurde ein Vorschau-Element ausgewählt. Es kann damit das Spiel nicht gespielt werden!</string>
+
 </resources>

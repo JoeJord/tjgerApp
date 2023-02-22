@@ -1,8 +1,18 @@
 package com.tjger.gui.internal;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Handler;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
+import com.tjger.MainFrame;
+import com.tjger.R;
 import com.tjger.game.completed.GameConfig;
 import com.tjger.gui.GameDialogs;
 import com.tjger.gui.completed.Arrangement;
@@ -15,19 +25,13 @@ import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.PieceSet;
 import com.tjger.lib.ConstantValue;
 
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.preference.ListPreference;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.gui.HGBaseGuiTools;
 import at.hagru.hgbase.gui.config.HGBaseColorPreference;
-import at.hagru.hgbase.gui.config.HGBaseConfigDialog;
+import at.hagru.hgbase.gui.config.HGBaseConfigStateDialog;
 import at.hagru.hgbase.gui.config.HGBaseConfigTools;
 import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseText;
@@ -39,23 +43,22 @@ import at.hagru.hgbase.lib.internal.IntBooleanStringMap;
  *
  * @author hagru
  */
-public class PartsDlg extends HGBaseConfigDialog implements OnSharedPreferenceChangeListener {
-
+public class PartsDlg extends HGBaseConfigStateDialog implements OnSharedPreferenceChangeListener {
     private static final String ARRANGE_USERDEFINED_ID = "arrangement_userdefined";
     private static final int INDEX_BACKCOLOR = 0; // the index in the configColorList
-    private PartsComboBox[] configComboList;
-    private HGBaseColorPreference[] configColorList;
     private static PreviewPanel pnPreview;
-    private Color newBackColor;
-    private boolean backColorDefined;
-    private boolean completeArrangement;
-    private boolean onChangeArrangement;
     private final IntBooleanStringMap indexMapStandard;
     private final IntBooleanStringMap indexMapUserDef;
     private final String[] userParts;
     private final String[] userPartSets;
     private final String[] cardSetTypes;
     private final String[] colorTypes;
+    private PartsComboBox[] configComboList;
+    private HGBaseColorPreference[] configColorList;
+    private Color newBackColor;
+    private boolean backColorDefined;
+    private boolean completeArrangement;
+    private boolean onChangeArrangement;
 
     public PartsDlg() {
         super(HGBaseText.getText("settings_parts").replace('.', ' '));
@@ -70,6 +73,48 @@ public class PartsDlg extends HGBaseConfigDialog implements OnSharedPreferenceCh
         colorTypes = config.getColorTypes();
         // add a listener to react on changes of the preference
         HGBaseConfig.getPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected boolean canLeave(Preference preference, String s) {
+        (new Handler()).post(this::setStateMessage); // The status message must be displayed with a slight delay, otherwise it cannot be determined correctly.
+        return true;
+    }
+
+    /**
+     * Sets the state message.
+     */
+    private void setStateMessage() {
+        Integer warningMsg = getWarningMessage();
+        if (warningMsg != null) {
+            setWarnMessage(HGBaseText.getText(warningMsg));
+        } else {
+            setWarnMessage("");
+        }
+    }
+
+    /**
+     * Returns the message that should be displayed as a warning.
+     *
+     * @return The message that should be displayed as a warning.
+     */
+    private Integer getWarningMessage() {
+        return getTeaserPartWarning();
+    }
+
+    /**
+     * Returns the warning message if a teaser part is selected or {@code null} if no warning is needed.
+     *
+     * @return The warning message if a teaser part is selected or {@code null} if no warning is needed.
+     */
+    private Integer getTeaserPartWarning() {
+        return (GameConfig.getInstance().isProTeaserPartSelected()) ? R.string.teaser_part_warning : null;
+    }
+
+    @Override
+    public void onBackPressed() {
+        MainFrame.getInstance().checkNewGame(); // Check if it is allowed to start a new game with the current selection.
+        super.onBackPressed();
     }
 
     @Override

@@ -91,5 +91,7 @@
     <string name="tooltip_scoregame">Total score</string>
     <string name="tooltip_gamesplayed">Number of played games</string>
     <string name="tooltip_gameswon">Number of won games</string>
-    
+
+    <string name="teaser_part_warning">A preview item has been selected. It can not be used to play the game!</string>
+
 </resources>

@@ -1,16 +1,6 @@
 package com.tjger.game.completed;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import android.graphics.Bitmap;
 
 import com.tjger.game.completed.imagereader.AbstractImageEffectReader;
 import com.tjger.game.completed.imagereader.ImageReflectionReader;
@@ -37,7 +27,17 @@ import com.tjger.gui.completed.PieceSet;
 import com.tjger.gui.internal.GameDialogFactory;
 import com.tjger.lib.ConstantValue;
 
-import android.graphics.Bitmap;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
 import at.hagru.hgbase.android.HGBaseResources;
 import at.hagru.hgbase.android.awt.Color;
@@ -51,21 +51,28 @@ import at.hagru.hgbase.lib.xml.ChildNodeIterator;
 import at.hagru.hgbase.lib.xml.HGBaseXMLTools;
 
 /**
- * Helper class for reading the configuration file.<p<
- * THe file has to be named "tjger.xml" and placed into the /res/raw directory.
+ * Helper class for reading the configuration file.<p>
+ * The file has to be named "tjger.xml" and placed into the /res/raw directory.
  *
  * @author Harald
  */
 class GameConfigFileReader {
 
-    private static final String TJGER_FILE_NAME = "tjger"; // the file extension (.xml) is added automatically by Android
-
-    private static final String CONFIG_TJGER = "tjger";
     static final String CONFIG_NAME = "name";
     static final String CONFIG_IMAGE = "image";
+    static final String CONFIG_TYPE = "type";
+    static final String CONFIG_VALUE = "value";
+    static final String CONFIG_CARDSET = "cardset";
+    static final String CONFIG_COLOR = "color";
+    private static final String TJGER_FILE_NAME = "tjger"; // the file extension (.xml) is added automatically by Android
+    private static final String CONFIG_TJGER = "tjger";
     private static final String CONFIG_CLASS = "class";
     private static final String CONFIG_APP = "app";
     private static final String CONFIG_PRO = "pro";
+    /**
+     * Configuration key for the flag if a part, which is only available in the pro version, should be shown in the free version as teaser for the pro version.
+     */
+    private static final String CONFIG_TEASER = "teaser";
     private static final String CONFIG_FULLSCREENMODE = "fullscreenmode";
     private static final String CONFIG_ADVERTISEMENTS = "advertisements";
     private static final String CONFIG_ADVERTISEMENTACTIVE = "active";
@@ -103,8 +110,6 @@ class GameConfigFileReader {
     private static final String CONFIG_ZOOM = "zoom";
     private static final String CONFIG_IGNOREZOOM = "ignorezoom";
     private static final String CONFIG_PATH = "path";
-    static final String CONFIG_TYPE = "type";
-    static final String CONFIG_VALUE = "value";
     private static final String CONFIG_FALSE = "false";
     private static final String CONFIG_TRUE = "true";
     private static final String CONFIG_DEFAULT = "default";
@@ -140,7 +145,6 @@ class GameConfigFileReader {
     private static final String CONFIG_PIECE = "piece";
     private static final String CONFIG_PIECECOLOR = "piececolor";
     private static final String CONFIG_DEFAULTCOMPUTER = "defaultcomputer";
-    static final String CONFIG_CARDSET = "cardset";
     private static final String CONFIG_CARDS = "cards";
     private static final String CONFIG_CARD = "card";
     private static final String CONFIG_COVERS = "covers";
@@ -154,7 +158,6 @@ class GameConfigFileReader {
     private static final String CONFIG_SETCLASS = "setclass";
     private static final String CONFIG_CVPCLASS = "cvpclass";
     private static final String CONFIG_COLORS = "colors";
-    static final String CONFIG_COLOR = "color";
     private static final String CONFIG_ARRANGEMENTS = "arrangements";
     private static final String CONFIG_ARRANGEMENT = "arrangement";
     private static final String CONFIG_PLAYING_FIELDS = "playingfields";
@@ -162,15 +165,13 @@ class GameConfigFileReader {
     private static final String CONFIG_FILE = "file";
     private static final String CONFIG_MAIN_MENU = "mainmenu";
     private static final String CONFIG_SCALE_TYPE = "scaletype";
-
-    private static BackgroundColor backgroundColor = null;
     private static final List<Background> backgroundList = new ArrayList<>();
     private static final List<Board> boardList = new ArrayList<>();
     private static final List<Cover> coverList = new ArrayList<>();
     private static final List<PieceSet> pieceSetList = new ArrayList<>();
     private static final List<Arrangement> arrangementList = new ArrayList<>();
-
     private static final Map<String, AbstractImageEffectReader<? extends ImageEffect>> effectReaders = new HashMap<>();
+    private static BackgroundColor backgroundColor = null;
 
     static {
         effectReaders.put(GameConfig.CONFIG_SHADOW, new ImageShodawReader());
@@ -330,8 +331,7 @@ class GameConfigFileReader {
      * @param config The game configuration object.
      */
     protected static void readArrangements(Node node, final GameConfig config) {
-        config.completeArrangement = HGBaseXMLTools.getAttributeValue(node, CONFIG_COMPLETE).equals(
-                CONFIG_TRUE);
+        config.completeArrangement = HGBaseXMLTools.getAttributeValue(node, CONFIG_COMPLETE).equals(CONFIG_TRUE);
         ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_ARRANGEMENTS, config) {
 
             @Override
@@ -345,7 +345,7 @@ class GameConfigFileReader {
                     String pieceset = HGBaseXMLTools.getAttributeValue(node, CONFIG_PIECESET);
                     String cover = HGBaseXMLTools.getAttributeValue(node, CONFIG_COVER);
                     String cardset = HGBaseXMLTools.getAttributeValue(node, CONFIG_CARDSET);
-                    Arrangement newArrangement = new Arrangement(name, backColor, back, board, pieceset, cover, cardset);
+                    Arrangement newArrangement = new Arrangement(name, backColor, back, board, pieceset, cover, cardset, isProTeaser(node));
                     arrangementList.add(newArrangement);
                     // look for user defined parts and part sets
                     ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_ARRANGEMENT, newArrangement) {
@@ -393,7 +393,27 @@ class GameConfigFileReader {
      * @return true if this part is available, false if not because it's a pro part and the free version is currently running
      */
     protected static boolean isAvailable(Node node, GameConfig config) {
-        return config.proVersion || !HGBaseXMLTools.getAttributeBooleanValue(node, CONFIG_PRO);
+        return config.proVersion || !isProPart(node) || isProTeaser(node);
+    }
+
+    /**
+     * Returns {@code true} if the part of the specified node in only available in the pro version.
+     *
+     * @param node The node to check.
+     * @return {@code true} if the part of the specified node in only available in the pro version.
+     */
+    private static boolean isProPart(Node node) {
+        return HGBaseXMLTools.getAttributeBooleanValue(node, CONFIG_PRO);
+    }
+
+    /**
+     * Returns {@code true} if the specified node is only available in the pro version but is shown in the free version as teaser for the pro version.
+     *
+     * @param node The node to check.
+     * @return {@code true} if the specified node is only available in the pro version but is shown in the free version as teaser for the pro version.
+     */
+    private static boolean isProTeaser(Node node) {
+        return HGBaseXMLTools.getAttributeBooleanValue(node, CONFIG_TEASER);
     }
 
     /**
@@ -474,7 +494,7 @@ class GameConfigFileReader {
             newPart = ClassFactory.createClass(partClass, Part.class, CONFIG_CVPCLASS, classes, params);
         }
         if (newPart == null) {
-            newPart = new Part(type, name, imgPart, hidden);
+            newPart = new Part(type, name, imgPart, hidden, isProTeaser(node));
         }
         setEffectsForPart(newPart, node, topLevelEffects);
         listPart.add(newPart);
@@ -517,7 +537,7 @@ class GameConfigFileReader {
                     newPartSet = ClassFactory.createClass(setClass, PartSet.class, CONFIG_SETCLASS, classes, params);
                 }
                 if (newPartSet == null) {
-                    newPartSet = new PartSet(type, name, hidden);
+                    newPartSet = new PartSet(type, name, hidden, isProTeaser(node));
                 }
                 setEffectsForPart(newPartSet, node, topLevelEffects);
                 return newPartSet;
@@ -534,7 +554,7 @@ class GameConfigFileReader {
                     newCVP = ClassFactory.createClass(cvpClass, ColorValuePart.class, CONFIG_CVPCLASS, classes, params);
                 }
                 if (newCVP == null) {
-                    newCVP = new ColorValuePart(set, partType, color, sequence, value, image);
+                    newCVP = new ColorValuePart(set, partType, color, sequence, value, image, isProTeaser(node));
                 }
                 setEffectsForPart(newCVP, node, set);
                 return newCVP;
@@ -578,14 +598,14 @@ class GameConfigFileReader {
         new PartSetContructor<PieceSet>(CONFIG_PIECES, CONFIG_PIECESET, CONFIG_PIECE, pieceSetList) {
             @Override
             protected PieceSet createPartSet(String type, String name, Node node, boolean hidden) {
-                PieceSet pieceSetPart = new PieceSet(name, hidden);
+                PieceSet pieceSetPart = new PieceSet(name, hidden, isProTeaser(node));
                 setEffectsForPart(pieceSetPart, node, topLevelEffects);
                 return pieceSetPart;
             }
 
             @Override
             protected ColorValuePart createColorValuePart(PartSet set, String color, int sequence, int value, Bitmap image, Node node) {
-                Piece piecePart = new Piece((PieceSet) set, color, sequence, value, image);
+                Piece piecePart = new Piece((PieceSet) set, color, sequence, value, image, isProTeaser(node));
                 setEffectsForPart(piecePart, node, set);
                 return piecePart;
             }
@@ -624,14 +644,14 @@ class GameConfigFileReader {
             @Override
             protected CardSet createPartSet(String type, String name, Node node, boolean hidden) {
                 String validType = (type == null || type.isEmpty()) ? ConstantValue.CONFIG_CARDSET : type;
-                CardSet cardSetPart = new CardSet(validType, name, hidden);
+                CardSet cardSetPart = new CardSet(validType, name, hidden, isProTeaser(node));
                 setEffectsForPart(cardSetPart, node, topLevelEffects);
                 return cardSetPart;
             }
 
             @Override
             protected ColorValuePart createColorValuePart(PartSet set, String color, int sequence, int value, Bitmap image, Node node) {
-                Card cardPart = new Card((CardSet) set, color, sequence, value, image);
+                Card cardPart = new Card((CardSet) set, color, sequence, value, image, isProTeaser(node));
                 setEffectsForPart(cardPart, node, set);
                 return cardPart;
             }
@@ -684,7 +704,7 @@ class GameConfigFileReader {
                     Bitmap imgCover = HGBaseGuiTools.loadImage(image);
                     boolean hidden = isHiddenPart(node, config);
                     if (imgCover != null) {
-                        Cover coverPart = new Cover(name, imgCover, hidden);
+                        Cover coverPart = new Cover(name, imgCover, hidden, isProTeaser(node));
                         setEffectsForPart(coverPart, node, topLevelEffects);
                         coverList.add(coverPart);
                     } else {
@@ -724,7 +744,7 @@ class GameConfigFileReader {
             }
             boolean hidden = isHiddenPart(node, config);
             if (imgBoard != null) {
-                Board boardPart = new Board(name, imgBoard, xPos, yPos, hidden, zoom);
+                Board boardPart = new Board(name, imgBoard, xPos, yPos, hidden, zoom, isProTeaser(node));
                 setEffectsForPart(boardPart, node, topLevelEffects);
                 boardList.add(boardPart);
             } else {
@@ -773,7 +793,7 @@ class GameConfigFileReader {
                 if (zoom == HGBaseTools.INVALID_INT) {
                     zoom = 100;
                 }
-                Background backPart = new Background(name, imgBack, repeat, ignoreZoom, hidden, zoom);
+                Background backPart = new Background(name, imgBack, repeat, ignoreZoom, hidden, zoom, isProTeaser(node));
                 if (!repeat) {
                     setEffectsForPart(backPart, node, topLevelEffects);
                 }
@@ -795,11 +815,11 @@ class GameConfigFileReader {
         // read the background color from the root (either color or backcolor attribute)
         int rgb = HGBaseTools.toInt(HGBaseXMLTools.getAttributeValue(node, CONFIG_COLOR));
         if (HGBaseTools.isValid(rgb)) {
-            backgroundColor = new BackgroundColor(new Color(rgb), config.helpHidden);
+            backgroundColor = new BackgroundColor(new Color(rgb), config.helpHidden, isProTeaser(node));
         } else {
             rgb = HGBaseTools.toInt(HGBaseXMLTools.getAttributeValue(node, CONFIG_BACKCOLOR));
             if (HGBaseTools.isValid(rgb)) {
-                backgroundColor = new BackgroundColor(new Color(rgb), config.helpHidden);
+                backgroundColor = new BackgroundColor(new Color(rgb), config.helpHidden, isProTeaser(node));
             }
         }
         // read all the background images
@@ -1220,7 +1240,7 @@ class GameConfigFileReader {
      */
     private static void readAppSettings(Node node, GameConfig config) {
         if (node.getNodeName().equals(CONFIG_APP)) {
-            config.proVersion = HGBaseXMLTools.getAttributeBooleanValue(node, CONFIG_PRO);
+            config.proVersion = isProPart(node);
             config.fullscreenMode = HGBaseXMLTools.getAttributeValue(node, CONFIG_FULLSCREENMODE);
         }
     }
@@ -1245,8 +1265,7 @@ class GameConfigFileReader {
      * @param config The GameConfig object.
      */
     private static void testForErrors(GameConfig config) {
-        if (config.getMinPlayers() == 0 || config.getMaxPlayers() == 0
-                || config.getMaxPlayers() < config.getMinPlayers()) {
+        if (config.getMinPlayers() == 0 || config.getMaxPlayers() == 0 || config.getMaxPlayers() < config.getMinPlayers()) {
             config.hasErrors = true;
             HGBaseLog.logError("Number of players are defined ambiguous!");
         } else {

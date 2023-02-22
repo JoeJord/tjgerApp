@@ -51,15 +51,10 @@ import at.hagru.hgbase.lib.HGBaseTools;
  */
 public class MainMenu extends Fragment {
 
-    static final StatePanelMenu STATEPANEL_MENU = new StatePanelMenu();
-    static final GameSpeedMenu GAMESPEED_MENU = new GameSpeedMenu();
-
-    private static final int BUTTON_PADDING = 20;
     public static final int DEFAULT_BUTTON_BACK_COLOR = Color.GRAY;
     public static final int DEFAULT_BUTTON_TEXT_COLOR = Color.WHITE;
     public static final int BUTTON_BACK_COLOR_DISABLED = Color.DKGRAY;
     public static final int BUTTON_TEXT_COLOR_DISABLED = Color.GRAY;
-
     public static final String MENU_ID_GAME_CLOSE = "game_close";
     public static final String MENU_ID_GAME_NEW = "game_new";
     public static final String MENU_ID_GAME_RESUME = "game_resume";
@@ -70,15 +65,19 @@ public class MainMenu extends Fragment {
     public static final String MENU_ID_HELP_GAMEHINTS = "help_gamehints";
     public static final String MENU_ID_SETTINGS_PARTS = "settings_parts";
     public static final String MENU_ID_SETTINGS_SOUND = "settings_playsound";
-
     public static final String MAIN_MENU_IMAGE = "main_menu";
     public static final String MAIN_MENU_BUTTON = "main_menu_button";
-
     public static final int MENU_ICON_SIZE = 64;
-
+    static final StatePanelMenu STATEPANEL_MENU = new StatePanelMenu();
+    static final GameSpeedMenu GAMESPEED_MENU = new GameSpeedMenu();
+    private static final int BUTTON_PADDING = 20;
     private final ZoomMenu zoomMenu;
     private final List<Button> buttonList = new ArrayList<>();
     private Button btResume;
+    /**
+     * The button to start a new game.
+     */
+    private Button btNewGame;
     private Button btMenuIcon;
     private Button btSoundSettings;
 
@@ -110,6 +109,7 @@ public class MainMenu extends Fragment {
         super.onDestroy();
         buttonList.clear();
         btResume = null;
+        btNewGame = null;
     }
 
     @Override
@@ -305,8 +305,9 @@ public class MainMenu extends Fragment {
         GameConfig config = getGameManager().getGameConfig();
         LinearLayout layout = HGBaseGuiTools.createLinearLayout(getMainFrame(), false);
         setResumeButton(addButton(layout, MENU_ID_GAME_RESUME));
-        setEnabledResume(getMainFrame().isAutosaveFileAvailable());
-        addButton(layout, MENU_ID_GAME_NEW);
+        setEnabledResume(getMainFrame().isResumeGameAllowed());
+        setNewGameButton(addButton(layout, MENU_ID_GAME_NEW));
+        setEnabledNewGame(getMainFrame().isNewGameAllowed());
         addButton(layout, MENU_ID_NEW_GAME_DLG);
         addButton(layout, MENU_ID_SETTINGS_PARTS);
         if (config.isRememberGames() || config.isRememberScores() || config.getHighScoreLength() > 0) {
@@ -335,6 +336,15 @@ public class MainMenu extends Fragment {
      */
     protected void setResumeButton(Button btResume) {
         this.btResume = btResume;
+    }
+
+    /**
+     * Sets the new game button.
+     *
+     * @param btNewGame The button to set.
+     */
+    protected void setNewGameButton(Button btNewGame) {
+        this.btNewGame = btNewGame;
     }
 
     /**
@@ -371,6 +381,30 @@ public class MainMenu extends Fragment {
             bt.setBackgroundColor(getButtonBackColor());
         }
         bt.setTextColor(getButtonTextColor());
+    }
+
+    /**
+     * Sets the text color and background color or image for the specified button depending if it is enabled or not.
+     *
+     * @param button  The button where to set the color.
+     * @param enabled The flag if the button is enabled or not.
+     */
+    protected void setEnabledButtonColors(Button button, boolean enabled) {
+        if (button == null) {
+            return;
+        }
+        if (enabled) {
+            setButtonColors(button);
+        } else {
+            button.setTextColor(BUTTON_TEXT_COLOR_DISABLED);
+            int backgroundId = HGBaseResources.getResourceIdByName(MAIN_MENU_BUTTON, HGBaseResources.DRAWABLE);
+            if (backgroundId > 0) {
+                button.setAlpha(0.5f);
+            } else {
+                button.setBackgroundColor(BUTTON_BACK_COLOR_DISABLED);
+            }
+            button.setTextColor(getButtonTextColor());
+        }
     }
 
     /**
@@ -449,23 +483,33 @@ public class MainMenu extends Fragment {
     }
 
     /**
+     * Enable/disable the new game button.
+     *
+     * @param newGamePossible {@code true} if it is possible to start a new game, otherwise {@code false}.
+     */
+    public void setEnabledNewGame(boolean newGamePossible) {
+        if (btNewGame != null) {
+            btNewGame.setEnabled(newGamePossible);
+            setNewGameButtonColors(newGamePossible);
+        }
+    }
+
+    /**
      * Sets the text color and background color or image for the resume button.
      *
      * @param resumePossible true if resume is possible, false if not
      */
     protected void setResumeButtonColors(boolean resumePossible) {
-        if (resumePossible) {
-            setButtonColors(btResume);
-        } else {
-            btResume.setTextColor(BUTTON_TEXT_COLOR_DISABLED);
-            int backgroundId = HGBaseResources.getResourceIdByName(MAIN_MENU_BUTTON, HGBaseResources.DRAWABLE);
-            if (backgroundId > 0) {
-                btResume.setAlpha(0.5f);
-            } else {
-                btResume.setBackgroundColor(BUTTON_BACK_COLOR_DISABLED);
-            }
-            btResume.setTextColor(getButtonTextColor());
-        }
+        setEnabledButtonColors(btResume, resumePossible);
+    }
+
+    /**
+     * Set the text color and background color or image for the new game button.
+     *
+     * @param newGamePossible {@code true} if it is allowed to start a new game.
+     */
+    protected void setNewGameButtonColors(boolean newGamePossible) {
+        setEnabledButtonColors(btNewGame, newGamePossible);
     }
 
     /**
@@ -542,10 +586,6 @@ public class MainMenu extends Fragment {
      */
     static class StatePanelMenu {
 
-        public enum StatePanelPosition {
-            STATEPANEL_NONE, STATEPANEL_AUTO, STATEPANEL_BOTTOM, STATEPANEL_TOP, STATEPANEL_RIGHT, STATEPANEL_LEFT
-        }
-
         private static final String STATEPANEL_DEFAULT = StatePanelPosition.STATEPANEL_AUTO.name();
 
         /**
@@ -568,6 +608,10 @@ public class MainMenu extends Fragment {
         public String[] getPositions() {
             return HGBaseTools.toStringArray(StatePanelPosition.values());
         }
+
+        public enum StatePanelPosition {
+            STATEPANEL_NONE, STATEPANEL_AUTO, STATEPANEL_BOTTOM, STATEPANEL_TOP, STATEPANEL_RIGHT, STATEPANEL_LEFT
+        }
     }
 
     /**
@@ -576,21 +620,6 @@ public class MainMenu extends Fragment {
     static class GameSpeedMenu {
 
         public static final String GAMESPEED_CONFIG = "gamespeed";
-
-        public enum GameSpeedOptions {
-            GAMESPEED_SLOW(2.0f), GAMESPEED_NORMAL(1.0f), GAMESPEED_FAST(0.5f);
-
-            private final float value;
-
-            GameSpeedOptions(float value) {
-                this.value = value;
-            }
-
-            public float getValue() {
-                return value;
-            }
-        }
-
         private static final String GAMESPEED_DEFAULT = GameSpeedOptions.GAMESPEED_NORMAL.name();
 
         /**
@@ -612,6 +641,20 @@ public class MainMenu extends Fragment {
          */
         public String[] getOptions() {
             return HGBaseTools.toStringArray(GameSpeedOptions.values());
+        }
+
+        public enum GameSpeedOptions {
+            GAMESPEED_SLOW(2.0f), GAMESPEED_NORMAL(1.0f), GAMESPEED_FAST(0.5f);
+
+            private final float value;
+
+            GameSpeedOptions(float value) {
+                this.value = value;
+            }
+
+            public float getValue() {
+                return value;
+            }
         }
     }
 

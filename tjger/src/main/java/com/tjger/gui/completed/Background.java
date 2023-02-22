@@ -1,8 +1,9 @@
 package com.tjger.gui.completed;
 
+import android.graphics.Bitmap;
+
 import com.tjger.lib.ConstantValue;
 
-import android.graphics.Bitmap;
 import at.hagru.hgbase.lib.HGBaseTools;
 
 /**
@@ -16,13 +17,13 @@ public class Background extends Part {
     private boolean ignoreZoom;
     private int zoom;
 
-    public Background(String name, Bitmap image, boolean repeat, boolean ignoreZoom, boolean hidden, int zoom) {
-        super(ConstantValue.CONFIG_BACKGROUND, name, image, hidden);
+    public Background(String name, Bitmap image, boolean repeat, boolean ignoreZoom, boolean hidden, int zoom, boolean proTeaser) {
+        super(ConstantValue.CONFIG_BACKGROUND, name, image, hidden, proTeaser);
         this.repeatMode = repeat;
         this.ignoreZoom = ignoreZoom;
-        this.zoom = (zoom>0)? zoom : 100;
+        this.zoom = (zoom > 0) ? zoom : 100;
     }
-    
+
     /* (non-Javadoc)
      * @see tjger.gui.completed.Part#equals(java.lang.Object)
      */
@@ -30,21 +31,21 @@ public class Background extends Part {
     public boolean equals(Object o2) {
         return (HGBaseTools.equalClass(this, o2) && this.toString().equals(o2.toString()));
     }
-    
+
     /**
      * @return If it's repeat mode, the background image is drawn multiple if it's to small.
      */
     public boolean isRepeatMode() {
         return repeatMode;
     }
-    
+
     /**
      * @return True if the zoom shall be ignored, makes only sense if <code>isRepeatMode()</code> is also true.
      */
     public boolean isIgnoreZoom() {
         return ignoreZoom;
     }
-    
+
     /**
      * @return The zoom factor for this background.
      */
