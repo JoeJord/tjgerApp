@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">TestApp</string>
+
+    <string name="type_human">Human</string>
+    <string name="type_computer_free">Computer free</string>
+    <string name="type_computer_pro">Computer pro</string>
+    <string name="type_computer_pro_teaser">Computer pro teaser</string>
+    <string name="back_free">Back free</string>
+    <string name="back_pro">Back pro</string>
+    <string name="back_pro_teaser">Back pro teaser</string>
+    <string name="board_free">Board free</string>
+    <string name="board_pro">Board pro</string>
+    <string name="board_pro_teaser">Board pro teaser</string>
+    <string name="partset">Part-Set</string>
+    <string name="partset_free">Partset free</string>
+    <string name="partset_pro">Partset pro</string>
+    <string name="partset_pro_teaser">Partset pro teaser</string>
+    <string name="part">Part</string>
+    <string name="part_free">Part free</string>
+    <string name="part_pro">Part pro</string>
+    <string name="part_pro_teaser">Part pro teaser</string>
+    <string name="pieceset_free">Pieceset free</string>
+    <string name="pieceset_pro">Pieceset pro</string>
+    <string name="pieceset_pro_teaser">Pieceset pro teaser</string>
+    <string name="piece_free">Piece free</string>
+    <string name="piece_pro">Piece pro</string>
+    <string name="piece_pro_teaser">Piece pro teaser</string>
+    <string name="cardset">Card-Set</string>
+    <string name="cardset_free">Cardset free</string>
+    <string name="cardset_pro">Cardset pro</string>
+    <string name="cardset_pro_teaser">Cardset pro teaser</string>
+    <string name="card">Card</string>
+    <string name="card_free">Card free</string>
+    <string name="card_pro">Card pro</string>
+    <string name="card_pro_teaser">Card pro teaser</string>
+    <string name="cover_free">Cover free</string>
+    <string name="cover_pro">Cover pro</string>
+    <string name="cover_pro_teaser">Cover pro teaser</string>
+    <string name="arrangement_free">Arrangement free</string>
+    <string name="arrangement_pro">Arrangement pro</string>
+    <string name="arrangement_pro_teaser">Arrangement pro teaser</string>
+</resources>

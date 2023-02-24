@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tjger>
+
+  <settings>
+    <players min="2" max="4" default="2" onehuman="false" withouthuman="true"/>
+    <rules class="com.tjger.testapp.game.rules.TestGameRules"/>
+    <gamestate class="com.tjger.testapp.game.state.TestGameState"/>
+    <newgamedialog class="com.tjger.gui.NewGameDialog" asktosave="newgame.asktosave"/>
+    <gamedialogs class="com.tjger.gui.GameDialogs"/>
+    <infodialogs move="false" turn="false" round="false" game="true"/>
+    <interrupt round="false"/>
+    <delay round="0" turn="0" move="0"/>
+    <changed newgame="false" newround="true" newturn="false" aftermove="true"/>
+    <statistics games="false" scores="false" highscore="0" onlyfirst="false" scrollwhen="15"/>
+    <hints path="/html/hints" extension="html" move="" turn="" round="" game="game" application="" />
+    <app pro="true" fullscreenmode="sticky_immersive" />
+    <advertisements active="true" url="http://tjger.ddns.net/tjgerversiondb/adservice.php?gameid=testad&amp;langid=[LANG]" errorpageurl="file:///android_asset/advertisement/defaultadvertisement.html" widthpercent="100" heightpercent="100" />
+    <mainmenu scaletype="FIT_XY" />
+  </settings>
+
+  <players extension="png" path="/gfx/player" piececolor="piece" defaultcomputer="type_computer_free">
+    <player type="type_human" class="com.tjger.game.HumanPlayer"/>
+    <player type="type_computer_free" class="com.tjger.testapp.game.player.computer.ComputerPlayerFree"/>
+    <player type="type_computer_pro" class="com.tjger.testapp.game.player.computer.ComputerPlayerPro" pro="true"/>
+    <player type="type_computer_pro_teaser" class="com.tjger.testapp.game.player.computer.ComputerPlayerProTeaser" pro="true" teaser="true"/>
+  </players>
+
+  <backgrounds extension="jpg" path="/gfx/background">
+    <background name="back_free"/>
+    <background name="back_pro" pro="true"/>
+    <background name="back_pro_teaser" pro="true" teaser="true"/>
+  </backgrounds>
+
+  <boards extension="png" path="/gfx/board">
+    <board name="board_free" xpos="0" ypos="0" zoom="0" shadow="true"/>
+    <board name="board_pro" xpos="0" ypos="0" zoom="0" shadow="true" pro="true"/>
+    <board name="board_pro_teaser" xpos="0" ypos="0" zoom="0" shadow="true" pro="true" teaser="true"/>
+  </boards>
+
+  <parts extension="png" path="/gfx/parts/set">
+    <partset type="partset" name="partset_free" orderby="none" shadow="true">
+      <part color="partsetpart" sequencestart="1" sequenceend="2"/>
+    </partset>
+    <partset type="partset" name="partset_pro" orderby="none" shadow="true" pro="true">
+      <part color="partsetpart" sequencestart="1" sequenceend="2"/>
+    </partset>
+    <partset type="partset" name="partset_pro_teaser" orderby="none" shadow="true" pro="true" teaser="true">
+      <part color="partsetpart" sequencestart="1" sequenceend="2"/>
+    </partset>
+  </parts>
+
+  <parts extension="png" path="/gfx/parts">
+    <part type="part" name="part_free"/>
+    <part type="part" name="part_pro" pro="true"/>
+    <part type="part" name="part_pro_teaser" pro="true" teaser="true"/>
+  </parts>
+
+  <pieces extension="png" path="/gfx/pieces/set">
+    <pieceset type="pieceset" name="pieceset_free" orderby="none">
+      <piece color="piecesetpiece" sequencestart="1" sequenceend="2"/>
+    </pieceset>
+    <pieceset type="pieceset" name="pieceset_pro" orderby="none" pro="true">
+      <piece color="piecesetpiece" sequencestart="1" sequenceend="2"/>
+    </pieceset>
+    <pieceset type="pieceset" name="pieceset_pro_teaser" orderby="none" pro="true" teaser="true">
+      <piece color="piecesetpiece" sequencestart="1" sequenceend="2"/>
+    </pieceset>
+  </pieces>
+
+  <pieces extension="png" path="/gfx/pieces">
+    <piece type="piece" name="piece_free"/>
+    <piece type="piece" name="piece_pro" pro="true"/>
+    <piece type="piece" name="piece_pro_teaser" pro="true" teaser="true"/>
+  </pieces>
+
+  <cards extension="png" path="/gfx/cards/set">
+    <cardset type="cardset" name="cardset_free" orderby="none">
+      <card color="cardsetcard" sequencestart="1" sequenceend="2"/>
+    </cardset>
+    <cardset type="cardset" name="cardset_pro" orderby="none" pro="true">
+      <card color="cardsetcard" sequencestart="1" sequenceend="2"/>
+    </cardset>
+    <cardset type="cardset" name="cardset_pro_teaser" orderby="none" pro="true" teaser="true">
+      <card color="cardsetcard" sequencestart="1" sequenceend="2"/>
+    </cardset>
+  </cards>
+
+  <cards extension="png" path="/gfx/cards">
+    <card color="card" name="card_free"/>
+    <card color="card" name="card_pro" pro="true"/>
+    <card color="card" name="card_pro_teaser" pro="true" teaser="true"/>
+  </cards>
+
+  <covers extension="png" path="/gfx/covers">
+    <cover name="cover_free"/>
+    <cover name="cover_pro" pro="true"/>
+    <cover name="cover_pro_teaser" pro="true" teaser="true"/>
+  </covers>
+
+  <arrangements complete="false">
+    <arrangement name="arrangement_free" background="back_free" board="board_free" pieceset="pieceset_free" cover="cover_free" cardset="cardset_free">
+      <partset type="partset" value="partset_free"/>
+      <part type="part" value="part_free"/>
+      <card type="card" value="card_free"/>
+    </arrangement>
+    <arrangement name="arrangement_pro" background="back_pro" board="board_pro" pieceset="pieceset_pro" cover="cover_pro" cardset="cardset_pro" pro="true">
+      <partset type="partset" value="partset_pro"/>
+      <part type="part" value="part_pro"/>
+      <card type="card" value="card_pro"/>
+    </arrangement>
+    <arrangement name="arrangement_pro_teaser" background="back_pro_teaser" board="board_pro_teaser" pieceset="pieceset_pro_teaser" cover="cover_pro_teaser" cardset="cardset_pro_teaser" pro="true" teaser="true">
+      <partset type="partset" value="partset_pro_teaser"/>
+      <part type="part" value="part_pro_teaser"/>
+      <card type="card" value="card_pro_teaser"/>
+    </arrangement>
+  </arrangements>
+</tjger>

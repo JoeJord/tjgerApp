@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 include ':tjger'
 rootProject.name = "tjgerApp"
+include ':testapp'
