@@ -153,7 +153,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
      *
      * @param manager the player manager
      */
-    private void createPlayerNamesPanel(PlayerManager manager) {
+    protected void createPlayerNamesPanel(PlayerManager manager) {
         tfPlayerName = (EditTextPreference) createHumanPlayerNamePreference(manager.getDefaultHumanPlayerName());
         addPreference(tfPlayerName);
     }
