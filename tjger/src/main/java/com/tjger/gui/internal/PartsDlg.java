@@ -108,7 +108,8 @@ public class PartsDlg extends HGBaseConfigStateDialog implements OnSharedPrefere
      * @return The warning message if a teaser part is selected or {@code null} if no warning is needed.
      */
     private Integer getTeaserPartWarning() {
-        return (GameConfig.getInstance().isProTeaserPartSelected()) ? R.string.teaser_part_warning : null;
+        GameConfig gameConfig = GameConfig.getInstance();
+        return (!gameConfig.isProVersion() && gameConfig.isProTeaserPartSelected()) ? R.string.teaser_part_warning : null;
     }
 
     @Override
