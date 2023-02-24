@@ -75,7 +75,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
                 return false;
             }
             for (String invalidChar : ConstantValue.getNetworkSpecialChars()) {
-                if (value.indexOf(invalidChar) >= 0) {
+                if (value.contains(invalidChar)) {
                     setErrorMessage(HGBaseText.getText("err_namewrong", new Object[]{invalidChar}));
                     return false;
                 }
