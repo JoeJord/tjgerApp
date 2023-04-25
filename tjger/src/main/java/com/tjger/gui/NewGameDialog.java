@@ -76,7 +76,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
             }
             for (String invalidChar : ConstantValue.getNetworkSpecialChars()) {
                 if (value.contains(invalidChar)) {
-                    setErrorMessage(HGBaseText.getText("err_namewrong", new Object[]{invalidChar}));
+                    setErrorMessage(HGBaseText.getText("err_namewrong", invalidChar));
                     return false;
                 }
             }
@@ -130,8 +130,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
         }
         if (!config.isOneHumanPlayer()) {
             int minHumans = (config.isWithoutHumanPlayer()) ? 0 : 1;
-            sliderNumHumans = HGBaseConfigTools.createNumberPickerPreference(this, ConstantValue.CONFIG_NUMHUMANS,
-                    minHumans, max, 1, minHumans, true);
+            sliderNumHumans = HGBaseConfigTools.createNumberPickerPreference(this, ConstantValue.CONFIG_NUMHUMANS, minHumans, max, 1, minHumans, true);
             addPreference(sliderNumHumans);
         }
     }
@@ -176,8 +175,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
         if (playerColors.first.size() > 1) {
             String[] colorNames = playerColors.first.toArray(new String[0]);
             Bitmap[] colorImages = playerColors.second.toArray(new Bitmap[0]);
-            cbPlayerPieceColor = HGBaseConfigTools.createListPreference(this, ConstantValue.CONFIG_PLAYERPIECECOLOR,
-                    colorNames, colorImages, colorNames[0]);
+            cbPlayerPieceColor = HGBaseConfigTools.createListPreference(this, ConstantValue.CONFIG_PLAYERPIECECOLOR, colorNames, colorImages, colorNames[0]);
             addPreference(cbPlayerPieceColor);
         }
     }
@@ -231,8 +229,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
         if (supportTypes.length > 1) {
             String[] typeIds = getComputerPlayerTypesIds(supportTypes);
             Bitmap[] typeImages = getComputerPlayerTypesImages(supportTypes);
-            cbComputerType = HGBaseConfigTools.createListPreference(this, ConstantValue.CONFIG_COMPUTERTYPE,
-                    typeIds, typeImages, true, typeIds[0]/*, true*/);
+            cbComputerType = HGBaseConfigTools.createListPreference(this, ConstantValue.CONFIG_COMPUTERTYPE, typeIds, typeImages, true, typeIds[0]/*, true*/);
             addPreference(cbComputerType);
         }
     }
