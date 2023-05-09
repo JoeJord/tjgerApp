@@ -28,7 +28,7 @@
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity
-            android:name="com.tjger.gui.NewGameDialog"
+            android:name="com.tjger.testapp.ui.dialog.TestNewGameDialog"
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
         <activity

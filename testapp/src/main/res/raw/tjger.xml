@@ -5,7 +5,7 @@
     <players min="2" max="4" default="2" onehuman="false" withouthuman="true"/>
     <rules class="com.tjger.testapp.game.rules.TestGameRules"/>
     <gamestate class="com.tjger.testapp.game.state.TestGameState"/>
-    <newgamedialog class="com.tjger.gui.NewGameDialog" asktosave="newgame.asktosave"/>
+    <newgamedialog class="com.tjger.testapp.ui.dialog.TestNewGameDialog" asktosave="newgame.asktosave"/>
     <gamedialogs class="com.tjger.gui.GameDialogs"/>
     <infodialogs move="false" turn="false" round="false" game="true"/>
     <interrupt round="false"/>
@@ -13,7 +13,7 @@
     <changed newgame="false" newround="true" newturn="false" aftermove="true"/>
     <statistics games="false" scores="false" highscore="0" onlyfirst="false" scrollwhen="15"/>
     <hints path="/html/hints" extension="html" move="" turn="" round="" game="game" application="" />
-    <app pro="true" fullscreenmode="sticky_immersive" />
+    <app pro="false" fullscreenmode="sticky_immersive" />
     <advertisements active="true" url="http://tjger.ddns.net/tjgerversiondb/adservice.php?gameid=testad&amp;langid=[LANG]" errorpageurl="file:///android_asset/advertisement/defaultadvertisement.html" widthpercent="100" heightpercent="100" />
     <mainmenu scaletype="FIT_XY" />
   </settings>
