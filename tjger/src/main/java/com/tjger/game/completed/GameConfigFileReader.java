@@ -909,7 +909,7 @@ class GameConfigFileReader {
                         image = calculateImage(CONFIG_PLAYER, playerType, config);
                     }
                     Bitmap typeImage = HGBaseGuiTools.loadImage(image);
-                    if ((PlayerFactory.getInstance().addPlayerType(playerType, classPath, typeImage)) && (typeImage == null)) {
+                    if ((PlayerFactory.getInstance().addPlayerType(playerType, classPath, typeImage, isProTeaser(node))) && (typeImage == null)) {
                         logImageNotFound("Player type", image);
                     }
                 }

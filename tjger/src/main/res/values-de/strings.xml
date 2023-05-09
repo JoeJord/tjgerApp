@@ -93,5 +93,6 @@
     <string name="tooltip_gameswon">Anzahl der gewonnenen Spiele</string>
 
     <string name="teaser_part_warning">Es wurde ein Vorschau-Element ausgewählt. Es kann damit das Spiel nicht gespielt werden!</string>
+    <string name="teaser_player_warning">Es wurde ein Vorschau-Element ausgewählt. Es kann damit das Spiel nicht gespielt werden!</string>
 
 </resources>

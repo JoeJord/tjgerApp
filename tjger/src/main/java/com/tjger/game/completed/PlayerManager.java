@@ -82,9 +82,7 @@ final public class PlayerManager {
      * @return The player name from the configuration or the default name.
      */
     public String getPlayerName(int i) {
-        String nameConfigKey = (i == HUMAN_PLAYER_INDEX) ? ConstantValue.CONFIG_PLAYERNAME 
-				  										 : ConstantValue.CONFIG_PLAYERNAME + i;				
-        String playerName = HGBaseConfig.get(nameConfigKey);
+        String playerName = GameConfig.getPlayerName(i);
         boolean isOnlyOneHuman = isOnlyOneHumanPlayer();
         if (!HGBaseTools.hasContent(playerName) || (i == HUMAN_PLAYER_INDEX && (playerName.equals(getDefaultHumanPlayerName()) 
                                                                             ||  playerName.equals(getDefaultPlayerName(i))))) {
@@ -227,5 +225,22 @@ final public class PlayerManager {
             playerList[index]=player;
         }
     }
-    
+
+    /**
+     * Returns {@code true} if at least one selected player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     *
+     * @return {@code true} if at least one selected player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     */
+    public boolean isProTeaserPlayerTypeSelected() {
+        int numPlayers = gameConfig.getMaxPlayers();
+        PlayerFactory playerFactory = PlayerFactory.getInstance();
+        PlayerManager playerManager = PlayerManager.getInstance();
+        for (int playerIndex = 0; playerIndex < numPlayers; playerIndex++) {
+            PlayerType playerType = playerFactory.getPlayerType(playerManager.getPlayerType(playerIndex));
+            if (PlayerType.isProTeaser(playerType)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

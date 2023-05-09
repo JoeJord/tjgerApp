@@ -17,11 +17,16 @@ public class PlayerType implements HGBaseItem {
 
     final private String playerType;
     final private Bitmap typeImage;
+    /**
+     * Flag if this player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     */
+    private final boolean proTeaser;
 
-    public PlayerType(String playerType, Bitmap typeImage) {
+    public PlayerType(String playerType, Bitmap typeImage, boolean proTeaser) {
         super();
         this.playerType = playerType;
         this.typeImage = typeImage;
+        this.proTeaser = proTeaser;
     }
     
     /**
@@ -84,4 +89,25 @@ public class PlayerType implements HGBaseItem {
         return getId().hashCode();
     }
 
+    /**
+     * Returns {@code true} if this player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     *
+     * @return {@code true} if this player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     */
+    public boolean isProTeaser() {
+        return proTeaser;
+    }
+
+    /**
+     * Returns {@code true} if the specified player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     *
+     * @param playerType The player type to check.
+     * @return {@code true} if the specified player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     */
+    public static boolean isProTeaser(PlayerType playerType) {
+        if (playerType == null) {
+            return false;
+        }
+        return playerType.isProTeaser();
+    }
 }

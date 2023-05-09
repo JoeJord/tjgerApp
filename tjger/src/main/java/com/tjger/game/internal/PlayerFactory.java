@@ -46,13 +46,14 @@ public final class PlayerFactory {
      * @param playerType New player type to add.
      * @param classPath The full name of the class that implements this player.
      * @param typeImage The image of the player type.
+     * @param proTeaser Flag if the player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
      * @return True, if player was added.
      */
-    public boolean addPlayerType(String playerType, String classPath, Bitmap typeImage) {
+    public boolean addPlayerType(String playerType, String classPath, Bitmap typeImage, boolean proTeaser) {
         Object player = createPlayer(classPath, playerType, "", "");
         if (player != null) {
             mapPlayerTypes.put(playerType, classPath);
-            PlayerType ptNew = createPlayerType(playerType, typeImage);
+            PlayerType ptNew = createPlayerType(playerType, typeImage, proTeaser);
             supportTypes.add(ptNew);
             if (player instanceof HumanPlayer) {
                 humanTypes.add(ptNew);
@@ -71,10 +72,11 @@ public final class PlayerFactory {
      *
      * @param playerType The id of the new player type.
      * @param typeImage The image of the player type.
+     * @param proTeaser Flag if the player type is only available in the pro version but should be shown in the free version as teaser for the pro version.
      * @return A new PlayerType object.
      */
-    private PlayerType createPlayerType(String playerType, Bitmap typeImage) {
-        return new PlayerType(playerType, typeImage);
+    private PlayerType createPlayerType(String playerType, Bitmap typeImage, boolean proTeaser) {
+        return new PlayerType(playerType, typeImage, proTeaser);
     }
 
     /**

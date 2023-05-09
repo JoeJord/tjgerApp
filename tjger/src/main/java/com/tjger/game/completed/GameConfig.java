@@ -1242,4 +1242,15 @@ public final class GameConfig {
         }
         return false;
     }
+
+    /**
+     * Returns the name of the player with the specified index.
+     *
+     * @param playerIndex The index of the player for which the name should be returned.
+     * @return The name of the player with the specified index.
+     */
+    public static String getPlayerName(int playerIndex) {
+        String nameConfigKey = ConstantValue.CONFIG_PLAYERNAME + ((playerIndex == PlayerManager.HUMAN_PLAYER_INDEX) ? "" : playerIndex);
+        return HGBaseConfig.get(nameConfigKey);
+    }
 }

@@ -1,12 +1,14 @@
 package com.tjger.gui;
 
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.util.Pair;
 
 import com.tjger.MainFrame;
+import com.tjger.R;
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.PlayerManager;
 import com.tjger.game.completed.PlayerType;
@@ -20,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import at.hagru.hgbase.gui.config.HGBaseConfigStateDialog;
 import at.hagru.hgbase.gui.config.HGBaseConfigTools;
 import at.hagru.hgbase.gui.config.HGBaseNumberPickerPreference;
@@ -34,7 +37,6 @@ import at.hagru.hgbase.lib.HGBaseTools;
  * @author hagru
  */
 public class NewGameDialog extends HGBaseConfigStateDialog {
-
     /**
      * Select the number of players.
      */
@@ -60,29 +62,151 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
         super(HGBaseText.getText("dlg_newgame"));
     }
 
-    @Override
-    protected boolean canLeave(Preference pref, String value) {
-        // reset game state if a preference has changed, because a new game has to be started for such changes
+    /**
+     * Resets the state of the current game.
+     */
+    protected void resetGameState() {
         File saveFile = MainFrame.getInstance().getAutosaveFile();
         if (saveFile != null && saveFile.exists()) {
             saveFile.delete();
             MainFrame.getInstance().checkResumeGame();
         }
-        // look if the player name is set
+    }
+
+    /**
+     * Returns {@code true} if the value of the preference is not valid.
+     *
+     * @param pref The preference that has been changed.
+     * @param value The new value for the preference (as {@code String}.
+     * @return {@code true} if the value of the preference is not valid.
+     */
+    protected boolean isValidValue(@NonNull Preference pref, String value) {
+        boolean valid = true;
         if (pref.equals(tfPlayerName)) {
-            if (!HGBaseTools.hasContent(value)) {
-                setErrorMessage(HGBaseText.getText("err_neednames"));
-                return false;
-            }
-            for (String invalidChar : ConstantValue.getNetworkSpecialChars()) {
-                if (value.contains(invalidChar)) {
-                    setErrorMessage(HGBaseText.getText("err_namewrong", invalidChar));
-                    return false;
-                }
+            valid = isPlayerNameValid(value);
+        }
+        return valid;
+    }
+
+    /**
+     * Returns {@code true} if the specified player name is valid.
+     *
+     * @param value The value to check.
+     * @return {@code true} if the specified player name is valid.
+     */
+    protected boolean isPlayerNameValid(String value) {
+        return !isPlayerNameEmpty(value) && !hasPlayerNameInvalidChar(value);
+    }
+
+    /**
+     * Returns {@code true} if the specified player name is empty.
+     *
+     * @param value The value to check.
+     * @return {@code true} if the specified player name is empty.
+     */
+    protected boolean isPlayerNameEmpty(String value) {
+        return !HGBaseTools.hasContent(value);
+    }
+
+    /**
+     * Returns {@code true} if the specified player name contains invalid chars.
+     *
+     * @param value The value to check.
+     * @return {@code true} if the specified player name contains invalid chars.
+     */
+    protected boolean hasPlayerNameInvalidChar(String value) {
+        if (value == null) {
+            return false;
+        }
+        for (String invalidChar : ConstantValue.getNetworkSpecialChars()) {
+            if (value.contains(invalidChar)) {
+                return true;
             }
         }
-        // everything ok
-        return true;
+        return false;
+    }
+
+    @Override
+    protected boolean canLeave(Preference pref, String value) {
+        // reset game state if a preference has changed, because a new game has to be started for such changes
+        resetGameState();
+        (new Handler()).post(this::setStateMessage); // The status message must be displayed with a slight delay, otherwise it cannot be determined correctly.
+        return isValidValue(pref, value);
+    }
+
+    /**
+     * Sets the state message.
+     */
+    protected void setStateMessage() {
+        String errorMsg = getErrorMessage();
+        if (errorMsg != null) {
+            setErrorMessage(errorMsg);
+            return;
+        }
+        String warningMsg = getWarningMessage();
+        if (warningMsg != null) {
+            setWarnMessage(warningMsg);
+            return;
+        }
+        String infoMsg = getInfoMessage();
+        if (infoMsg != null) {
+            setInfoMessage(infoMsg);
+            return;
+        }
+        setInfoMessage("");
+    }
+
+    /**
+     * Returns the message that should be displayed as an error or {@code null} if no error is needed.
+     *
+     * @return The message that should be displayed as an error or {@code null} if no error is needed.
+     */
+    protected String getErrorMessage() {
+        return getPlayerNameErrorMessage();
+    }
+
+    /**
+     * Returns the error message if the player name is not correct or {@code null} if not error is needed.
+     *
+     * @return The error message if the player name is not correct or {@code null} if not error is needed.
+     */
+    protected String getPlayerNameErrorMessage() {
+        String playerName = GameConfig.getPlayerName(0);
+        if (isPlayerNameEmpty(playerName)) {
+            return HGBaseText.getText(R.string.err_neednames);
+        }
+        if (hasPlayerNameInvalidChar(playerName)) {
+            return HGBaseText.getText(R.string.err_namewrong);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the message that should be displayed as a warning or {@code null} if no warning is needed.
+     *
+     * @return The message that should be displayed as a warning or {@code null} if no warning is needed.
+     */
+    protected String getWarningMessage() {
+        return getTeaserWarning();
+    }
+
+    /**
+     * Returns the warning message if a teaser item is selected or {@code null} if no warning is needed.
+     *
+     * @return The warning message if a teaser item is selected or {@code null} if no warning is needed.
+     */
+    protected String getTeaserWarning() {
+        GameConfig gameConfig = GameConfig.getInstance();
+        return (!gameConfig.isProVersion() && PlayerManager.getInstance().isProTeaserPlayerTypeSelected()) ? HGBaseText.getText(R.string.teaser_player_warning) : null;
+    }
+
+    /**
+     * Returns the message that should be displayed as an information or {@code null} if no information is needed.
+     *
+     * @return The message that should be displayed as an information or {@code null} if no information is needed.
+     */
+    protected String getInfoMessage() {
+        return null;
     }
 
     @Override
@@ -224,7 +348,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
      * Create a panel to select the difficulty by taking the possible computer types.
      * The panel will only be created if more than one computer types are available.
      */
-    private void createPlayerTypesPanel() {
+    public void createPlayerTypesPanel() {
         PlayerType[] supportTypes = PlayerFactory.getInstance().getComputerPlayerTypes();
         if (supportTypes.length > 1) {
             String[] typeIds = getComputerPlayerTypesIds(supportTypes);
@@ -281,5 +405,11 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
     @Override
     protected void okPressed() {
         PlayerManager.getInstance().initPlayers();
+    }
+
+    @Override
+    public void onBackPressed() {
+        MainFrame.getInstance().checkNewGame(); // Check if it is allowed to start a new game with the current selection.
+        super.onBackPressed();
     }
 }

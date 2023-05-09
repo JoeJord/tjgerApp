@@ -13,6 +13,7 @@ import com.tjger.game.GamePlayer;
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.GameEngine;
 import com.tjger.game.completed.GameManager;
+import com.tjger.game.completed.PlayerManager;
 import com.tjger.gui.GameDialogs;
 import com.tjger.gui.GamePanel;
 import com.tjger.gui.actions.ShowGameHintsDlgAction;
@@ -481,7 +482,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * @return {@code true} if it is allowed to resume a game.
      */
     public boolean isResumeGameAllowed() {
-        return (isAutosaveFileAvailable()) && ((isProVersion()) || (!isProTeaserPartSelected()));
+        return (isAutosaveFileAvailable()) && ((isProVersion()) || (!isProTeaserElementSelected()));
     }
 
     /**
@@ -490,7 +491,16 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * @return {@code true} if it is allowed to start a new game.
      */
     public boolean isNewGameAllowed() {
-        return (isProVersion()) || (!isProTeaserPartSelected());
+        return (isProVersion()) || (!isProTeaserElementSelected());
+    }
+
+    /**
+     * Returns {@code true} if at least one of the selected elements is a teaser for the pro version of the app.
+     *
+     * @return {@code true} if at least one of the selected elements is a teaser for the pro version of the app.
+     */
+    private boolean isProTeaserElementSelected() {
+        return (isProTeaserPartSelected()) || (isProTeaserPlayerTypeSelected());
     }
 
     /**
@@ -500,6 +510,15 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      */
     private boolean isProTeaserPartSelected() {
         return getGameConfig().isProTeaserPartSelected();
+    }
+
+    /**
+     * Returns {@code true} if at least one of the selected player types is a teaser for the pro version of the app.
+     *
+     * @return {@code true} if at least one of the selected player types is a teaser for the pro version of the app.
+     */
+    private boolean isProTeaserPlayerTypeSelected() {
+        return PlayerManager.getInstance().isProTeaserPlayerTypeSelected();
     }
 
     /**
