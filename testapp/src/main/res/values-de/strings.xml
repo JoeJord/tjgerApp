@@ -1,5 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TestApp</string>
+    <string name="app_description">Das ist eine Test Application.</string>
+    <string name="infoUrl">http://www.tjger.com</string>
+    <string name="infoCopyright">Copyright (&#169;) 2023 by Josef Jordan</string>
+
+    <string name="action_credits">Credits</string>
+    <string name="creditspage">credits_de.html</string>
+
+    <string name="dlg_newgame">Spieleinstellungen</string>
+
+    <string name="link_facebook">Facebook</string>
+    <string name="link_twitter">Twitter</string>
 
     <string name="type_human">Mensch</string>
     <string name="type_computer_free">Computer free</string>

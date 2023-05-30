@@ -2,7 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.tjger.hotdice.android.common.ui.frame.HDMainFrame" >
+    tools:context="com.tjger.hotdice.android.common.ui.frame.HDMainFrame"
+    tools:ignore="AlwaysShowAction" >
 
     <item 
         android:id="@+id/settings_playsound" 
@@ -28,5 +29,18 @@
         android:id="@+id/action_about" 
         android:title="@string/action_about"
         android:icon="@drawable/about"/>
+    <item
+        android:id="@+id/action_credits"
+        android:title="@string/action_credits"/>
+    <item
+        android:id="@+id/link_facebook" 
+        android:title="@string/link_facebook"
+        android:icon="@drawable/facebook"
+        app:showAsAction="always"/>
+    <item 
+        android:id="@+id/link_twitter" 
+        android:title="@string/link_twitter"
+        android:icon="@drawable/twitter"
+        app:showAsAction="always"/>
 
 </menu>

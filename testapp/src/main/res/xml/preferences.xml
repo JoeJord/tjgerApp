@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/category_game">
+        <ListPreference android:key="settings_gamespeed" android:title="@string/settings_gamespeed" android:defaultValue="gamespeed_normal" 
+                        android:entries="@array/gamespeed_labels" android:entryValues="@array/gamespeed_values"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/category_sound_graphics">
+        <SwitchPreference android:key="settings_playsound" android:title="@string/settings_playsound" android:defaultValue="true" android:switchTextOff="@string/button_off" android:switchTextOn="@string/button_on"/>
+    </PreferenceCategory>
+</PreferenceScreen>
