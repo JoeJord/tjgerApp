@@ -65,6 +65,10 @@ public class MainMenu extends Fragment {
     public static final String MENU_ID_HELP_GAMEHINTS = "help_gamehints";
     public static final String MENU_ID_SETTINGS_PARTS = "settings_parts";
     public static final String MENU_ID_SETTINGS_SOUND = "settings_playsound";
+    /**
+     * The menu id for the show credits dialog action.
+     */
+    public static final String MENU_ID_CREDITS = "action_credits";
     public static final String MAIN_MENU_IMAGE = "main_menu";
     public static final String MAIN_MENU_BUTTON = "main_menu_button";
     public static final int MENU_ICON_SIZE = 64;
@@ -579,6 +583,14 @@ public class MainMenu extends Fragment {
         // get the new game dialog and show it
         NewGameDialog dlg = GameDialogFactory.getInstance().createNewDialog();
         HGBaseConfigDialog.show(getMainFrame(), dlg.getClass());
+    }
+
+    /**
+     * Shows the credits dialog.
+     */
+    public void showCreditsDlg() {
+        GameDialogs dlg = GameDialogFactory.getInstance().createGameDialogs(getMainFrame());
+        dlg.showCreditsDlg(getMainFrame());
     }
 
     /**

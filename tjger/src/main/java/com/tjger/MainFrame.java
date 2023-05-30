@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.tjger.game.GamePlayer;
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.GameEngine;
@@ -16,6 +18,7 @@ import com.tjger.game.completed.GameManager;
 import com.tjger.game.completed.PlayerManager;
 import com.tjger.gui.GameDialogs;
 import com.tjger.gui.GamePanel;
+import com.tjger.gui.actions.ShowCreditsDlgAction;
 import com.tjger.gui.actions.ShowGameHintsDlgAction;
 import com.tjger.gui.actions.ShowGameInfoDlgAction;
 import com.tjger.gui.actions.ShowGameInstructionsDlgAction;
@@ -38,7 +41,6 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import androidx.drawerlayout.widget.DrawerLayout;
 import at.hagru.hgbase.HGBaseWelcomeActivity;
 import at.hagru.hgbase.android.HGBaseAdvertisements;
 import at.hagru.hgbase.android.HGBaseResources;
@@ -143,6 +145,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
         registerAction(MainMenu.MENU_ID_HELP_GAMEHINTS, new ShowGameHintsDlgAction(this));
         registerAction(MainMenu.MENU_ID_SETTINGS_PARTS, new ShowPartsDlgAction(this));
         registerAction(MainMenu.MENU_ID_SETTINGS_SOUND, new SoundConfigurationAction(this));
+        registerAction(MainMenu.MENU_ID_CREDITS, new ShowCreditsDlgAction(this));
     }
 
     /**
