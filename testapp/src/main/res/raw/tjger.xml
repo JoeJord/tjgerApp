@@ -14,7 +14,7 @@
     <statistics games="false" scores="false" highscore="0" onlyfirst="false" scrollwhen="15"/>
     <hints path="/html/hints" extension="html" move="" turn="" round="" game="game" application="" />
     <app pro="false" fullscreenmode="sticky_immersive" />
-    <advertisements active="true" url="http://tjger.ddns.net/tjgerversiondb/adservice.php?gameid=testad&amp;langid=[LANG]" errorpageurl="file:///android_asset/advertisement/defaultadvertisement.html" widthpercent="100" heightpercent="100" />
+    <advertisements active="true" url="https://tjger.ddns.net/tjgerversiondb/adservice.php?gameid=testad&amp;langid=[LANG]" errorpageurl="file:///android_asset/advertisement/defaultadvertisement.html" widthpercent="100" heightpercent="100" />
     <mainmenu scaletype="FIT_XY" />
   </settings>
 
