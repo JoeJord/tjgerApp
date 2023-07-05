@@ -128,6 +128,10 @@ class GameConfigFileReader {
     private static final String CONFIG_PLAYERS = "players";
     private static final String CONFIG_ONEHUMAN = "onehuman";
     private static final String CONFIG_WITHOUTHUMAN = "withouthuman";
+    /**
+     * Configuration key for the default number of human players if more (or less) than one human player is allowed.
+     */
+    private static final String CONFIG_DEFAULT_HUMAN = "defaulthuman";
     private static final String CONFIG_PLAYER = "player";
     private static final String CONFIG_GAMEFIELD = "gamefield";
     private static final String CONFIG_HEIGHT = "height";
@@ -1133,6 +1137,8 @@ class GameConfigFileReader {
                     config.defaultPlayers = config.minPlayers;
                 }
             }
+            int minHumanPlayers = config.getMinHumanPlayers();
+            config.defaultHumanPlayers = Math.max(HGBaseXMLTools.getAttributeIntValue(node, CONFIG_DEFAULT_HUMAN, minHumanPlayers), minHumanPlayers);
             String order = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORDER);
             if (CONFIG_CLOCKWISE.equals(order)) {
                 config.playersOrder = GameConfig.PLAYERS_CLOCKWISE;

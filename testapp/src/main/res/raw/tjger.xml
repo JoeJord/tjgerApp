@@ -2,7 +2,7 @@
 <tjger>
 
   <settings>
-    <players min="2" max="4" default="2" onehuman="false" withouthuman="true"/>
+    <players min="2" max="4" default="2" onehuman="false" withouthuman="true" defaulthuman="1"/>
     <rules class="com.tjger.testapp.game.rules.TestGameRules"/>
     <gamestate class="com.tjger.testapp.game.state.TestGameState"/>
     <newgamedialog class="com.tjger.testapp.ui.dialog.TestNewGameDialog" asktosave="newgame.asktosave"/>

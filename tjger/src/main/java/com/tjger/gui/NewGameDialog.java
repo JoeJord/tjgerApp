@@ -253,8 +253,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
             addPreference(sliderNumPlayers);
         }
         if (!config.isOneHumanPlayer()) {
-            int minHumans = (config.isWithoutHumanPlayer()) ? 0 : 1;
-            sliderNumHumans = HGBaseConfigTools.createNumberPickerPreference(this, ConstantValue.CONFIG_NUMHUMANS, minHumans, max, 1, minHumans, true);
+            sliderNumHumans = HGBaseConfigTools.createNumberPickerPreference(this, ConstantValue.CONFIG_NUMHUMANS, config.getMinHumanPlayers(), max, 1, config.getDefaultHumanPlayers(), true);
             addPreference(sliderNumHumans);
         }
     }

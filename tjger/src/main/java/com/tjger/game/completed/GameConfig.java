@@ -87,6 +87,10 @@ public final class GameConfig {
     boolean hasErrors;
     boolean oneHumanPlayer;
     boolean withoutHumanPlayer;
+    /**
+     * The default number of human players if more (or less) than one human player is allowed.
+     */
+    int defaultHumanPlayers;
     String playerPieceColor;
     boolean helpHidden;
     boolean rememberScores;
@@ -210,6 +214,24 @@ public final class GameConfig {
      */
     public boolean isWithoutHumanPlayer() {
         return withoutHumanPlayer;
+    }
+
+    /**
+     * Returns the default number of human players if more (or less) than one human player is allowed.
+     *
+     * @return The default number of human players if more (or less) than one human player is allowed.
+     */
+    public int getDefaultHumanPlayers() {
+        return defaultHumanPlayers;
+    }
+
+    /**
+     * Returns the minimum allowed number of human players.
+     *
+     * @return The minimum allowed number of human players.
+     */
+    public int getMinHumanPlayers() {
+        return (isWithoutHumanPlayer()) ? 0 : 1;
     }
 
     /**
