@@ -352,7 +352,7 @@ public class NewGameDialog extends HGBaseConfigStateDialog {
         if (supportTypes.length > 1) {
             String[] typeIds = getComputerPlayerTypesIds(supportTypes);
             Bitmap[] typeImages = getComputerPlayerTypesImages(supportTypes);
-            cbComputerType = HGBaseConfigTools.createListPreference(this, ConstantValue.CONFIG_COMPUTERTYPE, typeIds, typeImages, true, typeIds[0]/*, true*/);
+            cbComputerType = HGBaseConfigTools.createListPreference(this, ConstantValue.CONFIG_COMPUTERTYPE, typeIds, typeImages, true, typeIds[0]);
             addPreference(cbComputerType);
         }
     }
