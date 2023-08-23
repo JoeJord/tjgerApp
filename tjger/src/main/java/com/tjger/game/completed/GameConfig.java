@@ -887,6 +887,27 @@ public final class GameConfig {
     }
 
     /**
+     * Returns the first available part from the specified parts.<br>
+     * Hidden parts will be skipped.<br>
+     * If the game is not the pro version, then teaser parts will also be skipped.
+     *
+     * @param parts The parts to check.
+     * @return The name of the found part an empty string if nothing could be found.
+     */
+    private String getFirstAvailablePart(Part[] parts) {
+        if ((parts == null) || (parts.length == 0)) {
+            return null;
+        }
+        for (Part part : parts) {
+            // Search for the first not hidden part. If the game is not the pro version, then teaser parts are also skipped.
+            if ((!part.isHidden()) && (isProVersion() || !part.isProTeaser())) {
+                return part.getName();
+            }
+        }
+        return EMPTY_STRING;
+    }
+
+    /**
      * @param parts     An array with a sort of parts.
      * @param configKey Name of the part configuration.
      * @return The name of the active part configuration or "".
@@ -897,12 +918,7 @@ public final class GameConfig {
         if (index >= 0 && index < parts.length && !parts[index].isHidden()) {
             return parts[index].getName();
         }
-        for (Part part : parts) {
-            if (!part.isHidden()) {
-                return part.getName();
-            }
-        }
-        return EMPTY_STRING;
+        return getFirstAvailablePart(parts);
     }
 
     /**
