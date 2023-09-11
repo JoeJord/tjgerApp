@@ -785,7 +785,7 @@ public class GameDialogs {
             String title = HGBaseText.getText("help_gamehints").replace('.', ' ');
             final HintPanel pnDlg = createGameHintsPanel(hintType, hintUrls, gameEngine, config);
             Dialog dlg = HGBaseDialog.showOkDialog(mainFrame, pnDlg, title, (dialog, which) -> HGBaseConfig.set(ConstantValue.CONFIG_HINT_DONTSHOW, pnDlg.isNotShowAgain()));
-            HGBaseGuiTools.setSizeToFullScreen(mainFrame, dlg);
+            HGBaseGuiTools.setSizeToFullScreen(dlg);
         } else {
             HGBaseLog.logError("The game hints aren't configured correctly!");
         }
