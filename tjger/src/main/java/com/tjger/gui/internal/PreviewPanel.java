@@ -113,12 +113,12 @@ public class PreviewPanel extends SimpleGamePanel {
     }
     
     @Override
-	protected int getFieldWidth() {
+	public int getFieldWidth() {
         return config.getFieldWidth(dlg.getSelectedBoard(), dlg.getSelectedBackground());
     }
     
     @Override
-	protected int getFieldHeight() {
+	public int getFieldHeight() {
         return config.getFieldHeight(dlg.getSelectedBoard(), dlg.getSelectedBackground());
     }
     

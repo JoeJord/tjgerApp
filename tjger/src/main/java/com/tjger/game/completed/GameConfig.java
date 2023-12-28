@@ -12,15 +12,19 @@ import com.tjger.gui.completed.Cover;
 import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.PartSet;
 import com.tjger.gui.completed.PieceSet;
+import com.tjger.gui.completed.configurablelayout.layoutelement.AreaLayout;
+import com.tjger.gui.completed.configurablelayout.layoutelement.LayoutElement;
 import com.tjger.lib.ArrayUtil;
 import com.tjger.lib.ConstantValue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import at.hagru.hgbase.android.awt.Color;
+import at.hagru.hgbase.android.awt.Insets;
 import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseTools;
 import at.hagru.hgbase.lib.internal.IntBooleanStringMap;
@@ -123,6 +127,14 @@ public final class GameConfig {
     boolean recordOnNewTurn;
     String gameStateXmlRoot;
     String mainMenuImageScaleType;
+    /**
+     * The layout elements of the configurable game field.
+     */
+    Map<Class<? extends LayoutElement>, Map<String, LayoutElement>> layoutElements;
+    /**
+     * The margin of the configurable game field.
+     */
+    Insets gamefieldLayoutMargin;
 
     private GameConfig() {
         super();
@@ -134,6 +146,17 @@ public final class GameConfig {
      */
     public static GameConfig getInstance() {
         return INSTANCE;
+    }
+
+    /**
+     * Returns the name of the player with the specified index.
+     *
+     * @param playerIndex The index of the player for which the name should be returned.
+     * @return The name of the player with the specified index.
+     */
+    public static String getPlayerName(int playerIndex) {
+        String nameConfigKey = ConstantValue.CONFIG_PLAYERNAME + ((playerIndex == PlayerManager.HUMAN_PLAYER_INDEX) ? "" : playerIndex);
+        return HGBaseConfig.get(nameConfigKey);
     }
 
     /**
@@ -557,7 +580,6 @@ public final class GameConfig {
         Part part = getPartByName(getCardSets(type), name);
         return (CardSet) part;
     }
-
 
     /**
      * @param name Name of the piece set.
@@ -1282,13 +1304,65 @@ public final class GameConfig {
     }
 
     /**
-     * Returns the name of the player with the specified index.
+     * Adds a layout element to the map of elements.
      *
-     * @param playerIndex The index of the player for which the name should be returned.
-     * @return The name of the player with the specified index.
+     * @param elementClass The class of the layout element.
+     * @param elementKey   The map key of the layout element.
+     * @param element      The element to add.
      */
-    public static String getPlayerName(int playerIndex) {
-        String nameConfigKey = ConstantValue.CONFIG_PLAYERNAME + ((playerIndex == PlayerManager.HUMAN_PLAYER_INDEX) ? "" : playerIndex);
-        return HGBaseConfig.get(nameConfigKey);
+    public void addLayoutElement(Class<? extends LayoutElement> elementClass, String elementKey, LayoutElement element) {
+        if (elementClass == null || elementKey == null || element == null) {
+            return;
+        }
+        Map<String, LayoutElement> elementMap = layoutElements.get(elementClass);
+        if (elementMap == null) {
+            elementMap = new HashMap<>();
+        }
+        elementMap.put(elementKey, element);
+        layoutElements.put(elementClass, elementMap);
+    }
+
+    /**
+     * Returns the layout elements of a configurable game field.
+     *
+     * @return The layout elements of a configurable game field.
+     */
+    public Map<Class<? extends LayoutElement>, Map<String, LayoutElement>> getLayoutElements() {
+        return layoutElements;
+    }
+
+    /**
+     * Returns the margin of a configurable game field.
+     *
+     * @return The margin of a configurable game field.
+     */
+    public Insets getGamefieldLayoutMargin() {
+        return gamefieldLayoutMargin;
+    }
+
+    /**
+     * Sets the margin of a configurable game field.
+     *
+     * @param margin The margin to set.
+     */
+    public void setGamefieldLayoutMargin(Insets margin) {
+        gamefieldLayoutMargin = margin;
+    }
+
+    /**
+     * Returns the area layout with the specified name or {@code null} if there is no area with that name.
+     *
+     * @param name The name of the area layout.
+     * @return The area layout with the specified name or {@code null} if there is no area with that name.
+     */
+    public AreaLayout getLayoutArea(String name) {
+        if (!HGBaseTools.hasContent(name)) {
+            return null;
+        }
+        Map<String, LayoutElement> areaLayouts = layoutElements.get(AreaLayout.class);
+        if (areaLayouts == null) {
+            return null;
+        }
+        return (AreaLayout) areaLayouts.get(name);
     }
 }

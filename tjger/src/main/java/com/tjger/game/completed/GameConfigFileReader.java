@@ -24,6 +24,11 @@ import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.PartSet;
 import com.tjger.gui.completed.Piece;
 import com.tjger.gui.completed.PieceSet;
+import com.tjger.gui.completed.configurablelayout.layoutelement.AreaLayout;
+import com.tjger.gui.completed.configurablelayout.layoutelement.CardsetLayout;
+import com.tjger.gui.completed.configurablelayout.layoutelement.PartLayout;
+import com.tjger.gui.completed.configurablelayout.layoutelement.PartsetLayout;
+import com.tjger.gui.completed.configurablelayout.layoutelement.PiecesetLayout;
 import com.tjger.gui.internal.GameDialogFactory;
 import com.tjger.lib.ConstantValue;
 
@@ -41,6 +46,7 @@ import java.util.Objects;
 
 import at.hagru.hgbase.android.HGBaseResources;
 import at.hagru.hgbase.android.awt.Color;
+import at.hagru.hgbase.android.awt.Insets;
 import at.hagru.hgbase.gui.HGBaseGuiTools;
 import at.hagru.hgbase.lib.HGBaseFileTools;
 import at.hagru.hgbase.lib.HGBaseLog;
@@ -169,6 +175,58 @@ class GameConfigFileReader {
     private static final String CONFIG_FILE = "file";
     private static final String CONFIG_MAIN_MENU = "mainmenu";
     private static final String CONFIG_SCALE_TYPE = "scaletype";
+    /**
+     * The configuration tag for game file layout configuration.
+     */
+    private static final String CONFIG_GAMEFIELDLAYOUT = "gamefieldlayout";
+    /**
+     * The configuration tag for areas.
+     */
+    private static final String CONFIG_AREAS = "areas";
+    /**
+     * The configuration tag for one area.
+     */
+    private static final String CONFIG_AREA = "area";
+    /**
+     * The configuration tag for elements.
+     */
+    private static final String CONFIG_ELEMENTS = "elements";
+    /**
+     * The configuration tag for the percent size value.
+     */
+    private static final String CONFIG_PERCENTSIZE = "percentsize";
+    /**
+     * The configuration tag for the horizontal spacing.
+     */
+    private static final String CONFIG_XSPACING = "xspacing";
+    /**
+     * The configuration tag for the vertical spacing.
+     */
+    private static final String CONFIG_YSPACING = "yspacing";
+    /**
+     * The configuration tag for the orientation.
+     */
+    private static final String CONFIG_ORIENTATION = "orientation";
+    /**
+     * The configuration tag for the wrap threshold.
+     */
+    private static final String CONFIG_WRAPTHRESHOLD = "wrapthreshold";
+    /**
+     * The configuration tag for the top margin.
+     */
+    private static final String CONFIG_MARGIN_TOP = "margintop";
+    /**
+     * The configuration tag for the bottom margin.
+     */
+    private static final String CONFIG_MARGIN_BOTTOM = "marginbottom";
+    /**
+     * The configuration tag for the left margin.
+     */
+    private static final String CONFIG_MARGIN_LEFT = "marginleft";
+    /**
+     * The configuration tag for the right margin.
+     */
+    private static final String CONFIG_MARGIN_RIGHT = "marginright";
     private static final List<Background> backgroundList = new ArrayList<>();
     private static final List<Board> boardList = new ArrayList<>();
     private static final List<Cover> coverList = new ArrayList<>();
@@ -247,6 +305,9 @@ class GameConfigFileReader {
                         break;
                     case CONFIG_PLAYING_FIELDS:
                         readPlayingFields(node, config);
+                        break;
+                    case CONFIG_GAMEFIELDLAYOUT:
+                        readGameFieldLayout(node, config);
                         break;
                     default: // NOCHECK: unknown node
                 }
@@ -362,6 +423,187 @@ class GameConfigFileReader {
                 }
             }
         });
+    }
+
+    /**
+     * Reads the game field layout configuration.
+     *
+     * @param node   The game field layout node.
+     * @param config The game configuration object.
+     */
+    protected static void readGameFieldLayout(Node node, final GameConfig config) {
+        int marginTop = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_MARGIN_TOP, 0);
+        int marginBottom = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_MARGIN_BOTTOM, 0);
+        int marginLeft = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_MARGIN_LEFT, 0);
+        int marginRight = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_MARGIN_RIGHT, 0);
+        config.setGamefieldLayoutMargin(new Insets(marginTop, marginLeft, marginBottom, marginRight));
+        ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_GAMEFIELDLAYOUT, null) {
+            @Override
+            public void performNode(Node node, int index, Object obj) {
+                switch (node.getNodeName()) {
+                    case CONFIG_AREAS:
+                        readGameFieldLayoutAreas(node, config);
+                        break;
+                    case CONFIG_ELEMENTS:
+                        readGameFieldLayoutElements(node, config);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+    }
+
+    /**
+     * Reads the game field layout configuration for areas.
+     *
+     * @param node   The game field layout node.
+     * @param config The game configuration object.
+     */
+    protected static void readGameFieldLayoutAreas(Node node, final GameConfig config) {
+        ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_AREAS, null) {
+            @Override
+            public void performNode(Node node, int index, Object obj) {
+                if (CONFIG_AREA.equals(node.getNodeName())) {
+                    AreaLayout layoutArea = readGameFieldLayoutArea(node);
+                    if (layoutArea != null) {
+                        config.addLayoutElement(AreaLayout.class, layoutArea.getName(), layoutArea);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Reads the game field layout configuration for one area.
+     *
+     * @param node The node of the game field layout configuration of the part.
+     * @return The layout configuration for the area or {@code null} if the name is not specified.
+     */
+    protected static AreaLayout readGameFieldLayoutArea(Node node) {
+        String name = HGBaseXMLTools.getAttributeValue(node, CONFIG_NAME);
+        if (!HGBaseTools.hasContent(name)) {
+            return null;
+        }
+        String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
+        String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
+        String width = HGBaseXMLTools.getAttributeValue(node, CONFIG_WIDTH);
+        String height = HGBaseXMLTools.getAttributeValue(node, CONFIG_HEIGHT);
+        String marginTop = HGBaseXMLTools.getAttributeValue(node, CONFIG_MARGIN_TOP);
+        String marginBottom = HGBaseXMLTools.getAttributeValue(node, CONFIG_MARGIN_BOTTOM);
+        String marginLeft = HGBaseXMLTools.getAttributeValue(node, CONFIG_MARGIN_LEFT);
+        String marginRight = HGBaseXMLTools.getAttributeValue(node, CONFIG_MARGIN_RIGHT);
+        boolean hidden = HGBaseXMLTools.getAttributeBooleanValue(node, CONFIG_HIDDEN, true);
+        return new AreaLayout(name, xpos, ypos, width, height, marginTop, marginBottom, marginLeft, marginRight, hidden);
+    }
+
+    /**
+     * Reads the game field layout configuration for elements.
+     *
+     * @param node   The game field layout node.
+     * @param config The game configuration object.
+     */
+    protected static void readGameFieldLayoutElements(Node node, final GameConfig config) {
+        ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_ELEMENTS, null) {
+            @Override
+            public void performNode(Node node, int index, Object obj) {
+                switch (node.getNodeName()) {
+                    case CONFIG_PART:
+                        PartLayout layoutPart = readGameFieldLayoutPart(node, config);
+                        config.addLayoutElement(PartLayout.class, layoutPart.getType(), layoutPart);
+                        break;
+                    case CONFIG_PARTSET:
+                        PartsetLayout layoutPartset = readGameFieldLayoutPartset(node, config);
+                        config.addLayoutElement(PartsetLayout.class, layoutPartset.getType(), layoutPartset);
+                        break;
+                    case CONFIG_CARDSET:
+                        CardsetLayout layoutCardset = readGameFieldLayoutCardset(node, config);
+                        config.addLayoutElement(CardsetLayout.class, layoutCardset.getType(), layoutCardset);
+                        break;
+                    case CONFIG_PIECESET:
+                        PiecesetLayout layoutPieceset = readGameFieldLayoutPieceset(node, config);
+                        config.addLayoutElement(PiecesetLayout.class, layoutPieceset.getType(), layoutPieceset);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+    }
+
+    /**
+     * Reads the game field layout configuration for one part.
+     *
+     * @param node   The node of the game field layout configuration of the part.
+     * @param config The game configuration object.
+     * @return The layout configuration for the part.
+     */
+    protected static PartLayout readGameFieldLayoutPart(Node node, GameConfig config) {
+        String type = HGBaseXMLTools.getAttributeValue(node, CONFIG_TYPE);
+        String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
+        String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
+        String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
+        AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
+        return new PartLayout(type, xpos, ypos, percentSize, area);
+    }
+
+    /**
+     * Reads the game field layout configuration for one partset.
+     *
+     * @param node   The node of the game field layout configuration of the partset.
+     * @param config The game configuration object.
+     * @return The layout configuration for the partset.
+     */
+    protected static PartsetLayout readGameFieldLayoutPartset(Node node, GameConfig config) {
+        String type = HGBaseXMLTools.getAttributeValue(node, CONFIG_TYPE);
+        String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
+        String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
+        String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
+        AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
+        int xSpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_XSPACING, 0);
+        int ySpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_YSPACING, 0);
+        String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
+        int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
+        return new PartsetLayout(type, xpos, ypos, percentSize, area, xSpacing, ySpacing, orientation, wrapThreshold);
+    }
+
+    /**
+     * Reads the game field layout configuration for one cardset.
+     *
+     * @param node   The node of the game field layout configuration of the cardset.
+     * @param config The game configuration object.
+     * @return The layout configuration for the cardset.
+     */
+    protected static CardsetLayout readGameFieldLayoutCardset(Node node, GameConfig config) {
+        String type = HGBaseXMLTools.getAttributeValue(node, CONFIG_TYPE);
+        String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
+        String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
+        String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
+        AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
+        int xSpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_XSPACING, 0);
+        int ySpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_YSPACING, 0);
+        String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
+        int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
+        return new CardsetLayout(HGBaseTools.hasContent(type) ? type : ConstantValue.CONFIG_CARDSET, xpos, ypos, percentSize, area, xSpacing, ySpacing, orientation, wrapThreshold);
+    }
+
+    /**
+     * Reads the game field layout configuration for one pieceset.
+     *
+     * @param node   The node of the game field layout configuration of the pieceset.
+     * @param config The game configuration object.
+     * @return The layout configuration for the pieceset.
+     */
+    protected static PiecesetLayout readGameFieldLayoutPieceset(Node node, GameConfig config) {
+        String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
+        String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
+        String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
+        AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
+        int xSpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_XSPACING, 0);
+        int ySpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_YSPACING, 0);
+        String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
+        int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
+        return new PiecesetLayout(xpos, ypos, percentSize, area, xSpacing, ySpacing, orientation, wrapThreshold);
     }
 
     /**
@@ -1341,6 +1583,8 @@ class GameConfigFileReader {
         config.recordOnNewGame = false;
         config.recordOnNewRound = false;
         config.recordOnNewTurn = false;
+        config.layoutElements = new HashMap<>();
+        config.gamefieldLayoutMargin = new Insets(0, 0, 0, 0);
     }
 
     /**
