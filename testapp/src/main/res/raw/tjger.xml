@@ -114,4 +114,19 @@
       <card type="card" value="card_pro"/>
     </arrangement>
   </arrangements>
+
+  <gamefieldlayout margintop="50" marginbottom="50" marginleft="50" marginright="50">
+    <areas>
+      <area name="pieces" xpos="10%" ypos="10%" width="30%" height="40%" margintop="10" marginbottom="10" marginleft="10" marginright="10" hidden="false"/>
+      <area name="cards" xpos="10%" ypos="50%" width="30%" height="40%" margintop="10" marginbottom="10" marginleft="10" marginright="10" hidden="false"/>
+      <area name="parts" xpos="60%" ypos="10%" width="30%" height="40%" margintop="10" marginbottom="10" marginleft="10" marginright="10" hidden="false"/>
+      <area name="part" xpos="60%" ypos="50%" width="30%" height="40%" margintop="10" marginbottom="10" marginleft="10" marginright="10" hidden="false"/>
+    </areas>
+    <elements>
+      <pieceset xpos="0" ypos="0" percentsize="scale" area="pieces" xspacing="100" yspacing="100" orientation="" wrapthreshold=""/>
+      <cardset type="cardset" xpos="0" ypos="0" percentsize="scale" area="cards" xspacing="120" yspacing="0" orientation="" wrapthreshold=""/>
+      <partset type="partset" xpos="0" ypos="0" percentsize="scale" area="parts" xspacing="120" yspacing="0" orientation="" wrapthreshold=""/>
+      <part type="part" xpos="0" ypos="0" percentsize="scale" area="part"/>
+    </elements>
+  </gamefieldlayout>
 </tjger>
