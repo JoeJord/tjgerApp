@@ -47,6 +47,11 @@ public abstract class LayoutGameElement extends LayoutElement implements Display
         setArea(area);
     }
 
+    @Override
+    public String getElementKey() {
+        return getType();
+    }
+
     /**
      * Returns the type name of the game element in the tjger configuration.
      *

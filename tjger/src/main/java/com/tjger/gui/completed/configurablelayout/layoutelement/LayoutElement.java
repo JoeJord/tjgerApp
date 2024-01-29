@@ -10,7 +10,7 @@ import at.hagru.hgbase.lib.HGBaseTools;
 /**
  * An element of a configurable layout.
  */
-public class LayoutElement {
+public abstract class LayoutElement {
     /**
      * The percent sign.
      */
@@ -46,6 +46,13 @@ public class LayoutElement {
         setXPos(xPos);
         setYPos(yPos);
     }
+
+    /**
+     * Returns the key of the element.
+     *
+     * @return The key of the element.
+     */
+    public abstract String getElementKey();
 
     /**
      * Calculates the proportional value based on a given ratio and total value.
