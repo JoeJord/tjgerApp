@@ -10,7 +10,7 @@ import at.hagru.hgbase.lib.HGBaseTools;
 /**
  * An element of a configurable layout.
  */
-public class LayoutElement {
+public abstract class LayoutElement {
     /**
      * The percent sign.
      */
@@ -42,10 +42,17 @@ public class LayoutElement {
      * @param xPos The x position. The value may be "left", "center" or "right", a percentage (number with following %) or a number.
      * @param yPos The y position. The value may be "top", "middle" or "bottom", a percentage (number with following %) or a number.
      */
-    public LayoutElement(String xPos, String yPos) {
+    protected LayoutElement(String xPos, String yPos) {
         setXPos(xPos);
         setYPos(yPos);
     }
+
+    /**
+     * Returns the key of the element.
+     *
+     * @return The key of the element.
+     */
+    public abstract String getElementKey();
 
     /**
      * Calculates the proportional value based on a given ratio and total value.

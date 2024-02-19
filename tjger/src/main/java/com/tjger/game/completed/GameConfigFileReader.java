@@ -227,6 +227,10 @@ class GameConfigFileReader {
      * The configuration tag for the right margin.
      */
     private static final String CONFIG_MARGIN_RIGHT = "marginright";
+    /**
+     * The configuration tag for the player index.
+     */
+    private static final String CONFIG_PLAYER_INDEX = "playerindex";
     private static final List<Background> backgroundList = new ArrayList<>();
     private static final List<Board> boardList = new ArrayList<>();
     private static final List<Cover> coverList = new ArrayList<>();
@@ -467,7 +471,7 @@ class GameConfigFileReader {
                 if (CONFIG_AREA.equals(node.getNodeName())) {
                     AreaLayout layoutArea = readGameFieldLayoutArea(node);
                     if (layoutArea != null) {
-                        config.addLayoutElement(AreaLayout.class, layoutArea.getName(), layoutArea);
+                        config.addLayoutElement(AreaLayout.class, layoutArea.getElementKey(), layoutArea);
                     }
                 }
             }
@@ -510,19 +514,19 @@ class GameConfigFileReader {
                 switch (node.getNodeName()) {
                     case CONFIG_PART:
                         PartLayout layoutPart = readGameFieldLayoutPart(node, config);
-                        config.addLayoutElement(PartLayout.class, layoutPart.getType(), layoutPart);
+                        config.addLayoutElement(PartLayout.class, layoutPart.getElementKey(), layoutPart);
                         break;
                     case CONFIG_PARTSET:
                         PartsetLayout layoutPartset = readGameFieldLayoutPartset(node, config);
-                        config.addLayoutElement(PartsetLayout.class, layoutPartset.getType(), layoutPartset);
+                        config.addLayoutElement(PartsetLayout.class, layoutPartset.getElementKey(), layoutPartset);
                         break;
                     case CONFIG_CARDSET:
                         CardsetLayout layoutCardset = readGameFieldLayoutCardset(node, config);
-                        config.addLayoutElement(CardsetLayout.class, layoutCardset.getType(), layoutCardset);
+                        config.addLayoutElement(CardsetLayout.class, layoutCardset.getElementKey(), layoutCardset);
                         break;
                     case CONFIG_PIECESET:
                         PiecesetLayout layoutPieceset = readGameFieldLayoutPieceset(node, config);
-                        config.addLayoutElement(PiecesetLayout.class, layoutPieceset.getType(), layoutPieceset);
+                        config.addLayoutElement(PiecesetLayout.class, layoutPieceset.getElementKey(), layoutPieceset);
                         break;
                     default:
                         break;
@@ -576,6 +580,7 @@ class GameConfigFileReader {
      */
     protected static CardsetLayout readGameFieldLayoutCardset(Node node, GameConfig config) {
         String type = HGBaseXMLTools.getAttributeValue(node, CONFIG_TYPE);
+        int playerIndex = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_PLAYER_INDEX, -1);
         String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
         String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
         String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
@@ -584,7 +589,7 @@ class GameConfigFileReader {
         int ySpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_YSPACING, 0);
         String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
         int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
-        return new CardsetLayout(HGBaseTools.hasContent(type) ? type : ConstantValue.CONFIG_CARDSET, xpos, ypos, percentSize, area, xSpacing, ySpacing, orientation, wrapThreshold);
+        return new CardsetLayout(HGBaseTools.hasContent(type) ? type : ConstantValue.CONFIG_CARDSET, playerIndex, xpos, ypos, percentSize, area, xSpacing, ySpacing, orientation, wrapThreshold);
     }
 
     /**

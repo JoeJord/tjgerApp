@@ -70,6 +70,11 @@ public class AreaLayout extends LayoutElement {
         setHidden(hidden);
     }
 
+    @Override
+    public String getElementKey() {
+        return getName();
+    }
+
     /**
      * Returns the name of the area.
      *

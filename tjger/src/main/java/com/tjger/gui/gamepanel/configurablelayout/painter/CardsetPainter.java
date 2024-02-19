@@ -38,4 +38,14 @@ public class CardsetPainter implements ElementSetPainter<CardsetLayout, CardSet,
     public Card[] getActiveElements(CardsetLayout element) {
         return getActiveElement(element).getCards();
     }
+
+    /**
+     * Returns the index of the player for which the specified cardset should be painted.
+     *
+     * @param element The cardset element to paint.
+     * @return The index of the player for which the specified cardset should be painted.
+     */
+    public int getPlayerIndex(CardsetLayout element) {
+        return element.getPlayerIndex();
+    }
 }
