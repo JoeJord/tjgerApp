@@ -69,6 +69,11 @@ public interface ElementSetPainter<E extends LayoutGameElementSet, S extends Par
         return element.getScale();
     }
 
+    @Override
+    default double getPaintAngle(E element) {
+        return element.getAngle();
+    }
+
     /**
      * Returns the dimension which is needed to paint the specified element unscaled.
      *
@@ -120,9 +125,9 @@ public interface ElementSetPainter<E extends LayoutGameElementSet, S extends Par
         }
         Orientation orientation = getPaintOrientation(element);
         if (orientation != null) {
-            getGamePanel().drawParts(pos.x, pos.y, percentSize, orientation, getPaintWrapThreshold(element), getActiveElements(element), spacing.width, spacing.height, g);
+            getGamePanel().drawParts(pos.x, pos.y, percentSize, getPaintAngle(element), orientation, getPaintWrapThreshold(element), getActiveElements(element), spacing.width, spacing.height, g);
         } else {
-            getGamePanel().drawParts(pos.x, pos.y, percentSize, getActiveElements(element), spacing.width, spacing.height, g);
+            getGamePanel().drawParts(pos.x, pos.y, percentSize, getPaintAngle(element), getActiveElements(element), spacing.width, spacing.height, g);
         }
     }
 }

@@ -55,6 +55,11 @@ public class AreaPainter implements ElementPainter<AreaLayout, Part> {
     }
 
     @Override
+    public double getPaintAngle(AreaLayout element) {
+        return 0;
+    }
+
+    @Override
     public Dimension getPaintDimension(AreaLayout element) {
         return new Dimension(element.getWidth(() -> getGamePanel().getFieldSize().width), element.getHeight(() -> getGamePanel().getFieldSize().height));
     }

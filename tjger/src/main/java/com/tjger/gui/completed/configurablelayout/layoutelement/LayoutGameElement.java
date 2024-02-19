@@ -27,6 +27,10 @@ public abstract class LayoutGameElement extends LayoutElement implements Display
      */
     private ScaleType scale;
     /**
+     * The angle with which the element should be painted.
+     */
+    private double angle;
+    /**
      * The area in which the element should be painted.
      */
     private AreaLayout area;
@@ -38,12 +42,14 @@ public abstract class LayoutGameElement extends LayoutElement implements Display
      * @param xPos        The x position. The value may be "left", "center" or "right", a percentage (number with following %) or a number.
      * @param yPos        The y position. The value may be "top", "middle" or "bottom", a percentage (number with following %) or a number.
      * @param percentSize The percent size with which the element should be painted. May be "scale", "scale_x" or "scale_y" or a number.
+     * @param angle       The angle with which the element should be painted.
      * @param area        The area in which the element should be painted.
      */
-    protected LayoutGameElement(String type, String xPos, String yPos, String percentSize, AreaLayout area) {
+    protected LayoutGameElement(String type, String xPos, String yPos, String percentSize, double angle, AreaLayout area) {
         super(xPos, yPos);
         setType(type);
         setPercentSize(percentSize);
+        setAngle(angle);
         setArea(area);
     }
 
@@ -111,6 +117,24 @@ public abstract class LayoutGameElement extends LayoutElement implements Display
      */
     public ScaleType getScale() {
         return scale;
+    }
+
+    /**
+     * Returns the angle with which the element should be painted.
+     *
+     * @return The angle with which the element should be painted.
+     */
+    public double getAngle() {
+        return angle;
+    }
+
+    /**
+     * Sets the angle with which the element should be painted.
+     *
+     * @param angle The angle to set.
+     */
+    private void setAngle(double angle) {
+        this.angle = angle;
     }
 
     @Override

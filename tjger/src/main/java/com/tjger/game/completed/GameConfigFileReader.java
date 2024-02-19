@@ -231,6 +231,10 @@ class GameConfigFileReader {
      * The configuration tag for the player index.
      */
     private static final String CONFIG_PLAYER_INDEX = "playerindex";
+    /**
+     * The configuration tag for the angle.
+     */
+    private static final String CONFIG_ANGLE = "angle";
     private static final List<Background> backgroundList = new ArrayList<>();
     private static final List<Board> boardList = new ArrayList<>();
     private static final List<Cover> coverList = new ArrayList<>();
@@ -547,8 +551,9 @@ class GameConfigFileReader {
         String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
         String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
         String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
+        int angle = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_ANGLE, 0);
         AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
-        return new PartLayout(type, xpos, ypos, percentSize, area);
+        return new PartLayout(type, xpos, ypos, percentSize, angle, area);
     }
 
     /**
@@ -563,12 +568,13 @@ class GameConfigFileReader {
         String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
         String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
         String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
+        int angle = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_ANGLE, 0);
         AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
         int xSpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_XSPACING, 0);
         int ySpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_YSPACING, 0);
         String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
         int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
-        return new PartsetLayout(type, xpos, ypos, percentSize, area, xSpacing, ySpacing, orientation, wrapThreshold);
+        return new PartsetLayout(type, xpos, ypos, percentSize, angle, area, xSpacing, ySpacing, orientation, wrapThreshold);
     }
 
     /**
@@ -584,12 +590,13 @@ class GameConfigFileReader {
         String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
         String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
         String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
+        int angle = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_ANGLE, 0);
         AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
         int xSpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_XSPACING, 0);
         int ySpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_YSPACING, 0);
         String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
         int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
-        return new CardsetLayout(HGBaseTools.hasContent(type) ? type : ConstantValue.CONFIG_CARDSET, playerIndex, xpos, ypos, percentSize, area, xSpacing, ySpacing, orientation, wrapThreshold);
+        return new CardsetLayout(HGBaseTools.hasContent(type) ? type : ConstantValue.CONFIG_CARDSET, playerIndex, xpos, ypos, percentSize, angle, area, xSpacing, ySpacing, orientation, wrapThreshold);
     }
 
     /**
@@ -603,12 +610,13 @@ class GameConfigFileReader {
         String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
         String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
         String percentSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_PERCENTSIZE);
+        int angle = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_ANGLE, 0);
         AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
         int xSpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_XSPACING, 0);
         int ySpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_YSPACING, 0);
         String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
         int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
-        return new PiecesetLayout(xpos, ypos, percentSize, area, xSpacing, ySpacing, orientation, wrapThreshold);
+        return new PiecesetLayout(xpos, ypos, percentSize, angle, area, xSpacing, ySpacing, orientation, wrapThreshold);
     }
 
     /**

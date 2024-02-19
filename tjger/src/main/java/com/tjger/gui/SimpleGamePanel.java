@@ -19,6 +19,9 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
+
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.GameManager;
 import com.tjger.game.completed.playingfield.PlayingField;
@@ -35,8 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatImageView;
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.android.awt.Dimension;
 import at.hagru.hgbase.android.awt.Polygon;
@@ -544,13 +545,31 @@ public class SimpleGamePanel extends AppCompatImageView {
      * @param g             The canvas object.
      */
     public void drawParts(int x, int y, int percentSize, Orientation orientation, int wrapThreshold, Part[] parts, int xSpacing, int ySpacing, Canvas g) {
+        drawParts(x, y, percentSize, 0.0, orientation, wrapThreshold, parts, xSpacing, ySpacing, g);
+    }
+
+    /**
+     * Draws the specified parts.
+     *
+     * @param x             The x-position.
+     * @param y             The y-position.
+     * @param percentSize   The size in percent (100 is normal size).
+     * @param angle         The angle with which the parts should be drawn.
+     * @param orientation   The orientation with which the parts should be drawn.
+     * @param wrapThreshold The threshold at which a wrapping is done.
+     * @param parts         The parts to draw.
+     * @param xSpacing      The horizontal spacing.
+     * @param ySpacing      The vertical spacing.
+     * @param g             The canvas object.
+     */
+    public void drawParts(int x, int y, int percentSize, double angle, Orientation orientation, int wrapThreshold, Part[] parts, int xSpacing, int ySpacing, Canvas g) {
         for (int i = 0; parts != null && i < parts.length; i++) {
             int rowIndex = getOrientationRowIndex(orientation, i, wrapThreshold);
             int colIndex = getOrientationColumnIndex(orientation, i, wrapThreshold);
             int offsetX = getOrientationXOffset(orientation, colIndex, xSpacing);
             int offsetY = getOrientationYOffset(orientation, rowIndex, ySpacing);
 
-            drawPart(x + offsetX, y + offsetY, percentSize, parts[i], g);
+            drawPart(x + offsetX, y + offsetY, percentSize, angle, parts[i], g);
         }
     }
 
