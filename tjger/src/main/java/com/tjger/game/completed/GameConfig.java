@@ -1314,10 +1314,7 @@ public final class GameConfig {
         if (elementClass == null || elementKey == null || element == null) {
             return;
         }
-        Map<String, LayoutElement> elementMap = layoutElements.get(elementClass);
-        if (elementMap == null) {
-            elementMap = new HashMap<>();
-        }
+        Map<String, LayoutElement> elementMap = layoutElements.getOrDefault(elementClass, new HashMap<>());
         elementMap.put(elementKey, element);
         layoutElements.put(elementClass, elementMap);
     }
