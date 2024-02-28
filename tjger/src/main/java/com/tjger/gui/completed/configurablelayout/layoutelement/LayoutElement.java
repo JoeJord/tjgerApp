@@ -76,11 +76,7 @@ public abstract class LayoutElement {
             return null;
         }
         if (xPos.contains(PERCENT_SIGN)) {
-            if (surroundingAreaWidthSupplier != null) {
-                return calcProportionalValue(xPos, surroundingAreaWidthSupplier.getAsInt());
-            } else {
-                return 0;
-            }
+            return (surroundingAreaWidthSupplier != null) ? calcProportionalValue(xPos, surroundingAreaWidthSupplier.getAsInt()) : 0;
         } else {
             return HGBaseTools.toInt(xPos);
         }
@@ -93,11 +89,7 @@ public abstract class LayoutElement {
      */
     private void setXPos(String xPos) {
         hAlign = HorizontalAlignment.valueOfSecure(xPos.toUpperCase());
-        if (hAlign == null) {
-            this.xPos = xPos;
-        } else {
-            this.xPos = null;
-        }
+        this.xPos = (hAlign == null) ? xPos : null;
     }
 
     /**
@@ -120,11 +112,7 @@ public abstract class LayoutElement {
             return null;
         }
         if (yPos.contains(PERCENT_SIGN)) {
-            if (surroundingAreaHeightSupplier != null) {
-                return calcProportionalValue(yPos, surroundingAreaHeightSupplier.getAsInt());
-            } else {
-                return 0;
-            }
+            return (surroundingAreaHeightSupplier != null) ? calcProportionalValue(yPos, surroundingAreaHeightSupplier.getAsInt()) : 0;
         } else {
             return HGBaseTools.toInt(yPos);
         }
@@ -137,11 +125,7 @@ public abstract class LayoutElement {
      */
     private void setYPos(String yPos) {
         vAlign = VerticalAlignment.valueOfSecure(yPos.toUpperCase());
-        if (vAlign == null) {
-            this.yPos = yPos;
-        } else {
-            this.yPos = null;
-        }
+        this.yPos = (vAlign == null) ? yPos : null;
     }
 
     /**
