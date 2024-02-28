@@ -76,6 +76,11 @@ public class PartPainter implements ElementPainter<PartLayout, Part> {
     }
 
     @Override
+    public double getPaintAngle(PartLayout element) {
+        return element.getAngle();
+    }
+
+    @Override
     public Dimension getPaintDimension(PartLayout element) {
         Dimension elementSize = getActiveElementSize(element);
         return new Dimension(calcPaintWidth(elementSize.width, getPercentSize(element, elementSize)), calcPaintHeight(elementSize.height, getPercentSize(element, elementSize)));
@@ -84,6 +89,6 @@ public class PartPainter implements ElementPainter<PartLayout, Part> {
     @Override
     public void paint(PartLayout element, Canvas g) {
         Point pos = getPaintPosition(element);
-        getGamePanel().drawPart(pos.x, pos.y, getPercentSize(element), getActiveElement(element), g);
+        getGamePanel().drawPart(pos.x, pos.y, getPercentSize(element), getPaintAngle(element), getActiveElement(element), g);
     }
 }

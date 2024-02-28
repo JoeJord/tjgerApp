@@ -42,7 +42,7 @@ public abstract class LayoutElement {
      * @param xPos The x position. The value may be "left", "center" or "right", a percentage (number with following %) or a number.
      * @param yPos The y position. The value may be "top", "middle" or "bottom", a percentage (number with following %) or a number.
      */
-    public LayoutElement(String xPos, String yPos) {
+    protected LayoutElement(String xPos, String yPos) {
         setXPos(xPos);
         setYPos(yPos);
     }

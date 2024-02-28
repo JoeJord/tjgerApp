@@ -99,6 +99,14 @@ public interface ElementPainter<E extends LayoutElement, P extends Part> {
     }
 
     /**
+     * Returns the angle with which the element should be painted.
+     *
+     * @param element The layout element to paint.
+     * @return The angle with which the element should be painted.
+     */
+    double getPaintAngle(E element);
+
+    /**
      * Returns the dimension which is needed to paint the specified element.
      *
      * @param element The layout element to paint.
