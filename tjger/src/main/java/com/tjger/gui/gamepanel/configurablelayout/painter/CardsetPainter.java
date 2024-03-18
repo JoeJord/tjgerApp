@@ -9,7 +9,7 @@ import com.tjger.gui.completed.configurablelayout.layoutelement.CardsetLayout;
 /**
  * The painter for an element of the type "Cardset" of a configurable layout.
  */
-public class CardsetPainter implements ElementSetPainter<CardsetLayout, CardSet, Card> {
+public class CardsetPainter implements IndexedElementSetPainter<CardsetLayout, CardSet, Card> {
     /**
      * The game panel where to paint.
      */
@@ -37,15 +37,5 @@ public class CardsetPainter implements ElementSetPainter<CardsetLayout, CardSet,
     @Override
     public Card[] getActiveElements(CardsetLayout element) {
         return getActiveElement(element).getCards();
-    }
-
-    /**
-     * Returns the index of the player for which the specified cardset should be painted.
-     *
-     * @param element The cardset element to paint.
-     * @return The index of the player for which the specified cardset should be painted.
-     */
-    public int getPlayerIndex(CardsetLayout element) {
-        return element.getPlayerIndex();
     }
 }

@@ -3,7 +3,7 @@ package com.tjger.gui.completed.configurablelayout.layoutelement;
 /**
  * The layout configuration for a cardset.
  */
-public class CardsetLayout extends LayoutGameElementSet {
+public class CardsetLayout extends LayoutGameElementSet implements IndexedLayoutElement {
     /**
      * The index of the player for which the cards should be painted.
      */
@@ -34,21 +34,13 @@ public class CardsetLayout extends LayoutGameElementSet {
         return getType() + getPlayerIndex();
     }
 
-    /**
-     * Returns the index of the player for which the cards should be painted.
-     *
-     * @return The index of the player for which the cards should be painted.
-     */
+    @Override
     public int getPlayerIndex() {
         return playerIndex;
     }
 
-    /**
-     * Sets the index of the player for which the cards should be painted.
-     *
-     * @param playerIndex The index of the player for which the cards should be painted.
-     */
-    private void setPlayerIndex(int playerIndex) {
+    @Override
+    public void setPlayerIndex(int playerIndex) {
         this.playerIndex = playerIndex;
     }
 }
