@@ -61,7 +61,7 @@ public class AreaPainter implements ElementPainter<AreaLayout, Part> {
 
     @Override
     public Dimension getPaintDimension(AreaLayout element) {
-        return new Dimension(element.getWidth(() -> getGamePanel().getFieldSize().width), element.getHeight(() -> getGamePanel().getFieldSize().height));
+        return new Dimension(element.getWidth(() -> getGamePanel().getFieldWidth()), element.getHeight(() -> getGamePanel().getFieldHeight()));
     }
 
     /**
