@@ -29,6 +29,7 @@ import com.tjger.gui.completed.configurablelayout.layoutelement.CardsetLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.PartLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.PartsetLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.PiecesetLayout;
+import com.tjger.gui.completed.configurablelayout.layoutelement.PlayerInfoLayout;
 import com.tjger.gui.internal.GameDialogFactory;
 import com.tjger.lib.ConstantValue;
 
@@ -235,6 +236,14 @@ class GameConfigFileReader {
      * The configuration tag for the angle.
      */
     private static final String CONFIG_ANGLE = "angle";
+    /**
+     * The configuration tag for a player information.
+     */
+    private static final String CONFIG_PLAYER_INFO = "playerinfo";
+    /**
+     * The configuration tag for the font size.
+     */
+    private static final String CONFIG_FONTSIZE = "fontsize";
     private static final List<Background> backgroundList = new ArrayList<>();
     private static final List<Board> boardList = new ArrayList<>();
     private static final List<Cover> coverList = new ArrayList<>();
@@ -532,6 +541,10 @@ class GameConfigFileReader {
                         PiecesetLayout layoutPieceset = readGameFieldLayoutPieceset(node, config);
                         config.addLayoutElement(PiecesetLayout.class, layoutPieceset.getElementKey(), layoutPieceset);
                         break;
+                    case CONFIG_PLAYER_INFO:
+                        PlayerInfoLayout layoutPlayerInfo = readGameFieldLayoutPlayerInfo(node, config);
+                        config.addLayoutElement(PlayerInfoLayout.class, layoutPlayerInfo.getElementKey(), layoutPlayerInfo);
+                        break;
                     default:
                         break;
                 }
@@ -617,6 +630,25 @@ class GameConfigFileReader {
         String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
         int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
         return new PiecesetLayout(xpos, ypos, percentSize, angle, area, xSpacing, ySpacing, orientation, wrapThreshold);
+    }
+
+    /**
+     * Reads the game field layout configuration for one player information.
+     *
+     * @param node   The node of the game field layout configuration of the player information.
+     * @param config The game configuration object.
+     * @return The layout configuration for the player information.
+     */
+    protected static PlayerInfoLayout readGameFieldLayoutPlayerInfo(Node node, GameConfig config) {
+        String type = HGBaseXMLTools.getAttributeValue(node, CONFIG_TYPE);
+        int playerIndex = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_PLAYER_INDEX, -1);
+        String xpos = HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS);
+        String ypos = HGBaseXMLTools.getAttributeValue(node, CONFIG_YPOS);
+        String fontSize = HGBaseXMLTools.getAttributeValue(node, CONFIG_FONTSIZE);
+        Color color = HGBaseXMLTools.getAttributeRGBColorValue(node, CONFIG_COLOR);
+        int angle = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_ANGLE, 0);
+        AreaLayout area = config.getLayoutArea(HGBaseXMLTools.getAttributeValue(node, CONFIG_AREA));
+        return new PlayerInfoLayout(type, playerIndex, xpos, ypos, fontSize, color, angle, area);
     }
 
     /**

@@ -13,12 +13,14 @@ import com.tjger.gui.completed.configurablelayout.layoutelement.LayoutElement;
 import com.tjger.gui.completed.configurablelayout.layoutelement.PartLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.PartsetLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.PiecesetLayout;
+import com.tjger.gui.completed.configurablelayout.layoutelement.PlayerInfoLayout;
 import com.tjger.gui.gamepanel.configurablelayout.painter.AreaPainter;
 import com.tjger.gui.gamepanel.configurablelayout.painter.CardsetPainter;
 import com.tjger.gui.gamepanel.configurablelayout.painter.ElementPainter;
 import com.tjger.gui.gamepanel.configurablelayout.painter.PartPainter;
 import com.tjger.gui.gamepanel.configurablelayout.painter.PartsetPainter;
 import com.tjger.gui.gamepanel.configurablelayout.painter.PiecesetPainter;
+import com.tjger.gui.gamepanel.configurablelayout.painter.PlayerInfoPainter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +64,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
         painterMap.put(PartsetLayout.class, createPartsetPainter());
         painterMap.put(CardsetLayout.class, createCardsetPainter());
         painterMap.put(PiecesetLayout.class, createPiecesetPainter());
+        painterMap.put(PlayerInfoLayout.class, createPlayerInfoPainter());
     }
 
     @Override
@@ -161,6 +164,24 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
     }
 
     /**
+     * Creates the painter for layout elements of the type "player information".
+     *
+     * @return The created painter.
+     */
+    protected PlayerInfoPainter createPlayerInfoPainter() {
+        return new PlayerInfoPainter(this);
+    }
+
+    /**
+     * Returns the painter for layout elements of the type "player information".
+     *
+     * @return The painter for layout elements of the type "player information".
+     */
+    protected final PlayerInfoPainter getPlayerInfoPainter() {
+        return (PlayerInfoPainter) painterMap.get(PlayerInfoLayout.class);
+    }
+
+    /**
      * Returns {@code true} if it is allowed to paint the parts.
      *
      * @return {@code true} if it is allowed to paint the parts.
@@ -224,6 +245,15 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
         return getLayoutElements(PiecesetLayout.class).values().stream().map(PiecesetLayout.class::cast);
     }
 
+    /**
+     * Returns a stream of the layout player informations of a configurable field.
+     *
+     * @return A stream of the layout player informations of a configurable field.
+     */
+    protected final Stream<PlayerInfoLayout> getLayoutPlayerInfos() {
+        return getLayoutElements(PlayerInfoLayout.class).values().stream().map(PlayerInfoLayout.class::cast);
+    }
+
     @Override
     protected void paintParts(Canvas g) {
         super.paintParts(g);
@@ -235,6 +265,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
         paintLayoutPartsets(getLayoutPartsets(), g);
         paintLayoutCardsets(getLayoutCardsets(), g);
         paintLayoutPiecesets(getLayoutPiecesets(), g);
+        paintLayoutPlayerInfos(getLayoutPlayerInfos(), g);
     }
 
     /**
@@ -370,5 +401,32 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
             return;
         }
         piecesetPainter.paint(pieceset, g);
+    }
+
+    /**
+     * Paints the specified layout elements for the type "player information".
+     *
+     * @param playerInfos A stream of layout configurations for the player informations to paint.
+     * @param g           The canvas object.
+     */
+    private void paintLayoutPlayerInfos(Stream<PlayerInfoLayout> playerInfos, Canvas g) {
+        if (playerInfos == null) {
+            return;
+        }
+        playerInfos.forEach(playerInfo -> paintLayoutPlayerInfo(playerInfo, g));
+    }
+
+    /**
+     * Paints the specified layout element of the type "player information".
+     *
+     * @param playerInfo The layout configuration for the player information to paint
+     * @param g          The canvas object.
+     */
+    private void paintLayoutPlayerInfo(PlayerInfoLayout playerInfo, Canvas g) {
+        PlayerInfoPainter playerInfoPainter = getPlayerInfoPainter();
+        if ((playerInfo == null) || (!playerInfoPainter.shouldPaint(playerInfo))) {
+            return;
+        }
+        playerInfoPainter.paint(playerInfo, g);
     }
 }
