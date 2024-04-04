@@ -172,7 +172,7 @@ public class PlayerInfoLayout extends LayoutElement implements DisplayArea, Inde
      * @param stringSizeSupplier The supplier which delivers the size of the player information.
      * @param areaSizeSupplier The supplier for the size of the area.
      * @return The font size with which the information should be painted if the font size is specified via percentage.
-     * @throws IllegalArgumentException if {@code stringSiozeSupplier}, {@code areaSizeSupplier} or font size is not specified or the font size was not specified as percentage.
+     * @throws IllegalArgumentException if {@code stringSizeSupplier}, {@code areaSizeSupplier} or font size is not specified or the font size was not specified as percentage.
      */
     public float getPercentFontSize(StringSizeSupplier stringSizeSupplier, Supplier<Dimension> areaSizeSupplier) {
         if (stringSizeSupplier == null) {
