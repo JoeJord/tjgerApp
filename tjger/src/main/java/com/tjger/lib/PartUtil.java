@@ -66,8 +66,8 @@ public class PartUtil {
     protected static List<Part> getActiveParts(Part[] parts, PartSet set) {
         List<Part> listParts = new ArrayList<>();
         if (parts instanceof ColorValuePart[]) {
-            for (int i = 0; i < parts.length; i++) {
-                listParts.add(getActivePart(parts[i], set));
+            for (Part part : parts) {
+                listParts.add(getActivePart(part, set));
             }
         } else {
             listParts.addAll(Arrays.asList(parts));
@@ -98,7 +98,7 @@ public class PartUtil {
             String type = cards[0].getCardSet().getType();
             CardSet set = GameConfig.getInstance().getActiveCardSet(type);
             List<Part> activeParts = getActiveParts(cards, set);
-            return activeParts.toArray(new Card[activeParts.size()]);
+            return activeParts.toArray(new Card[0]);
         } else {
             return cards;
         }
@@ -114,13 +114,13 @@ public class PartUtil {
     }
 
     /**
-     * @param cards A list with pieces.
+     * @param pieces A list with pieces.
      * @return The same pieces of the active piece set.
      */
     public static Piece[] getActivePieces(Piece[] pieces) {
         PieceSet set = GameConfig.getInstance().getActivePieceSet();
         List<Part> activeParts = getActiveParts(pieces, set);
-        return activeParts.toArray(new Piece[activeParts.size()]);
+        return activeParts.toArray(new Piece[0]);
     }
 
     /**
@@ -524,8 +524,8 @@ public class PartUtil {
                                         GamePanel gamePanel, Canvas g) {
         int numParts = parts.length;
         if (selectIndex >= 0 && selectIndex < numParts) {
-            int cardWidth = (int) Math.ceil(getDrawingWidth(parts[0], percentSize));
-            int cardHeight = (int) Math.ceil(getDrawingHeight(parts[0], percentSize));
+            int cardWidth = getDrawingWidth(parts[0], percentSize);
+            int cardHeight = getDrawingHeight(parts[0], percentSize);
             if (rotated) {
                 // correction for rotation
                 int factor = (int) ((cardHeight - cardWidth) / 2.0);
@@ -616,23 +616,17 @@ public class PartUtil {
      */
     public static boolean isInsidePolygon(Polygon p, int x, int y) {
         // http://geography.uoregon.edu/buckley/teaching/geog472-s01/lectures/lecture11/n11.html
-        int ni = +1;
+        int ni = 1;
         int u = x;
         int v = y;
         for (int i = 0; i < p.npoints; i++) {
             int ip1 = (i + 1) % p.npoints;
-            if (p.xpoints[ip1] != p.xpoints[i]) {
-                if ((p.xpoints[ip1] - u) * (u - p.xpoints[i]) >= 0) {
-                    if (p.xpoints[ip1] != u || p.xpoints[i] >= u) {
-                        if (p.xpoints[i] != u || p.xpoints[ip1] >= u) {
-                            int b = (p.ypoints[ip1] - p.ypoints[i]) / (p.xpoints[ip1] - p.xpoints[i]);
-                            int a = p.ypoints[i] - b * p.xpoints[i];
-                            int yi = a + b * u;
-                            if (yi > v) {
-                                ni = ni * (-1);
-                            }
-                        }
-                    }
+            if (p.xpoints[ip1] != p.xpoints[i] && ((p.xpoints[ip1] - u) * (u - p.xpoints[i]) >= 0) && (p.xpoints[ip1] != u || p.xpoints[i] >= u) && (p.xpoints[i] != u || p.xpoints[ip1] >= u)) {
+                int b = (p.ypoints[ip1] - p.ypoints[i]) / (p.xpoints[ip1] - p.xpoints[i]);
+                int a = p.ypoints[i] - b * p.xpoints[i];
+                int yi = a + b * u;
+                if (yi > v) {
+                    ni = ni * (-1);
                 }
             }
         }
