@@ -10,13 +10,14 @@ import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.configurablelayout.ScaleType;
 import com.tjger.gui.completed.configurablelayout.layoutelement.AreaLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.PartLayout;
+import com.tjger.lib.PartUtil;
 
 import at.hagru.hgbase.android.awt.Dimension;
 
 /**
  * The painter for an element of the type "Part" of a configurable layout.
  */
-public class PartPainter implements ElementPainter<PartLayout, Part> {
+public class PartPainter implements ElementPainter<PartLayout, Part>, ElementSelectionPainter<PartLayout> {
     /**
      * The game panel where to paint.
      */
@@ -89,6 +90,11 @@ public class PartPainter implements ElementPainter<PartLayout, Part> {
     @Override
     public void paint(PartLayout element, Canvas g) {
         Point pos = getPaintPosition(element);
-        getGamePanel().drawPart(pos.x, pos.y, getPercentSize(element), getPaintAngle(element), getActiveElement(element), g);
+        int percentSize = getPercentSize(element);
+        Part part = getActiveElement(element);
+        getGamePanel().drawPart(pos.x, pos.y, percentSize, getPaintAngle(element), part, g);
+        if (isSelected(element)) {
+            PartUtil.drawSelectedPart(part, pos.x, pos.y, percentSize, getSelectionColor(element), getGamePanel(), g);
+        }
     }
 }

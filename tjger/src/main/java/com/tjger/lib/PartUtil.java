@@ -6,7 +6,7 @@ import android.graphics.Point;
 
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.playingfield.PlayingField;
-import com.tjger.gui.GamePanel;
+import com.tjger.gui.SimpleGamePanel;
 import com.tjger.gui.completed.Card;
 import com.tjger.gui.completed.CardSet;
 import com.tjger.gui.completed.ColorValuePart;
@@ -497,7 +497,7 @@ public class PartUtil {
      * @param gamePanel   The game panel where to paint the rectangle.
      * @param g           The graphics object.
      */
-    public static void drawSelectedPart(int selectIndex, Part[] parts, int xPos, int yPos, int percentSize, int xSpacing, int ySpacing, boolean rotated, Color selectColor, GamePanel gamePanel, Canvas g) {
+    public static void drawSelectedPart(int selectIndex, Part[] parts, int xPos, int yPos, int percentSize, int xSpacing, int ySpacing, boolean rotated, Color selectColor, SimpleGamePanel gamePanel, Canvas g) {
         drawSelectedPart(selectIndex, parts, xPos, yPos, percentSize, ConstantValue.ALIGN_LEFT,
                 ConstantValue.ALIGN_TOP, xSpacing, ySpacing, rotated, selectColor, gamePanel, g);
     }
@@ -521,7 +521,7 @@ public class PartUtil {
      */
     public static void drawSelectedPart(int selectIndex, Part[] parts, int xPos, int yPos, int percentSize,
                                         Align hAlignment, int vAlignment, int xSpacing, int ySpacing, boolean rotated, Color selectColor,
-                                        GamePanel gamePanel, Canvas g) {
+                                        SimpleGamePanel gamePanel, Canvas g) {
         int numParts = parts.length;
         if (selectIndex >= 0 && selectIndex < numParts) {
             int cardWidth = getDrawingWidth(parts[0], percentSize);
@@ -560,9 +560,9 @@ public class PartUtil {
     }
 
     /* (non-javadoc)
-     * @see #drawSelectedPart(int, Part[], int, int, int, int, int, boolean, Color, GamePanel, Graphics)
+     * @see #drawSelectedPart(int, Part[], int, int, int, int, int, boolean, Color, SimpleGamePanel, Graphics)
      */
-    public static void drawSelectedPart(int selectIndex, Part[] parts, int xPos, int yPos, int percentSize, int xSpacing, int ySpacing, Color selectColor, GamePanel gamePanel, Canvas g) {
+    public static void drawSelectedPart(int selectIndex, Part[] parts, int xPos, int yPos, int percentSize, int xSpacing, int ySpacing, Color selectColor, SimpleGamePanel gamePanel, Canvas g) {
         drawSelectedPart(selectIndex, parts, xPos, yPos, percentSize, xSpacing, ySpacing, false, selectColor, gamePanel, g);
     }
 
@@ -584,7 +584,7 @@ public class PartUtil {
      */
     public static void drawSelectedPart(int selectIndex, Part[] parts, int xPos, int yPos, int percentSize,
                                         Align hAlignment, int vAlignment, int xSpacing, int ySpacing, Color selectColor,
-                                        GamePanel gamePanel, Canvas g) {
+                                        SimpleGamePanel gamePanel, Canvas g) {
         drawSelectedPart(selectIndex, parts, xPos, yPos, percentSize, hAlignment, vAlignment, xSpacing,
                 ySpacing, false, selectColor, gamePanel, g);
     }
@@ -601,7 +601,7 @@ public class PartUtil {
      * @param g           The graphics object.
      */
     public static void drawSelectedPart(Part part, int xPos, int yPos, int percentSize, Color selectColor,
-                                        GamePanel gamePanel, Canvas g) {
+                                        SimpleGamePanel gamePanel, Canvas g) {
         drawSelectedPart(0, new Part[]{part}, xPos, yPos, percentSize, 0, 0, selectColor, gamePanel, g);
     }
 

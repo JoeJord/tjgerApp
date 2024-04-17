@@ -9,6 +9,7 @@ import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.PartSet;
 import com.tjger.gui.completed.configurablelayout.ScaleType;
 import com.tjger.gui.completed.configurablelayout.layoutelement.LayoutGameElementSet;
+import com.tjger.lib.PartUtil;
 
 import at.hagru.hgbase.android.awt.Dimension;
 
@@ -19,7 +20,7 @@ import at.hagru.hgbase.android.awt.Dimension;
  * @param <S> The type of the game panel element set.
  * @param <P> The type of the game panel element.
  */
-public interface ElementSetPainter<E extends LayoutGameElementSet, S extends PartSet, P extends Part> extends ElementPainter<E, S> {
+public interface ElementSetPainter<E extends LayoutGameElementSet, S extends PartSet, P extends Part> extends ElementPainter<E, S>, ElementSetSelectionPainter<E> {
     /**
      * Returns the elements of the active set with which the specified layout element should be painted.
      *
@@ -119,15 +120,19 @@ public interface ElementSetPainter<E extends LayoutGameElementSet, S extends Par
         Point pos = getPaintPosition(element);
         int percentSize = getPercentSize(element);
         Dimension spacing = getPaintSpacing(element);
+        P[] parts = getActiveElements(element);
         if (isScaleUsed(element)) {
             double factor = percentSize / 100.0;
             spacing = new Dimension((int) (spacing.width * factor), (int) (spacing.height * factor));
         }
         Orientation orientation = getPaintOrientation(element);
         if (orientation != null) {
-            getGamePanel().drawParts(pos.x, pos.y, percentSize, getPaintAngle(element), orientation, getPaintWrapThreshold(element), getActiveElements(element), spacing.width, spacing.height, g);
+            getGamePanel().drawParts(pos.x, pos.y, percentSize, getPaintAngle(element), orientation, getPaintWrapThreshold(element), parts, spacing.width, spacing.height, g);
         } else {
-            getGamePanel().drawParts(pos.x, pos.y, percentSize, getPaintAngle(element), getActiveElements(element), spacing.width, spacing.height, g);
+            getGamePanel().drawParts(pos.x, pos.y, percentSize, getPaintAngle(element), parts, spacing.width, spacing.height, g);
+        }
+        if (isSelected(element)) {
+            PartUtil.drawSelectedPart(getSelectedIndex(element), parts, pos.x, pos.y, percentSize, spacing.width, spacing.height, getSelectionColor(element), getGamePanel(), g);
         }
     }
 }
