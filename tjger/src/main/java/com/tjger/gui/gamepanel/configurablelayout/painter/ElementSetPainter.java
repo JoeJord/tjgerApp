@@ -5,9 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 
 import com.tjger.gui.Orientation;
+import com.tjger.gui.completed.Card;
 import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.PartSet;
 import com.tjger.gui.completed.configurablelayout.ScaleType;
+import com.tjger.gui.completed.configurablelayout.layoutelement.CoverableLayoutElement;
 import com.tjger.gui.completed.configurablelayout.layoutelement.LayoutGameElementSet;
 import com.tjger.lib.PartUtil;
 
@@ -115,12 +117,38 @@ public interface ElementSetPainter<E extends LayoutGameElementSet, S extends Par
         }
     }
 
+    /**
+     * Returns {@code true} if the specified layout element should be painted covered.
+     *
+     * @param element The layout element to paint.
+     * @return {@code true} if the specified layout element should be painted covered.
+     */
+    default boolean isCovered(E element) {
+        return ((element instanceof CoverableLayoutElement) && (((CoverableLayoutElement) element).isCovered()));
+    }
+
+    /**
+     * Returns the cover parts if the parts should be painted covered or the specified parts otherwise.
+     *
+     * @param element The layout element to paint.
+     * @param parts   The parts to paint.
+     * @return The cover parts if the parts should be painted covered or the specified parts otherwise.
+     */
+    @SuppressWarnings("unchecked")
+    default P[] getCovers(E element, P[] parts) {
+        if (isCovered(element) && parts instanceof Card[]) {
+            return (P[]) PartUtil.getCovers((Card[]) parts);
+        } else {
+            return parts;
+        }
+    }
+
     @Override
     default void paint(E element, Canvas g) {
         Point pos = getPaintPosition(element);
         int percentSize = getPercentSize(element);
         Dimension spacing = getPaintSpacing(element);
-        P[] parts = getActiveElements(element);
+        P[] parts = getCovers(element, getActiveElements(element));
         if (isScaleUsed(element)) {
             double factor = percentSize / 100.0;
             spacing = new Dimension((int) (spacing.width * factor), (int) (spacing.height * factor));

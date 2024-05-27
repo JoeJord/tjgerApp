@@ -244,6 +244,11 @@ class GameConfigFileReader {
      * The configuration tag for the font size.
      */
     private static final String CONFIG_FONTSIZE = "fontsize";
+    /**
+     * The configuration tag for the covered flag.
+     */
+    private static final String CONFIG_COVERED = "covered";
+
     private static final List<Background> backgroundList = new ArrayList<>();
     private static final List<Board> boardList = new ArrayList<>();
     private static final List<Cover> coverList = new ArrayList<>();
@@ -609,7 +614,8 @@ class GameConfigFileReader {
         int ySpacing = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_YSPACING, 0);
         String orientation = HGBaseXMLTools.getAttributeValue(node, CONFIG_ORIENTATION);
         int wrapThreshold = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_WRAPTHRESHOLD, 0);
-        return new CardsetLayout(HGBaseTools.hasContent(type) ? type : ConstantValue.CONFIG_CARDSET, playerIndex, xpos, ypos, percentSize, angle, area, xSpacing, ySpacing, orientation, wrapThreshold);
+        boolean covered = HGBaseXMLTools.getAttributeBooleanValue(node, CONFIG_COVERED, false);
+        return new CardsetLayout(HGBaseTools.hasContent(type) ? type : ConstantValue.CONFIG_CARDSET, playerIndex, xpos, ypos, percentSize, angle, area, xSpacing, ySpacing, orientation, wrapThreshold, covered);
     }
 
     /**
