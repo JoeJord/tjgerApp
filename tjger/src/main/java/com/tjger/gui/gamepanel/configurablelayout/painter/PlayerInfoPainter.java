@@ -110,17 +110,72 @@ public class PlayerInfoPainter implements IndexedElementPainter<PlayerInfoLayout
         }
         switch (element.getType()) {
             case NAME:
-                return player.getName();
+                return getNameInformation(element, player);
             case GAME_SCORE:
-                return String.valueOf(player.getScore(GamePlayer.SCORE_GAME));
+                return getGameScoreInformation(element, player);
             case ROUND_SCORE:
-                return String.valueOf(player.getScore(GamePlayer.SCORE_ROUND));
+                return getRoundScoreInformation(element, player);
             case TURN_SCORE:
-                return String.valueOf(player.getScore(GamePlayer.SCORE_TURN));
+                return getTurnScoreInformation(element, player);
             default:
                 break;
         }
         return null;
+    }
+
+    /**
+     * Returns the information of the type {@code NAME}.
+     *
+     * @param element The layout element to paint.
+     * @param player  The player from which the information should be returned.
+     * @return The information of the type {@code NAME}.
+     */
+    protected String getNameInformation(PlayerInfoLayout element, GamePlayer player) {
+        return player.getName();
+    }
+
+    /**
+     * Returns the information of the type {@code GAME_SCORE}.
+     *
+     * @param element The layout element to paint.
+     * @param player  The player from which the information should be returned.
+     * @return The information of the type {@code GAME_SCORE}.
+     */
+    protected String getGameScoreInformation(PlayerInfoLayout element, GamePlayer player) {
+        return getScoreInformation(player, GamePlayer.SCORE_GAME);
+    }
+
+    /**
+     * Returns the information of the type {@code ROUND_SCORE}.
+     *
+     * @param element The layout element to paint.
+     * @param player  The player from which the information should be returned.
+     * @return The information of the type {@code ROUND_SCORE}.
+     */
+    protected String getRoundScoreInformation(PlayerInfoLayout element, GamePlayer player) {
+        return getScoreInformation(player, GamePlayer.SCORE_ROUND);
+    }
+
+    /**
+     * Returns the information of the type {@code TURN_SCORE}.
+     *
+     * @param element The layout element to paint.
+     * @param player  The player from which the information should be returned.
+     * @return The information of the type {@code TURN_SCORE}.
+     */
+    protected String getTurnScoreInformation(PlayerInfoLayout element, GamePlayer player) {
+        return getScoreInformation(player, GamePlayer.SCORE_TURN);
+    }
+
+    /**
+     * Returns the information of the specified score type.
+     *
+     * @param player    The player from which the information should be returned.
+     * @param scoreType The type of the score which should be returned.
+     * @return The information of the specified score type.
+     */
+    private String getScoreInformation(GamePlayer player, int scoreType) {
+        return String.valueOf(player.getScore(scoreType));
     }
 
     /**
