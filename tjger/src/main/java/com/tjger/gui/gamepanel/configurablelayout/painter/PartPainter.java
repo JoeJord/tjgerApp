@@ -48,7 +48,7 @@ public class PartPainter implements ElementPainter<PartLayout, Part>, ElementSel
      * @param element The layout element to paint.
      * @return The size of the active configured game panel element which is painted.
      */
-    public Dimension getActiveElementSize(PartLayout element) {
+    protected Dimension getActiveElementSize(PartLayout element) {
         Bitmap image = getActiveElement(element).getImage();
         return new Dimension(image.getWidth(), image.getHeight());
     }
@@ -65,7 +65,7 @@ public class PartPainter implements ElementPainter<PartLayout, Part>, ElementSel
      * @param elementSize The normal size of the element.
      * @return The percent size with which the specified layout element should be painted.
      */
-    public int getPercentSize(PartLayout element, Dimension elementSize) {
+    protected int getPercentSize(PartLayout element, Dimension elementSize) {
         AreaLayout area = element.getArea();
         Dimension areaSize = (area == null) ? getGamePanel().getFieldSize() : area.getInnerSize(() -> getGamePanel().getFieldSize());
         return element.getPercentSize(() -> elementSize, () -> areaSize);

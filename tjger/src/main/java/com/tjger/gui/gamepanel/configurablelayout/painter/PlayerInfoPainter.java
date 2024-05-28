@@ -82,7 +82,7 @@ public class PlayerInfoPainter implements IndexedElementPainter<PlayerInfoLayout
      * @param element The layout element to paint.
      * @return The color in which the player information is painted.
      */
-    public Color getColor(PlayerInfoLayout element) {
+    protected Color getColor(PlayerInfoLayout element) {
         return element.getColor();
     }
 
@@ -93,7 +93,7 @@ public class PlayerInfoPainter implements IndexedElementPainter<PlayerInfoLayout
      * @param element The layout element to paint.
      * @return The player for which the information should be painted.
      */
-    public GamePlayer getPlayer(GameEngine engine, PlayerInfoLayout element) {
+    protected GamePlayer getPlayer(GameEngine engine, PlayerInfoLayout element) {
         return engine.getPlayerWithIndex(getPlayerIndex(element));
     }
 
@@ -103,7 +103,7 @@ public class PlayerInfoPainter implements IndexedElementPainter<PlayerInfoLayout
      * @param element The layout element to paint.
      * @return The information which should be painted.
      */
-    public String getInformation(PlayerInfoLayout element) {
+    protected String getInformation(PlayerInfoLayout element) {
         GamePlayer player = getPlayer(GameEngine.getInstance(), element);
         if (player == null) {
             return null;
@@ -184,7 +184,7 @@ public class PlayerInfoPainter implements IndexedElementPainter<PlayerInfoLayout
      * @param element The layout element to paint.
      * @return The font size with which the information should be painted.
      */
-    public Float getFontSize(PlayerInfoLayout element) {
+    protected Float getFontSize(PlayerInfoLayout element) {
         return element.getFontSize(new StringSizeSupplier(getInformation(element), new Paint()), () -> getSurroundingAreaDimension(element));
     }
 

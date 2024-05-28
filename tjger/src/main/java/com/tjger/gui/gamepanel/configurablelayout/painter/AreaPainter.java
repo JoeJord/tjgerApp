@@ -70,7 +70,7 @@ public class AreaPainter implements ElementPainter<AreaLayout, Part> {
      * @param element The layout element to paint.
      * @return The color in which the area frame is painted.
      */
-    public Color getColor(AreaLayout element) {
+    protected Color getColor(AreaLayout element) {
         return Color.BLACK;
     }
 
