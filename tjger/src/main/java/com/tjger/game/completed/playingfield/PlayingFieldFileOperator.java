@@ -56,7 +56,7 @@ public final class PlayingFieldFileOperator {
     private static final String POINT_POSITION_ATTRIBUTE = "position";
     private static final String FROM_ATTRIBUTE = "from";
     private static final String TO_ATTRIBUTE = "to";
-    private static final String WEIGHT_ATTRIBUTE = "weigt";
+    private static final String WEIGHT_ATTRIBUTE = "weight";
     private static final String SINGLE_FIELD_ID_ATTRIBUTE = "singlefieldid";
 
     private static final String DIMENSION_SEPARATOR = "x";
@@ -251,7 +251,7 @@ public final class PlayingFieldFileOperator {
         if (CONNECTION_NODE.equals(node.getNodeName())) {
             String fromId = HGBaseXMLTools.getAttributeValue(node, FROM_ATTRIBUTE);
             String toId = HGBaseXMLTools.getAttributeValue(node, TO_ATTRIBUTE);
-            int weight = HGBaseTools.toInt(HGBaseXMLTools.getAttributeValue(node, WEIGHT_ATTRIBUTE));
+            int weight = HGBaseXMLTools.getAttributeIntValue(node, WEIGHT_ATTRIBUTE, HGBaseXMLTools.getAttributeIntValue(node, "weigt"));
             SingleField from = fieldToLoad.getField(fromId);
             SingleField to = fieldToLoad.getField(toId);
             if (from != null && to != null && weight != HGBaseTools.INVALID_INT) {
