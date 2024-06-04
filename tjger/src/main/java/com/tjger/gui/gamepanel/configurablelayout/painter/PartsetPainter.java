@@ -8,24 +8,26 @@ import com.tjger.gui.completed.configurablelayout.layoutelement.PartsetLayout;
 
 /**
  * The painter for an element of the type "Partset" of a configurable layout.
+ *
+ * @param <G> The type of the game panel.
  */
-public class PartsetPainter implements ElementSetPainter<PartsetLayout, PartSet, Part> {
+public class PartsetPainter<G extends SimpleGamePanel> implements ElementSetPainter<PartsetLayout, PartSet, Part, G> {
     /**
      * The game panel where to paint.
      */
-    private final SimpleGamePanel gamePanel;
+    private final G gamePanel;
 
     /**
      * Constructs a new instance.
      *
      * @param gamePanel The game panel where to paint.
      */
-    public PartsetPainter(SimpleGamePanel gamePanel) {
+    public PartsetPainter(G gamePanel) {
         this.gamePanel = gamePanel;
     }
 
     @Override
-    public SimpleGamePanel getGamePanel() {
+    public G getGamePanel() {
         return gamePanel;
     }
 

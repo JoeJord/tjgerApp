@@ -8,24 +8,26 @@ import com.tjger.gui.completed.configurablelayout.layoutelement.CardsetLayout;
 
 /**
  * The painter for an element of the type "Cardset" of a configurable layout.
+ *
+ * @param <G> The type of the game panel.
  */
-public class CardsetPainter implements IndexedElementSetPainter<CardsetLayout, CardSet, Card> {
+public class CardsetPainter<G extends SimpleGamePanel> implements IndexedElementSetPainter<CardsetLayout, CardSet, Card, G> {
     /**
      * The game panel where to paint.
      */
-    private final SimpleGamePanel gamePanel;
+    private final G gamePanel;
 
     /**
      * Constructs a new instance.
      *
      * @param gamePanel The game panel where to paint.
      */
-    public CardsetPainter(SimpleGamePanel gamePanel) {
+    public CardsetPainter(G gamePanel) {
         this.gamePanel = gamePanel;
     }
 
     @Override
-    public SimpleGamePanel getGamePanel() {
+    public G getGamePanel() {
         return gamePanel;
     }
 

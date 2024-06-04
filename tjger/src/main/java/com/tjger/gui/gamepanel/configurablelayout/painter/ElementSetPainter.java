@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 
 import com.tjger.gui.Orientation;
+import com.tjger.gui.SimpleGamePanel;
 import com.tjger.gui.completed.Card;
 import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.PartSet;
@@ -21,8 +22,9 @@ import at.hagru.hgbase.android.awt.Dimension;
  * @param <E> The type of the layout element.
  * @param <S> The type of the game panel element set.
  * @param <P> The type of the game panel element.
+ * @param <G> The type of the game panel.
  */
-public interface ElementSetPainter<E extends LayoutGameElementSet, S extends PartSet, P extends Part> extends ElementPainter<E, S>, ElementSetSelectionPainter<E> {
+public interface ElementSetPainter<E extends LayoutGameElementSet, S extends PartSet, P extends Part, G extends SimpleGamePanel> extends ElementPainter<E, S, G>, ElementSetSelectionPainter<E> {
     /**
      * Returns the elements of the active set with which the specified layout element should be painted.
      *

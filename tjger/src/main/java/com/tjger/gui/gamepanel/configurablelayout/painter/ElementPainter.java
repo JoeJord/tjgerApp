@@ -21,14 +21,15 @@ import at.hagru.hgbase.android.awt.Rectangle;
  *
  * @param <E> The type of the layout element.
  * @param <P> The type of the game panel element.
+ * @param <G> The type of the game panel.
  */
-public interface ElementPainter<E extends LayoutElement, P extends Part> {
+public interface ElementPainter<E extends LayoutElement, P extends Part, G extends SimpleGamePanel> {
     /**
      * Returns the game panel.
      *
      * @return The game panel.
      */
-    SimpleGamePanel getGamePanel();
+    G getGamePanel();
 
     /**
      * Returns the active configured game panel element which is painted.

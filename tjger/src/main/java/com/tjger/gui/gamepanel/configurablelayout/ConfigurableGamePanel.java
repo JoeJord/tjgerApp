@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 
 import com.tjger.game.completed.GameConfig;
 import com.tjger.gui.AnimatedGamePanel;
+import com.tjger.gui.SimpleGamePanel;
 import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.configurablelayout.layoutelement.AreaLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.CardsetLayout;
@@ -41,7 +42,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
     /**
      * The map with the painters for the layout elements.
      */
-    private HashMap<Class<? extends LayoutElement>, ElementPainter<? extends LayoutElement, ? extends Part>> painterMap;
+    private HashMap<Class<? extends LayoutElement>, ElementPainter<? extends LayoutElement, ? extends Part, ? extends SimpleGamePanel>> painterMap;
 
     /**
      * Constructs a new instance.
@@ -78,8 +79,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The created painter.
      */
-    protected AreaPainter createAreaPainter() {
-        return new AreaPainter(this);
+    protected AreaPainter<?> createAreaPainter() {
+        return new AreaPainter<>(this);
     }
 
     /**
@@ -87,8 +88,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The painter for layout elements of the type "Area".
      */
-    public final AreaPainter getAreaPainter() {
-        return (AreaPainter) painterMap.get(AreaLayout.class);
+    public final AreaPainter<?> getAreaPainter() {
+        return (AreaPainter<?>) painterMap.get(AreaLayout.class);
     }
 
     /**
@@ -96,8 +97,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The created painter.
      */
-    protected PartPainter createPartPainter() {
-        return new PartPainter(this);
+    protected PartPainter<?> createPartPainter() {
+        return new PartPainter<>(this);
     }
 
     /**
@@ -105,8 +106,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The painter for layout elements of the type "Part".
      */
-    protected final PartPainter getPartPainter() {
-        return (PartPainter) painterMap.get(PartLayout.class);
+    protected final PartPainter<?> getPartPainter() {
+        return (PartPainter<?>) painterMap.get(PartLayout.class);
     }
 
     /**
@@ -114,8 +115,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The created painter.
      */
-    protected PartsetPainter createPartsetPainter() {
-        return new PartsetPainter(this);
+    protected PartsetPainter<?> createPartsetPainter() {
+        return new PartsetPainter<>(this);
     }
 
     /**
@@ -123,8 +124,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The painter for layout elements of the type "Partset".
      */
-    protected final PartsetPainter getPartsetPainter() {
-        return (PartsetPainter) painterMap.get(PartsetLayout.class);
+    protected final PartsetPainter<?> getPartsetPainter() {
+        return (PartsetPainter<?>) painterMap.get(PartsetLayout.class);
     }
 
     /**
@@ -132,8 +133,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The created painter.
      */
-    protected CardsetPainter createCardsetPainter() {
-        return new CardsetPainter(this);
+    protected CardsetPainter<?> createCardsetPainter() {
+        return new CardsetPainter<>(this);
     }
 
     /**
@@ -141,8 +142,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The painter for layout elements of the type "Cardset".
      */
-    protected final CardsetPainter getCardsetPainter() {
-        return (CardsetPainter) painterMap.get(CardsetLayout.class);
+    protected final CardsetPainter<?> getCardsetPainter() {
+        return (CardsetPainter<?>) painterMap.get(CardsetLayout.class);
     }
 
     /**
@@ -150,8 +151,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The created painter.
      */
-    protected PiecesetPainter createPiecesetPainter() {
-        return new PiecesetPainter(this);
+    protected PiecesetPainter<?> createPiecesetPainter() {
+        return new PiecesetPainter<>(this);
     }
 
     /**
@@ -159,8 +160,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The painter for layout elements of the type "Pieceset".
      */
-    protected final PiecesetPainter getPiecesetPainter() {
-        return (PiecesetPainter) painterMap.get(PiecesetLayout.class);
+    protected final PiecesetPainter<?> getPiecesetPainter() {
+        return (PiecesetPainter<?>) painterMap.get(PiecesetLayout.class);
     }
 
     /**
@@ -168,8 +169,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The created painter.
      */
-    protected PlayerInfoPainter createPlayerInfoPainter() {
-        return new PlayerInfoPainter(this);
+    protected PlayerInfoPainter<?> createPlayerInfoPainter() {
+        return new PlayerInfoPainter<>(this);
     }
 
     /**
@@ -177,8 +178,8 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      *
      * @return The painter for layout elements of the type "player information".
      */
-    protected final PlayerInfoPainter getPlayerInfoPainter() {
-        return (PlayerInfoPainter) painterMap.get(PlayerInfoLayout.class);
+    protected final PlayerInfoPainter<?> getPlayerInfoPainter() {
+        return (PlayerInfoPainter<?>) painterMap.get(PlayerInfoLayout.class);
     }
 
     /**
@@ -288,7 +289,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      * @param g    The canvas object.
      */
     protected void paintLayoutArea(AreaLayout area, Canvas g) {
-        AreaPainter areaPainter = getAreaPainter();
+        AreaPainter<?> areaPainter = getAreaPainter();
         if ((area == null) || (!areaPainter.shouldPaint(area))) {
             return;
         }
@@ -315,7 +316,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      * @param g    The canvas object.
      */
     protected void paintLayoutPart(PartLayout part, Canvas g) {
-        PartPainter partPainter = getPartPainter();
+        PartPainter<?> partPainter = getPartPainter();
         if ((part == null) || (!partPainter.shouldPaint(part))) {
             return;
         }
@@ -342,7 +343,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      * @param g       The canvas object.
      */
     protected void paintLayoutPartset(PartsetLayout partset, Canvas g) {
-        PartsetPainter partsetPainter = getPartsetPainter();
+        PartsetPainter<?> partsetPainter = getPartsetPainter();
         if ((partset == null) || (!partsetPainter.shouldPaint(partset))) {
             return;
         }
@@ -369,7 +370,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      * @param g       The canvas object.
      */
     protected void paintLayoutCardset(CardsetLayout cardset, Canvas g) {
-        CardsetPainter cardsetPainter = getCardsetPainter();
+        CardsetPainter<?> cardsetPainter = getCardsetPainter();
         if ((cardset == null) || (!cardsetPainter.shouldPaint(cardset))) {
             return;
         }
@@ -396,7 +397,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      * @param g        The canvas object.
      */
     protected void paintLayoutPieceset(PiecesetLayout pieceset, Canvas g) {
-        PiecesetPainter piecesetPainter = getPiecesetPainter();
+        PiecesetPainter<?> piecesetPainter = getPiecesetPainter();
         if ((pieceset == null) || (!piecesetPainter.shouldPaint(pieceset))) {
             return;
         }
@@ -423,7 +424,7 @@ public class ConfigurableGamePanel extends AnimatedGamePanel {
      * @param g          The canvas object.
      */
     private void paintLayoutPlayerInfo(PlayerInfoLayout playerInfo, Canvas g) {
-        PlayerInfoPainter playerInfoPainter = getPlayerInfoPainter();
+        PlayerInfoPainter<?> playerInfoPainter = getPlayerInfoPainter();
         if ((playerInfo == null) || (!playerInfoPainter.shouldPaint(playerInfo))) {
             return;
         }

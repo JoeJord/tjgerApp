@@ -1,5 +1,6 @@
 package com.tjger.gui.gamepanel.configurablelayout.painter;
 
+import com.tjger.gui.SimpleGamePanel;
 import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.configurablelayout.layoutelement.IndexedLayoutElement;
 import com.tjger.gui.completed.configurablelayout.layoutelement.LayoutElement;
@@ -9,8 +10,9 @@ import com.tjger.gui.completed.configurablelayout.layoutelement.LayoutElement;
  *
  * @param <E> The type of the layout element.
  * @param <P> The type of the game panel element.
+ * @param <G> The type of the game panel.
  */
-public interface IndexedElementPainter<E extends LayoutElement, P extends Part> extends ElementPainter<E, P> {
+public interface IndexedElementPainter<E extends LayoutElement, P extends Part, G extends SimpleGamePanel> extends ElementPainter<E, P, G> {
     /**
      * Returns the index of the player for which the specified element should be painted.
      *

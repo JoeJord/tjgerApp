@@ -13,24 +13,26 @@ import at.hagru.hgbase.android.awt.Dimension;
 
 /**
  * The painter for an element of the type "Area" of a configurable layout.
+ *
+ * @param <G> The type of the game panel.
  */
-public class AreaPainter implements ElementPainter<AreaLayout, Part> {
+public class AreaPainter<G extends SimpleGamePanel> implements ElementPainter<AreaLayout, Part, G> {
     /**
      * The game panel where to paint.
      */
-    private final SimpleGamePanel gamePanel;
+    private final G gamePanel;
 
     /**
      * Constructs a new instance.
      *
      * @param gamePanel The game panel where to paint.
      */
-    public AreaPainter(SimpleGamePanel gamePanel) {
+    public AreaPainter(G gamePanel) {
         this.gamePanel = gamePanel;
     }
 
     @Override
-    public SimpleGamePanel getGamePanel() {
+    public G getGamePanel() {
         return gamePanel;
     }
 

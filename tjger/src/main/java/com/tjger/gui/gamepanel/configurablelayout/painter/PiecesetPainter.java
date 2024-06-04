@@ -8,24 +8,26 @@ import com.tjger.gui.completed.configurablelayout.layoutelement.PiecesetLayout;
 
 /**
  * The painter for an element of the type "Pieceset" of a configurable layout.
+ *
+ * @param <G> The type of the game panel.
  */
-public class PiecesetPainter implements ElementSetPainter<PiecesetLayout, PieceSet, Piece> {
+public class PiecesetPainter<G extends SimpleGamePanel> implements ElementSetPainter<PiecesetLayout, PieceSet, Piece, G> {
     /**
      * The game panel where to paint.
      */
-    private final SimpleGamePanel gamePanel;
+    private final G gamePanel;
 
     /**
      * Constructs a new instance.
      *
      * @param gamePanel The game panel where to paint.
      */
-    public PiecesetPainter(SimpleGamePanel gamePanel) {
+    public PiecesetPainter(G gamePanel) {
         this.gamePanel = gamePanel;
     }
 
     @Override
-    public SimpleGamePanel getGamePanel() {
+    public G getGamePanel() {
         return gamePanel;
     }
 

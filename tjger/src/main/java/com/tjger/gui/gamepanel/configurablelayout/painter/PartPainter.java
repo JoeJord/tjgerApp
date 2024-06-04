@@ -16,24 +16,26 @@ import at.hagru.hgbase.android.awt.Dimension;
 
 /**
  * The painter for an element of the type "Part" of a configurable layout.
+ *
+ * @param <G> The type of the game panel.
  */
-public class PartPainter implements ElementPainter<PartLayout, Part>, ElementSelectionPainter<PartLayout> {
+public class PartPainter<G extends SimpleGamePanel> implements ElementPainter<PartLayout, Part, G>, ElementSelectionPainter<PartLayout> {
     /**
      * The game panel where to paint.
      */
-    private final SimpleGamePanel gamePanel;
+    private final G gamePanel;
 
     /**
      * Constructs a new instance.
      *
      * @param gamePanel The game panel where to paint.
      */
-    public PartPainter(SimpleGamePanel gamePanel) {
+    public PartPainter(G gamePanel) {
         this.gamePanel = gamePanel;
     }
 
     @Override
-    public SimpleGamePanel getGamePanel() {
+    public G getGamePanel() {
         return gamePanel;
     }
 

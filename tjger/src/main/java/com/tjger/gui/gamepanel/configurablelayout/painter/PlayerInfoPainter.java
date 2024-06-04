@@ -18,24 +18,26 @@ import at.hagru.hgbase.lib.HGBaseTools;
 
 /**
  * The painter for an element of the type "Player information" of a configurable layout.
+ *
+ * @param <G> The type of the game panel.
  */
-public class PlayerInfoPainter implements IndexedElementPainter<PlayerInfoLayout, Part> {
+public class PlayerInfoPainter<G extends SimpleGamePanel> implements IndexedElementPainter<PlayerInfoLayout, Part, G> {
     /**
      * The game panel where to paint.
      */
-    private final SimpleGamePanel gamePanel;
+    private final G gamePanel;
 
     /**
      * Constructs a new instance.
      *
      * @param gamePanel The game panel where to paint.
      */
-    public PlayerInfoPainter(SimpleGamePanel gamePanel) {
+    public PlayerInfoPainter(G gamePanel) {
         this.gamePanel = gamePanel;
     }
 
     @Override
-    public SimpleGamePanel getGamePanel() {
+    public G getGamePanel() {
         return gamePanel;
     }
 
