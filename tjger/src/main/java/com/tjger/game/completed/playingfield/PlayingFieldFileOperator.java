@@ -1,5 +1,14 @@
 package com.tjger.game.completed.playingfield;
 
+import android.graphics.Point;
+
+import com.tjger.lib.XmlMapStringConverter;
+import com.tjger.lib.XmlUtil;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,14 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import com.tjger.lib.XmlMapStringConverter;
-import com.tjger.lib.XmlUtil;
-
-import android.graphics.Point;
 import at.hagru.hgbase.android.awt.Dimension;
 import at.hagru.hgbase.lib.HGBaseLog;
 import at.hagru.hgbase.lib.HGBaseTools;
@@ -29,7 +30,7 @@ import at.hagru.hgbase.lib.xml.HGBaseXMLTools;
  * @author hagru
  */
 public final class PlayingFieldFileOperator {
-    
+
     /**
      * The name of the parent node for all single field data objects.
      */
@@ -61,7 +62,7 @@ public final class PlayingFieldFileOperator {
 
     private static final String DIMENSION_SEPARATOR = "x";
     private static final String POINT_SEPARATOR = "/";
-    
+
     private static PlayingField fieldToLoad; // helper variable when reading a file
 
     /**
@@ -96,7 +97,7 @@ public final class PlayingFieldFileOperator {
         Element root = HGBaseXMLTools.readXML(stream);
         return fromXml(root);
     }
-    
+
     /**
      * Reads a playing field from an XML document by passing the root node.
      *
@@ -108,26 +109,26 @@ public final class PlayingFieldFileOperator {
         if (root != null && PLAYING_FIELD_NODE.equals(root.getNodeName())) {
             readPlayingFieldData(root);
             ChildNodeIterator.run(new ChildNodeIterator(root, PLAYING_FIELD_NODE, null) {
-                
+
                 @Override
                 public void performNode(Node node, int index, Object obj) {
                     if (fieldToLoad != null) {
                         ChildNodeIterator.run(new ChildNodeIterator(node, SINGLE_FIELDS_NODE, null) {
-                            
+
                             @Override
                             public void performNode(Node node, int index, Object obj) {
                                 readSingleFields(node);
                             }
                         });
                         ChildNodeIterator.run(new ChildNodeIterator(node, CONNECTIONS_NODE, null) {
-                            
+
                             @Override
                             public void performNode(Node node, int index, Object obj) {
                                 readConnections(node);
                             }
                         });
                     }
-                    
+
                 }
             });
             if (fieldToLoad == null) {
@@ -140,7 +141,7 @@ public final class PlayingFieldFileOperator {
     /**
      * Reads the basic data for a playing field and creates a new object.
      * This object is stored in {@code fieldToLoad}.
-     * 
+     *
      * @param node the node to read the data from
      */
     private static void readPlayingFieldData(Node node) {
@@ -165,7 +166,7 @@ public final class PlayingFieldFileOperator {
 
     /**
      * Reads all single field information from the single fields node.
-     * 
+     *
      * @param node the node containing all single field nodes
      */
     private static void readSingleFields(Node node) {
@@ -180,7 +181,7 @@ public final class PlayingFieldFileOperator {
                 } else {
                     List<Point> pointList = readSingleFieldPixelPositions(node);
                     if (pointList.size() >= 2) {
-                        field = new SingleField(id, shape, pointList.toArray(new Point[pointList.size()]));
+                        field = new SingleField(id, shape, pointList.toArray(new Point[0]));
                     }
                 }
                 if (field != null) {
@@ -193,7 +194,7 @@ public final class PlayingFieldFileOperator {
 
     /**
      * Reads the pixel positions of a single field.
-     * 
+     *
      * @param node the node of the single field
      * @return a list with all pixel positions, may be empty
      */
@@ -222,8 +223,8 @@ public final class PlayingFieldFileOperator {
 
     /**
      * Reads the single field properties from the field node.
-     * 
-     * @param node the node of the single field
+     *
+     * @param node  the node of the single field
      * @param field the single field to add the properties
      */
     private static void readSingleFieldProperties(Node node, SingleField field) {
@@ -233,18 +234,18 @@ public final class PlayingFieldFileOperator {
             public void performNode(Node node, int index, Object obj) {
                 if (PROPERTIES_NODE.equals(node.getNodeName())) {
                     SingleField field = (SingleField) obj;
-                    Map<String,String> properties = XmlUtil.loadMap(node, PROPERTY_NODE, new XmlMapStringConverter());
-                    for (Entry<String,String> property : properties.entrySet()) {
+                    Map<String, String> properties = XmlUtil.loadMap(node, PROPERTY_NODE, new XmlMapStringConverter());
+                    for (Entry<String, String> property : properties.entrySet()) {
                         field.setProperty(property.getKey(), property.getValue());
                     }
                 }
             }
         });
     }
-    
+
     /**
      * Reads all connection information from the connections node.
-     * 
+     *
      * @param node the node containing all connection nodes
      */
     private static void readConnections(Node node) {
@@ -257,31 +258,31 @@ public final class PlayingFieldFileOperator {
             if (from != null && to != null && weight != HGBaseTools.INVALID_INT) {
                 fieldToLoad.addConnection(from, to, weight);
             }
-            
+
         }
     }
 
     /**
      * Writes a playing field to a file.
      *
-     * @param file the file to write the field into, must no be null
+     * @param file  the file to write the field into, must no be null
      * @param field the playing field to write
      * @return true if writing was successful, otherwise false
      */
     public static boolean toFile(File file, PlayingField field) {
         Document doc = HGBaseXMLTools.createDocument();
-        if (toXml(doc, null, field) ) {
+        if (toXml(doc, null, field)) {
             return HGBaseXMLTools.writeXML(doc, file.getPath());
         }
         return false;
     }
-    
+
     /**
      * Writes a playing field to an XML document.
      *
-     * @param doc the xml document
+     * @param doc    the xml document
      * @param parent the parent node to add the data, may be null
-     * @param field the playing field to write
+     * @param field  the playing field to write
      * @return true if writing was successful, otherwise false
      */
     public static boolean toXml(Document doc, Element parent, PlayingField field) {
@@ -296,14 +297,14 @@ public final class PlayingFieldFileOperator {
 
     /**
      * Add the basic data of a playing field.
-     * 
-     * @param field the playing field
-     * @param doc the xml document
+     *
+     * @param field  the playing field
+     * @param doc    the xml document
      * @param parent the parent node to put the playing field data into, is null if added as root element (default)
      * @return the new created root node
      */
     private static Element writePlayingFieldData(PlayingField field, Document doc, Element parent) {
-        Element root = (parent == null)? HGBaseXMLTools.createElement(doc, null, PLAYING_FIELD_NODE) : parent;
+        Element root = (parent == null) ? HGBaseXMLTools.createElement(doc, null, PLAYING_FIELD_NODE) : parent;
         if (!field.getGridType().isYes()) {
             writeDimensionAttribute(root, SIZE_ATTRIBUTE, field.getSize());
         }
@@ -315,10 +316,10 @@ public final class PlayingFieldFileOperator {
 
     /**
      * Add single fields to the playing field.
-     * 
+     *
      * @param field the playing field
-     * @param doc the xml document
-     * @param root the root node to add the single fields node
+     * @param doc   the xml document
+     * @param root  the root node to add the single fields node
      */
     private static void writeSingleFields(PlayingField field, Document doc, Element root) {
         Element fieldsNode = HGBaseXMLTools.createElement(doc, root, SINGLE_FIELDS_NODE);
@@ -345,16 +346,16 @@ public final class PlayingFieldFileOperator {
 
     /**
      * Add connections between single fields.
-     * 
+     *
      * @param field the playing field
-     * @param doc the xml document
-     * @param root the root node to add the connections node
+     * @param doc   the xml document
+     * @param root  the root node to add the connections node
      */
     private static void writeConnections(PlayingField field, Document doc, Element root) {
         Element connectionsNode = HGBaseXMLTools.createElement(doc, root, CONNECTIONS_NODE);
-        for (Entry<SingleField,Map<SingleField,Integer>> connection : field.getConnectionsMap().entrySet()) {
+        for (Entry<SingleField, Map<SingleField, Integer>> connection : field.getConnectionsMap().entrySet()) {
             String id = connection.getKey().getId();
-            for (Entry<SingleField,Integer> target : connection.getValue().entrySet()) {
+            for (Entry<SingleField, Integer> target : connection.getValue().entrySet()) {
                 Element connectionNode = HGBaseXMLTools.createElement(doc, connectionsNode, CONNECTION_NODE);
                 connectionNode.setAttribute(FROM_ATTRIBUTE, id);
                 connectionNode.setAttribute(TO_ATTRIBUTE, target.getKey().getId());
@@ -362,13 +363,13 @@ public final class PlayingFieldFileOperator {
             }
         }
     }
-    
+
     /**
      * Saves a dimension object as attribute value.
-     * 
-     * @param node the node to add the attribute
+     *
+     * @param node      the node to add the attribute
      * @param attribute the name of the attribute
-     * @param dim the dimension to save, may be null
+     * @param dim       the dimension to save, may be null
      */
     private static void writeDimensionAttribute(Element node, String attribute, Dimension dim) {
         if (dim != null) {
@@ -376,26 +377,26 @@ public final class PlayingFieldFileOperator {
             node.setAttribute(attribute, value);
         }
     }
-    
+
     /**
      * Saves a dimension object as attribute value.
-     * 
-     * @param node the node to add the attribute
+     *
+     * @param node      the node to add the attribute
      * @param attribute the name of the attribute
      * @return the dimension object or null if it invalid
      */
     private static Dimension readDimensionAttribute(Node node, String attribute) {
         String value = HGBaseXMLTools.getAttributeValue(node, attribute);
         int[] intValues = getSeparatedIntegers(value, DIMENSION_SEPARATOR, 2);
-        return (intValues == null)? null : new Dimension(intValues[0], intValues[1]);
+        return (intValues == null) ? null : new Dimension(intValues[0], intValues[1]);
     }
-    
+
     /**
      * Saves a point object as attribute value.
-     * 
-     * @param node the node to add the attribute
+     *
+     * @param node      the node to add the attribute
      * @param attribute the name of the attribute
-     * @param dim the point to save, may be null
+     * @param point     the point to save, may be null
      */
     private static void writePointAttribute(Element node, String attribute, Point point) {
         if (point != null) {
@@ -403,41 +404,41 @@ public final class PlayingFieldFileOperator {
             node.setAttribute(attribute, value);
         }
     }
-    
+
     /**
      * Saves a point object as attribute value.
-     * 
-     * @param node the node to add the attribute
+     *
+     * @param node      the node to add the attribute
      * @param attribute the name of the attribute
      * @return the point object or null if it invalid
      */
     private static Point readPointAttribute(Node node, String attribute) {
         String value = HGBaseXMLTools.getAttributeValue(node, attribute);
         int[] intValues = getSeparatedIntegers(value, POINT_SEPARATOR, 2);
-        return (intValues == null)? null : new Point(intValues[0], intValues[1]);
+        return (intValues == null) ? null : new Point(intValues[0], intValues[1]);
     }
-    
+
     /**
      * Concatenates integers by the given separator.
-     * 
+     *
      * @param separator the separator
-     * @param values the integer values
+     * @param values    the integer values
      * @return a string with the integer values concatenated by the separator
      */
-    private static String concatenateIntegers(String separator, int ... values) {
+    private static String concatenateIntegers(String separator, int... values) {
         String[] text = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             text[i] = String.valueOf(values[i]);
         }
         return HGBaseTools.toStringText(text, separator);
     }
-    
+
     /**
      * Returns separated integer values from a string separated by the given separator.
-     * 
-     * @param value the string value to get the integers from
+     *
+     * @param value     the string value to get the integers from
      * @param separator the separator between the integer values
-     * @param count the number of expected integers
+     * @param count     the number of expected integers
      * @return an array with count size holding the integers or null if values are invalid
      */
     private static int[] getSeparatedIntegers(String value, String separator, int count) {
@@ -457,14 +458,14 @@ public final class PlayingFieldFileOperator {
         }
         return null;
     }
-    
+
     /**
      * Creates an xml node that stores the data object for each single field using the given {@link XmlSingleFieldDataConverter}.
-     * 
-     * @param doc the xml document
+     *
+     * @param doc        the xml document
      * @param parentNode the parent node to append the new node, may be null
-     * @param field the playing field that contains all single fields
-     * @param converter the data object converter
+     * @param field      the playing field that contains all single fields
+     * @param converter  the data object converter
      * @return the new created xml element
      */
     public Element createNodeWithAllFieldData(Document doc, Element parentNode, PlayingField field, XmlSingleFieldDataConverter converter) {
@@ -484,15 +485,15 @@ public final class PlayingFieldFileOperator {
      * Reads all data objects from the given node and assigns them to the according single fields using the
      * given {@link XmlSingleFieldDataConverter}. The {@code dataNode} can be parent node or the node created
      * with {@link #createNodeWithAllFieldData(Document, Element, PlayingField, XmlSingleFieldDataConverter)}.
-     * 
-     * @param dataNode the xml node to read the data from, must not be null
-     * @param field the playing field holding all single fields to assign the data to
+     *
+     * @param dataNode  the xml node to read the data from, must not be null
+     * @param field     the playing field holding all single fields to assign the data to
      * @param converter the data object converter
      */
     public void readAllFieldDataFromNode(Node dataNode, final PlayingField field, final XmlSingleFieldDataConverter converter) {
         if (SINGLE_FIELD_OBJECTS.equals(dataNode.getNodeName())) {
             ChildNodeIterator.run(new ChildNodeIterator(dataNode, SINGLE_FIELD_OBJECTS, null) {
-                
+
                 @Override
                 public void performNode(Node node, int index, Object obj) {
                     if (SINGLE_FIELD_OBJECT.equals(node.getNodeName())) {
@@ -507,7 +508,7 @@ public final class PlayingFieldFileOperator {
             });
         } else {
             ChildNodeIterator.run(new ChildNodeIterator(dataNode, null) {
-                
+
                 @Override
                 public void performNode(Node node, int index, Object obj) {
                     if (SINGLE_FIELD_OBJECTS.equals(node.getNodeName())) {
