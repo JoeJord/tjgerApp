@@ -1,5 +1,12 @@
 package com.tjger.game.completed.playingfield;
 
+import android.graphics.Point;
+
+import androidx.annotation.NonNull;
+
+import com.tjger.lib.ShortestPath;
+import com.tjger.lib.ShortestPathFinder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,10 +19,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.tjger.lib.ShortestPath;
-import com.tjger.lib.ShortestPathFinder;
-
-import android.graphics.Point;
 import at.hagru.hgbase.android.awt.Dimension;
 import at.hagru.hgbase.android.awt.Rectangle;
 import at.hagru.hgbase.gui.HGBaseGuiTools;
@@ -28,19 +31,19 @@ import at.hagru.hgbase.lib.HGBaseTools;
  */
 public class PlayingField {
 
+    private final Map<String, SingleField> fields = new HashMap<>();
+    private final Map<SingleField, Map<SingleField, Integer>> connections = new HashMap<>();
     private Dimension size;
     private GridType gridType;
     private Dimension grid;
     private Dimension gridSize;
     private Dimension gridSpan;
-    private final Map<String,SingleField> fields = new HashMap<>();
-    private final Map<SingleField,Map<SingleField,Integer>> connections = new HashMap<>();
     private int idCounter = 0;
 
     /**
      * Create a new playing field without grid.
      *
-     * @param width the width of the field in pixels
+     * @param width  the width of the field in pixels
      * @param height the height of the field in pixels
      */
     public PlayingField(int width, int height) {
@@ -52,8 +55,8 @@ public class PlayingField {
      * Create a new playing field with a grid.<p>
      * The size of the field (in pixels) is calculated by the grid values.
      *
-     * @param grid the horizontal and vertical dimension of the grid, must not be null
-     * @param gridSie the size of a single grid field, must not be null
+     * @param grid     the horizontal and vertical dimension of the grid, must not be null
+     * @param gridSize the size of a single grid field, must not be null
      * @param gridSpan the horizontal and vertical span between grid fields, must not be null
      */
     public PlayingField(Dimension grid, Dimension gridSize, Dimension gridSpan) {
@@ -107,7 +110,7 @@ public class PlayingField {
                     Point gridPosition = field.getGridPosition();
                     Point point1 = getPositionOnGrid(gridPosition.x, gridPosition.y);
                     Point point2 = new Point(point1.x + gridSize.width - 1, point1.y + gridSize.height - 1);
-                    Point[] pixelPositions = new Point[] { point1, point2 };
+                    Point[] pixelPositions = new Point[]{point1, point2};
                     field.setPixelPositions(pixelPositions);
                 }
             }
@@ -148,7 +151,7 @@ public class PlayingField {
      */
     public void setGridSpan(Dimension gridSpan) {
         this.gridSpan = (grid == null) ? gridSpan
-                                       : HGBaseTools.requireNonNull(gridSpan, "The grid span must not be null!");
+                : HGBaseTools.requireNonNull(gridSpan, "The grid span must not be null!");
         calculateSizeByGrid();
     }
 
@@ -168,15 +171,13 @@ public class PlayingField {
      * @param gridSize the width and height of a single grid field, must not be null if a grid is used
      */
     public void setGridSize(Dimension gridSize) {
-        this.gridSize = (grid == null) ? gridSize
-                                       : HGBaseTools.requireNonNull(gridSize, "The grid size must not be null!");
+        this.gridSize = (grid == null) ? gridSize : HGBaseTools.requireNonNull(gridSize, "The grid size must not be null!");
         calculateSizeByGrid();
     }
-    
+
     /**
-     * Returns the grid position for a given pixel position or null if the position is not on the grid
-     * (or the grid is not set).
-     * 
+     * Returns the grid position for a given pixel position or null if the position is not on the grid (or the grid is not set).
+     *
      * @param x the horizontal pixel position
      * @param y the vertical pixel position
      * @return a point that contains the row and column information for the grid or null
@@ -199,7 +200,7 @@ public class PlayingField {
      * The fields {@code gridSize} and {@code gridSpan} must not be null.
      *
      * @param column the column in the grid, must not be negative for valid result
-     * @param row the row in the grid, must not be negative for valid result
+     * @param row    the row in the grid, must not be negative for valid result
      * @return the the pixel position on the grid
      */
     private Point getPositionOnGrid(int column, int row) {
@@ -220,7 +221,7 @@ public class PlayingField {
             Point[] positions = new Point[2];
             positions[0] = getPositionOnGrid(gridPosition.x, gridPosition.y);
             positions[1] = new Point(positions[0].x + gridSize.width - 1,
-                                     positions[0].y + gridSize.height - 1);
+                    positions[0].y + gridSize.height - 1);
             return positions;
         } else {
             return field.getPixelPositions();
@@ -259,14 +260,14 @@ public class PlayingField {
                 // just use the rectangle area for the check, only problematic with overlapping ellipses/circles
                 Point[] positions = getPixelPositions(field);
                 if (positions != null && positions.length == 2 && x >= positions[0].x && x <= positions[1].x
-                                                               && y >= positions[0].y && y <= positions[1].y) {
+                        && y >= positions[0].y && y <= positions[1].y) {
                     return field;
                 }
             }
         }
         return null;
     }
-    
+
     /**
      * Returns the id of the field at the given pixel position.
      *
@@ -276,13 +277,13 @@ public class PlayingField {
      */
     public String getFieldIdAtPosition(int x, int y) {
         SingleField sf = getFieldAtPosition(x, y);
-        return (sf == null)? null : sf.getId();
+        return (sf == null) ? null : sf.getId();
     }
-    
+
     /**
      * Returns the field at a given grid position, will be null if there is no grid or there is no field at
      * that position.
-     * 
+     *
      * @param gridPos the grid position
      * @return the field at the given grid position or null
      */
@@ -304,23 +305,23 @@ public class PlayingField {
      */
     public Collection<SingleField> getFields() {
         Collection<SingleField> sortedFields = new TreeSet<>(fields.values());
-        return Collections.<SingleField>unmodifiableCollection(sortedFields);
+        return Collections.unmodifiableCollection(sortedFields);
     }
-    
+
     /**
      * Returns the single field for the given id.
-     * 
+     *
      * @param id the id to get the particular field for
      * @return the field with the id or null if such a field does not exist
      */
     public SingleField getField(String id) {
         return fields.get(id);
     }
-    
+
     /**
      * Returns the first field that has the given value as property set.
-     * 
-     * @param key the property key
+     *
+     * @param key   the property key
      * @param value the value to test for
      * @return the first field or null
      */
@@ -329,10 +330,10 @@ public class PlayingField {
         properties.put(key, value);
         return getFirstFieldWithProperties(properties);
     }
-    
+
     /**
      * Returns the first field that has the given property values set.
-     * 
+     *
      * @param properties a map with property keys and according values to test
      * @return the first field or null
      */
@@ -344,11 +345,11 @@ public class PlayingField {
         }
         return null;
     }
-    
+
     /**
      * Returns all fields that have the given value as property set.
-     * 
-     * @param key the property key
+     *
+     * @param key   the property key
      * @param value the value to test for
      * @return all fields with the given property set, may be an empty collection
      */
@@ -357,27 +358,27 @@ public class PlayingField {
         properties.put(key, value);
         return getFieldsWithProperties(properties);
     }
-            /**
+
+    /**
      * Returns all fields that have the given property values set.
-     * 
+     *
      * @param properties a map with property keys and according values to test
      * @return all fields with the given properties set, may be an empty collection
      */
     public Collection<SingleField> getFieldsWithProperties(Map<String, String> properties) {
-        Collection<SingleField> fields = new ArrayList<>();
+        Collection<SingleField> localFields = new ArrayList<>();
         for (SingleField sf : getFields()) {
             if (checkPropertiesForField(sf, properties)) {
-                fields.add(sf);
+                localFields.add(sf);
             }
         }
-        return Collections.unmodifiableCollection(fields);
+        return Collections.unmodifiableCollection(localFields);
     }
 
     /**
-     * Cehcks the field for the given properties and returns true if all properties of the field have the
-     * given values.
-     * 
-     * @param field the field to check the properties for
+     * Checks the field for the given properties and returns true if all properties of the field have the given values.
+     *
+     * @param field      the field to check the properties for
      * @param properties the properties to check
      * @return true if the field has all property values set that are given by the map, otherwise false
      */
@@ -390,10 +391,10 @@ public class PlayingField {
         }
         return true;
     }
-    
+
     /**
      * Returns all fields that have to given data assigned to.
-     * 
+     *
      * @param data the data that is assigned to single fields, must not be null
      * @return a list with all single fields, may be empty
      */
@@ -424,7 +425,7 @@ public class PlayingField {
     public void removeField(SingleField field) {
         if (fields.remove(field.getId()) != null) {
             connections.remove(field);
-            for (Map<SingleField,Integer> connection : connections.values()) {
+            for (Map<SingleField, Integer> connection : connections.values()) {
                 connection.remove(field);
             }
         }
@@ -434,7 +435,7 @@ public class PlayingField {
      * Add a connection from the start field to the target field with a given weight.<p>
      * If there is already a connection from start to target, the old value will be overwritten.
      *
-     * @param start the start field of the connection, must not be null
+     * @param start  the start field of the connection, must not be null
      * @param target the target field of the connection, must not be null
      * @param weight the weight of the connection, must be 1 or higher
      * @throws IllegalArgumentException if weight is to small
@@ -443,37 +444,36 @@ public class PlayingField {
         if (weight < 1) {
             throw new IllegalArgumentException("The weight of the connection must be 1 or higher");
         }
-        Map<SingleField,Integer> targets = HGBaseTools.getOrCreateValue(connections, start,
-                                                                        new HashMap<SingleField,Integer>());
-        targets.put(target, Integer.valueOf(weight));
+        Map<SingleField, Integer> targets = HGBaseTools.getOrCreateValue(connections, start, new HashMap<>());
+        targets.put(target, weight);
     }
 
     /**
      * Removes the connection between start and target field. Nothing will be done if there is no connection.
      *
-     * @param start the start field of the connection to remove
+     * @param start  the start field of the connection to remove
      * @param target the target field of the connection to remove
      */
     public void removeConnection(SingleField start, SingleField target) {
-        Map<SingleField,Integer> targets = this.connections.get(start);
+        Map<SingleField, Integer> targets = this.connections.get(start);
         if (targets != null) {
             targets.remove(target);
         }
     }
-    
+
     /**
      * Returns the internal map for the connections.
-     * 
+     *
      * @return the unmodifiable internal map for the connections
      */
-    Map<SingleField,Map<SingleField,Integer>> getConnectionsMap() {
+    Map<SingleField, Map<SingleField, Integer>> getConnectionsMap() {
         return Collections.unmodifiableMap(connections);
     }
-    
+
     /**
-     * Returns a collection with all possible collections that are available for the field.
-     * 
-     * @return an unmodifiable collection of possible collections
+     * Returns a collection with all possible connections that are available for the field.
+     *
+     * @return an unmodifiable collection of possible connections
      */
     public Collection<SingleFieldConnection> getConnections() {
         Set<SingleFieldConnection> sfc = new LinkedHashSet<>();
@@ -489,17 +489,17 @@ public class PlayingField {
     /**
      * Returns the weight between two single fields.
      *
-     * @param start the start field
+     * @param start  the start field
      * @param target the target field
      * @return the weight between the two fields or 0 if there is no connection
      */
     private int getWeight(SingleField start, SingleField target) {
-        Map<SingleField,Integer> targets = this.connections.get(start);
+        Map<SingleField, Integer> targets = this.connections.get(start);
         int weight = 0;
         if (targets != null) {
             Integer w = targets.get(target);
             if (w != null) {
-                weight = w.intValue();
+                weight = w;
             }
         }
         return weight;
@@ -512,7 +512,7 @@ public class PlayingField {
      * @param fields an arbitrary number of fields to get the connection weight, must be at least two fields
      * @return the weight between the fields or 0 if there is no connection
      */
-    public int getConnectionWeight(SingleField ...fields) {
+    public int getConnectionWeight(SingleField... fields) {
         if (fields.length >= 2) {
             int weight = 0;
             for (int i = 0; i < fields.length - 1; i++) {
@@ -536,18 +536,18 @@ public class PlayingField {
      * @return an unmodifiable collection with neighbors, can be empty
      */
     public Collection<SingleField> getNeighbours(SingleField field) {
-        Map<SingleField,Integer> neighbours = connections.get(field);
-        if (neighbours == null || neighbours.size() == 0) {
-            return Collections.<SingleField>emptySet();
+        Map<SingleField, Integer> neighbours = connections.get(field);
+        if (neighbours == null || neighbours.isEmpty()) {
+            return Collections.emptySet();
         } else {
-            return Collections.<SingleField>unmodifiableSet(neighbours.keySet());
+            return Collections.unmodifiableSet(neighbours.keySet());
         }
     }
 
     /**
      * Returns the shortest path from the start field to the target field.
      *
-     * @param start the start field
+     * @param start  the start field
      * @param target the target field
      * @return the shortest path object, will be null if there is no path available
      */
@@ -558,8 +558,8 @@ public class PlayingField {
     /**
      * Returns the shortest path from the start field to the target field with a maximum search depth.
      *
-     * @param start the start field
-     * @param target the target field
+     * @param start    the start field
+     * @param target   the target field
      * @param maxDepth the maximum search depth, 0 for infinite depth
      * @return the shortest path object, will be null if there is no path available
      */
@@ -570,8 +570,8 @@ public class PlayingField {
     /**
      * Returns a collection of single fields that is reachable from the start field with the given weight.
      *
-     * @param start the start field
-     * @param weight the exact weight to reach possible targets
+     * @param start         the start field
+     * @param weight        the exact weight to reach possible targets
      * @param allowTurnBack true if it is allowed to turn back during the way, i.e., the same field between
      *                      start and target can be used multiple times
      * @return an unmodifiable collection of all possible targets, may be empty
@@ -586,14 +586,13 @@ public class PlayingField {
                 }
             }
         }
-        return (targets.size() > 0)? Collections.<SingleField>unmodifiableCollection(targets)
-                                   : Collections.<SingleField>emptySet();
+        return (!targets.isEmpty()) ? Collections.unmodifiableCollection(targets) : Collections.emptySet();
     }
-    
+
     /**
      * Internal method to calculate the reachable fields (including turn back).
-     * 
-     * @param start the start field
+     *
+     * @param start  the start field
      * @param weight the exact weight to reach possible targets
      * @return an modifiable collection of all possible targets, may be empty
      */
@@ -614,9 +613,9 @@ public class PlayingField {
     /**
      * Checks whether the target field is reachable from the start field with the given weight.
      *
-     * @param start the start field
-     * @param target the target field
-     * @param weight the exact weight to possibly reach the target field
+     * @param start         the start field
+     * @param target        the target field
+     * @param weight        the exact weight to possibly reach the target field
      * @param allowTurnBack true if it is allowed to turn back during the way, i.e., the same field between
      *                      start and target can be used multiple times
      * @return true if the target field is reachable, otherwise false
@@ -624,11 +623,11 @@ public class PlayingField {
     public boolean isFieldReachable(SingleField start, SingleField target, int weight, boolean allowTurnBack) {
         return getReachableFields(start, weight, allowTurnBack).contains(target);
     }
-    
+
     /**
      * Returns a sorted set with all available property keys of the single fields.<p>
      * This call is an expensive call as all fields are searched every time the method is called.
-     * 
+     *
      * @return an unmodifiable set with all available property keys, may be empty
      */
     public Set<String> getFieldPropertyKeys() {
@@ -638,11 +637,11 @@ public class PlayingField {
         }
         return Collections.unmodifiableSet(keys);
     }
-    
+
     /**
      * Returns a sorted set with all available property values for a given key of the single fields.<p>
      * This call is an expensive call as all fields are searched every time the method is called.
-     * 
+     *
      * @return an unmodifiable set with all available property values for the given key, may be empty
      */
     public Set<String> getFieldPropertyValues(String key) {
@@ -655,10 +654,10 @@ public class PlayingField {
         }
         return Collections.unmodifiableSet(values);
     }
-    
+
     /**
      * Returns the next id for a single field.
-     * 
+     *
      * @return the next available id
      * @throws IllegalStateException if the maximum number of possible fields has been reached
      */
@@ -672,9 +671,9 @@ public class PlayingField {
             }
         }
         throw new IllegalStateException("It is not possible to get a new id, the maximum number of possible fields ("
-                                        + Integer.MAX_VALUE + ") has been reached!");
+                + Integer.MAX_VALUE + ") has been reached!");
     }
-    
+
     /**
      * Clears all data objects of the single fields.
      */
@@ -683,10 +682,8 @@ public class PlayingField {
             sf.clearData();
         }
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
+
+    @NonNull
     @Override
     public String toString() {
         return "PlayingField: gridType=" + getGridType() + ", grid=" + getGrid() + ", size=" + getSize()
