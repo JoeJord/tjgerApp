@@ -33,6 +33,10 @@ public class PlayingField {
 
     private final Map<String, SingleField> fields = new HashMap<>();
     private final Map<SingleField, Map<SingleField, Integer>> connections = new HashMap<>();
+    /**
+     * Map for the properties of a connection. The key of the first map is the from field. The key of the second map is the to field. The key of the third map is the property key. The property value is the value of the third map.
+     */
+    private final Map<SingleField, Map<SingleField, Map<String, String>>> connectionProperties = new HashMap<>();
     private Dimension size;
     private GridType gridType;
     private Dimension grid;
@@ -527,6 +531,67 @@ public class PlayingField {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Sets the specified properties for the specified connection.
+     *
+     * @param from       The destination field of the connection.
+     * @param to         The target field of the connection.
+     * @param properties The properties to set.
+     */
+    public void setConnectionProperties(SingleField from, SingleField to, Map<String, String> properties) {
+        connectionProperties.computeIfAbsent(from, k -> new HashMap<>()).put(to, properties);
+    }
+
+    /**
+     * Sets the specified property for the specified connection.
+     *
+     * @param from     The destination field of the connection.
+     * @param to       The target field of the connection.
+     * @param property The property to set.
+     */
+    public void setConnectionProperty(SingleField from, SingleField to, Entry<String, String> property) {
+        if (property == null) {
+            return;
+        }
+        connectionProperties.computeIfAbsent(from, k -> new HashMap<>())
+                .computeIfAbsent(to, k -> new HashMap<>()).put(property.getKey(), property.getValue());
+    }
+
+    /**
+     * Returns the properties for the specified connection.
+     *
+     * @param from The destination field of the connection.
+     * @param to   The target field of the connection.
+     * @return The properties for the specified connection.
+     */
+    public Map<String, String> getConnectionProperties(SingleField from, SingleField to) {
+        return connectionProperties.computeIfAbsent(from, k -> new HashMap<>()).computeIfAbsent(to,
+                k -> new HashMap<>());
+    }
+
+    /**
+     * Returns the properties for the specified connection.
+     *
+     * @param connection The connection.
+     * @return The properties for the specified connection.
+     */
+    public Map<String, String> getConnectionProperties(SingleFieldConnection connection) {
+        return (connection == null) ? new HashMap<>()
+                : getConnectionProperties(connection.getFirst(), connection.getSecond());
+    }
+
+    /**
+     * Returns the value of the specified property for the specified connection.
+     *
+     * @param from The destination field of the connection.
+     * @param to   The target field of the connection.
+     * @param key  The key of the property to retrieve.
+     * @return The value of the specified property for the specified connection.
+     */
+    public String getConnectionProperty(SingleField from, SingleField to, String key) {
+        return getConnectionProperties(from, to).get(key);
     }
 
     /**

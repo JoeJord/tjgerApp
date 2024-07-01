@@ -257,9 +257,28 @@ public final class PlayingFieldFileOperator {
             SingleField to = fieldToLoad.getField(toId);
             if (from != null && to != null && weight != HGBaseTools.INVALID_INT) {
                 fieldToLoad.addConnection(from, to, weight);
+                readConnectionProperties(node, from, to);
             }
-
         }
+    }
+
+    /**
+     * Reads all properties for the specified connection.
+     *
+     * @param node The node containing the connection.
+     * @param from The destination of the connection.
+     * @param to   The target of the connection.
+     */
+    private static void readConnectionProperties(Node node, SingleField from, SingleField to) {
+        ChildNodeIterator.run(new ChildNodeIterator(node, CONNECTION_NODE, null) {
+            @Override
+            public void performNode(Node node, int index, Object obj) {
+                if (PROPERTIES_NODE.equals(node.getNodeName())) {
+                    fieldToLoad.setConnectionProperties(from, to,
+                            XmlUtil.loadMap(node, PROPERTY_NODE, new XmlMapStringConverter()));
+                }
+            }
+        });
     }
 
     /**
@@ -360,7 +379,26 @@ public final class PlayingFieldFileOperator {
                 connectionNode.setAttribute(FROM_ATTRIBUTE, id);
                 connectionNode.setAttribute(TO_ATTRIBUTE, target.getKey().getId());
                 connectionNode.setAttribute(WEIGHT_ATTRIBUTE, target.getValue().toString());
+                writeConnectionProperties(field, connection.getKey(), target.getKey(), doc, connectionNode);
             }
+        }
+    }
+
+    /**
+     * Writes the properties of the specified connection to the specified XML node.
+     *
+     * @param field          The playing field.
+     * @param from           The destination of the connection.
+     * @param to             The target of the connection.
+     * @param doc            The XML document.
+     * @param connectionNode The node where to add the properties node.
+     */
+    private static void writeConnectionProperties(PlayingField field, SingleField from, SingleField to,
+                                                  Document doc, Element connectionNode) {
+        Map<String, String> properties = field.getConnectionProperties(from, to);
+        if (!properties.isEmpty()) {
+            XmlUtil.saveMap(doc, connectionNode, PROPERTIES_NODE, PROPERTY_NODE, properties,
+                    new XmlMapStringConverter());
         }
     }
 
