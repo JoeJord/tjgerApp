@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 import at.hagru.hgbase.android.awt.Dimension;
@@ -603,23 +603,22 @@ public class PlayingField {
      * @return an unmodifiable collection with neighbors, can be empty
      */
     public Collection<SingleField> getNeighbours(SingleField field) {
-        return getNeighbours(field, connection -> true);
+        return getNeighbours(field, (origin, target) -> true);
     }
 
     /**
-     * Returns a collection with all direct neighbors of the given field where connection is tested as valid.
+     * Returns a collection with all direct neighbors of the given field where the connection is tested as valid.
      *
-     * @param field             The field go get the neighbors for.
-     * @param isConnectionValid A predicate to test each connection (key-value pair where key is the neighboring field and value is the weight of the connection).
-     * @return A collection with all direct neighbors of the given field where connection is tested as valid.
+     * @param field             The field to get the neighbors for.
+     * @param isConnectionValid A predicate to test each connection.
+     * @return A collection with all direct neighbors of the given field where the connection is tested as valid.
      */
-    public Collection<SingleField> getNeighbours(SingleField field, Predicate<Entry<SingleField, Integer>> isConnectionValid) {
+    public Collection<SingleField> getNeighbours(SingleField field, BiPredicate<SingleField, SingleField> isConnectionValid) {
         Map<SingleField, Integer> neighbours = connections.get(field);
         if (neighbours == null || neighbours.isEmpty()) {
             return Collections.emptySet();
         }
-        return neighbours.entrySet().stream().filter(isConnectionValid).map(Map.Entry::getKey)
-                .collect(Collectors.toUnmodifiableSet());
+        return neighbours.keySet().stream().filter(target -> isConnectionValid.test(field, target)).collect(Collectors.toUnmodifiableSet());
     }
 
     /**
