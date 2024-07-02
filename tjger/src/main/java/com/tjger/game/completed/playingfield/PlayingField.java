@@ -2,8 +2,6 @@ package com.tjger.game.completed.playingfield;
 
 import android.graphics.Point;
 
-import androidx.annotation.NonNull;
-
 import com.tjger.lib.ShortestPath;
 import com.tjger.lib.ShortestPathFinder;
 
@@ -21,6 +19,7 @@ import java.util.TreeSet;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
+import androidx.annotation.NonNull;
 import at.hagru.hgbase.android.awt.Dimension;
 import at.hagru.hgbase.android.awt.Rectangle;
 import at.hagru.hgbase.gui.HGBaseGuiTools;
@@ -156,8 +155,7 @@ public class PlayingField {
      * @param gridSpan the grid span, must not be null if a grid is used
      */
     public void setGridSpan(Dimension gridSpan) {
-        this.gridSpan = (grid == null) ? gridSpan
-                : HGBaseTools.requireNonNull(gridSpan, "The grid span must not be null!");
+        this.gridSpan = (grid == null) ? gridSpan : HGBaseTools.requireNonNull(gridSpan, "The grid span must not be null!");
         calculateSizeByGrid();
     }
 
@@ -192,9 +190,7 @@ public class PlayingField {
         if (grid != null) {
             int gridX = x / (gridSpan.width + gridSize.width);
             int gridY = y / (gridSpan.height + gridSize.height);
-            if (gridX < grid.width && gridY < grid.height
-                    && x % (gridSpan.width + gridSize.width) >= gridSpan.width
-                    && y % (gridSpan.height + gridSize.height) >= gridSpan.height) {
+            if (gridX < grid.width && gridY < grid.height && x % (gridSpan.width + gridSize.width) >= gridSpan.width && y % (gridSpan.height + gridSize.height) >= gridSpan.height) {
                 return new Point(gridX, gridY);
             }
         }
@@ -226,8 +222,7 @@ public class PlayingField {
         if (gridPosition != null) {
             Point[] positions = new Point[2];
             positions[0] = getPositionOnGrid(gridPosition.x, gridPosition.y);
-            positions[1] = new Point(positions[0].x + gridSize.width - 1,
-                    positions[0].y + gridSize.height - 1);
+            positions[1] = new Point(positions[0].x + gridSize.width - 1, positions[0].y + gridSize.height - 1);
             return positions;
         } else {
             return field.getPixelPositions();
@@ -265,8 +260,7 @@ public class PlayingField {
             } else {
                 // just use the rectangle area for the check, only problematic with overlapping ellipses/circles
                 Point[] positions = getPixelPositions(field);
-                if (positions != null && positions.length == 2 && x >= positions[0].x && x <= positions[1].x
-                        && y >= positions[0].y && y <= positions[1].y) {
+                if (positions != null && positions.length == 2 && x >= positions[0].x && x <= positions[1].x && y >= positions[0].y && y <= positions[1].y) {
                     return field;
                 }
             }
@@ -557,8 +551,7 @@ public class PlayingField {
         if (property == null) {
             return;
         }
-        connectionProperties.computeIfAbsent(from, k -> new HashMap<>())
-                .computeIfAbsent(to, k -> new HashMap<>()).put(property.getKey(), property.getValue());
+        connectionProperties.computeIfAbsent(from, k -> new HashMap<>()).computeIfAbsent(to, k -> new HashMap<>()).put(property.getKey(), property.getValue());
     }
 
     /**
@@ -569,8 +562,7 @@ public class PlayingField {
      * @return The properties for the specified connection.
      */
     public Map<String, String> getConnectionProperties(SingleField from, SingleField to) {
-        return connectionProperties.computeIfAbsent(from, k -> new HashMap<>()).computeIfAbsent(to,
-                k -> new HashMap<>());
+        return connectionProperties.computeIfAbsent(from, k -> new HashMap<>()).computeIfAbsent(to, k -> new HashMap<>());
     }
 
     /**
@@ -580,8 +572,7 @@ public class PlayingField {
      * @return The properties for the specified connection.
      */
     public Map<String, String> getConnectionProperties(SingleFieldConnection connection) {
-        return (connection == null) ? new HashMap<>()
-                : getConnectionProperties(connection.getFirst(), connection.getSecond());
+        return (connection == null) ? new HashMap<>() : getConnectionProperties(connection.getFirst(), connection.getSecond());
     }
 
     /**
@@ -747,8 +738,7 @@ public class PlayingField {
                 return newId;
             }
         }
-        throw new IllegalStateException("It is not possible to get a new id, the maximum number of possible fields ("
-                + Integer.MAX_VALUE + ") has been reached!");
+        throw new IllegalStateException("It is not possible to get a new id, the maximum number of possible fields (" + Integer.MAX_VALUE + ") has been reached!");
     }
 
     /**
@@ -763,8 +753,7 @@ public class PlayingField {
     @NonNull
     @Override
     public String toString() {
-        return "PlayingField: gridType=" + getGridType() + ", grid=" + getGrid() + ", size=" + getSize()
-                + ", fields=" + getFields().size();
+        return "PlayingField: gridType=" + getGridType() + ", grid=" + getGrid() + ", size=" + getSize() + ", fields=" + getFields().size();
     }
 
 }
