@@ -532,7 +532,7 @@ public class PlayingField {
     /**
      * Sets the specified properties for the specified connection.
      *
-     * @param from       The destination field of the connection.
+     * @param from       The origin field of the connection.
      * @param to         The target field of the connection.
      * @param properties The properties to set.
      */
@@ -543,7 +543,7 @@ public class PlayingField {
     /**
      * Sets the specified property for the specified connection.
      *
-     * @param from     The destination field of the connection.
+     * @param from     The origin field of the connection.
      * @param to       The target field of the connection.
      * @param property The property to set.
      */
@@ -557,7 +557,7 @@ public class PlayingField {
     /**
      * Returns the properties for the specified connection.
      *
-     * @param from The destination field of the connection.
+     * @param from The origin field of the connection.
      * @param to   The target field of the connection.
      * @return The properties for the specified connection.
      */
@@ -578,7 +578,7 @@ public class PlayingField {
     /**
      * Returns the value of the specified property for the specified connection.
      *
-     * @param from The destination field of the connection.
+     * @param from The origin field of the connection.
      * @param to   The target field of the connection.
      * @param key  The key of the property to retrieve.
      * @return The value of the specified property for the specified connection.
