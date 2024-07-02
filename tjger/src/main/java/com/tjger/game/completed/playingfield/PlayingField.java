@@ -600,16 +600,16 @@ public class PlayingField {
     /**
      * Returns a collection with all direct neighbors of the given field where the connection is tested as valid.
      *
-     * @param field             The field to get the neighbors for.
-     * @param isConnectionValid A predicate to test each connection.
+     * @param field     The field to get the neighbors for.
+     * @param condition The condition a connection to a target field must met. The parameters for the {@link BiPredicate} are the origin and the target fields.
      * @return A collection with all direct neighbors of the given field where the connection is tested as valid.
      */
-    public Collection<SingleField> getNeighbours(SingleField field, BiPredicate<SingleField, SingleField> isConnectionValid) {
+    public Collection<SingleField> getNeighbours(SingleField field, BiPredicate<SingleField, SingleField> condition) {
         Map<SingleField, Integer> neighbours = connections.get(field);
         if (neighbours == null || neighbours.isEmpty()) {
             return Collections.emptySet();
         }
-        return neighbours.keySet().stream().filter(target -> isConnectionValid.test(field, target)).collect(Collectors.toUnmodifiableSet());
+        return neighbours.keySet().stream().filter(target -> condition.test(field, target)).collect(Collectors.toUnmodifiableSet());
     }
 
     /**
