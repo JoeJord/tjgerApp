@@ -1,14 +1,5 @@
 package com.tjger.game.completed;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.tjger.MainFrame;
 import com.tjger.game.GamePlayer;
 import com.tjger.game.GameRules;
@@ -23,13 +14,22 @@ import com.tjger.lib.ConstantValue;
 import com.tjger.lib.MoveUtil;
 import com.tjger.lib.TimeAction;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import at.hagru.hgbase.gui.HGBaseDialog;
 import at.hagru.hgbase.gui.ProgressState;
 import at.hagru.hgbase.lib.HGBaseTools;
 
 /**
  * Manages the state of a game, including starting and stopping it. The process is move > turn > round > game.
- * 
+ *
  * @author hagru
  */
 final public class GameEngine {
@@ -49,11 +49,13 @@ final public class GameEngine {
     final public static int AFTER_GAME = 3;
 
     private static final GameEngine engine = new GameEngine();
-
+    final private List<GameStateListener> gameStateListeners; // array with the GameStateListeners that shall
+    // be invoked
+    final private GameState gameState;
+    final private List<TimeAction> timeActionList;
     /*
      * All data needs to be package-protected for the game engine file reader/writer.
-     */
-    int numberPlayers; // number of active players of the current game
+     */ int numberPlayers; // number of active players of the current game
     GamePlayer[] activePlayers; // array with the active players
     int playerStartRound; // number of the player, that started the current round
     int cyclingPlayerStartGame; // index of the player that starts the game if the start player shall cycle
@@ -63,15 +65,10 @@ final public class GameEngine {
     AtomicInteger currentMove = new AtomicInteger(0);// the current move within a turn
     boolean activeGame; // indicates whether the game is active or not
     boolean activeRound; // indicates whether the current round is active or not
-
-    final private List<GameStateListener> gameStateListeners; // array with the GameStateListeners that shall
-                                                              // be invoked
-    final private GameState gameState;
-    final private List<TimeAction> timeActionList;
+    boolean stoppedGame = true; // to find out whether game was stopped or normal finish
     private boolean stopGameProcessing = false; // to prevent calling stop game two times
     private boolean nextGameProcessing = false; // to prevent error message on next game
-    boolean stoppedGame = true; // to find out whether game was stopped or normal finish
-    
+
     private GameEngine() {
         super();
         gameStateListeners = new ArrayList<>();
@@ -80,6 +77,13 @@ final public class GameEngine {
         initGame();
         // create the game state class
         gameState = StateFactory.getInstance().createGameState();
+    }
+
+    /**
+     * @return The one and only instance of the game state.
+     */
+    public static GameEngine getInstance() {
+        return engine;
     }
 
     /**
@@ -95,13 +99,6 @@ final public class GameEngine {
         activeGame = false;
         activeRound = false;
         activePlayers = null;
-    }
-
-    /**
-     * @return The one and only instance of the game state.
-     */
-    public static GameEngine getInstance() {
-        return engine;
     }
 
     /**
@@ -175,46 +172,46 @@ final public class GameEngine {
 
     /**
      * Contributes the new game state for all listeners. Internal use only!
-     * 
+     *
      * @param beforeMove True to indicate that it's before a player move, false to indicate after a player's
-     *            move.
+     *                   move.
      */
     protected void contributeGameState(final int action) {
         // contribute the game state
         synchronized (gameStateListeners) {
-        	getMainFrame().runOnUiThread(new Runnable() {
-				
-				@Override
-				public void run() {
-		            GameState state = getGameState();
-		            for (GameStateListener gsListener : gameStateListeners) {
-		                switch (action) {
-		                    case ACTION_NEWGAME:
-		                        gsListener.newGameStarted(state, GameEngine.this);
-		                        break;
-		                    case ACTION_NEWROUND:
-		                        gsListener.newRoundStarted(state, GameEngine.this);
-		                        break;
-		                    case ACTION_NEWTURN:
-		                        gsListener.newTurnStarted(state, GameEngine.this);
-		                        break;
-		                    case ACTION_GAMEFINISHED:
-		                        gsListener.gameFinished(true);
-		                        break;
-		                    case ACTION_GAMESTOPPED:
-		                        gsListener.gameFinished(false);
-		                        break;
-		                    case ACTION_BEFOREMOVE:
-		                        gsListener.gameStateBeforeMove(state, GameEngine.this);
-		                        break;
-		                    case ACTION_AFTERMOVE:
-		                        gsListener.gameStateAfterMove(state, GameEngine.this);
-		                        break;
-		                }
-		            }
-		            updateGamePanel();
-				}
-			});
+            getMainFrame().runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    GameState state = getGameState();
+                    for (GameStateListener gsListener : gameStateListeners) {
+                        switch (action) {
+                            case ACTION_NEWGAME:
+                                gsListener.newGameStarted(state, GameEngine.this);
+                                break;
+                            case ACTION_NEWROUND:
+                                gsListener.newRoundStarted(state, GameEngine.this);
+                                break;
+                            case ACTION_NEWTURN:
+                                gsListener.newTurnStarted(state, GameEngine.this);
+                                break;
+                            case ACTION_GAMEFINISHED:
+                                gsListener.gameFinished(true);
+                                break;
+                            case ACTION_GAMESTOPPED:
+                                gsListener.gameFinished(false);
+                                break;
+                            case ACTION_BEFOREMOVE:
+                                gsListener.gameStateBeforeMove(state, GameEngine.this);
+                                break;
+                            case ACTION_AFTERMOVE:
+                                gsListener.gameStateAfterMove(state, GameEngine.this);
+                                break;
+                        }
+                    }
+                    updateGamePanel();
+                }
+            });
         }
     }
 
@@ -255,6 +252,16 @@ final public class GameEngine {
     }
 
     /**
+     * For internal use only! Used by MainMenu for next game.
+     *
+     * @param player New player to set.
+     */
+    public void setActivePlayers(GamePlayer[] player) {
+        this.activePlayers = HGBaseTools.clone(player);
+        this.numberPlayers = player.length;
+    }
+
+    /**
      * @param withoutDropOut True to get only player that aren't drop out.
      * @return An array with active players (inclusive or without players that are drop out).
      */
@@ -276,16 +283,6 @@ final public class GameEngine {
     }
 
     /**
-     * For internal use only! Used by MainMenu for next game.
-     * 
-     * @param player New player to set.
-     */
-    public void setActivePlayers(GamePlayer[] player) {
-        this.activePlayers = HGBaseTools.clone(player);
-        this.numberPlayers = player.length;
-    }
-
-    /**
      * @return The current player.
      */
     public GamePlayer getCurrentPlayer() {
@@ -297,7 +294,7 @@ final public class GameEngine {
 
     /**
      * Returns the index of the current player.
-     * 
+     *
      * @return The index of the current player.
      */
     public int getCurrentPlayerIndex() {
@@ -322,18 +319,18 @@ final public class GameEngine {
         }
 
     }
-    
+
     /**
      * Returns the first player (of the next) game assuming that the start player cycles through all players.<p>
      * This method is intended to be used by {@link GameRules#getGameStartPlayer(GameState)} to define this
      * default behavior.
-     * 
+     *
      * @return the indented player to start the next game
      */
     public GamePlayer getCyclingFirstGamePlayer() {
         return getActivePlayers(ConstantValue.EXCLUDE_DROPOUT)[getCyclingFirstGamePlayerIndex()];
     }
-    
+
     /**
      * @return the index of the indented player to start the next game
      */
@@ -403,7 +400,7 @@ final public class GameEngine {
     }
 
     /**
-     * @param player An active player.
+     * @param player         An active player.
      * @param withoutDropOut When calculating the index ignore players that are drop out.
      * @return The index of this player.
      * @see ConstantValue#INCLUDE_DROPOUT
@@ -468,7 +465,7 @@ final public class GameEngine {
     /**
      * The current round is 0 before a game starts. On every new game the round is set to 1 and increased
      * after every round.
-     * 
+     *
      * @return The current round of this game.
      */
     public int getCurrentRound() {
@@ -478,7 +475,7 @@ final public class GameEngine {
     /**
      * The current turn is 0 after game starts. On every new round the turn is set to 1 and increased after
      * every turn.
-     * 
+     *
      * @return The current turn of this round.
      */
     public int getCurrentTurn() {
@@ -487,7 +484,7 @@ final public class GameEngine {
 
     /**
      * The current move is reseted to 0 after every turn and increased before a player starts his move.
-     * 
+     *
      * @return The current move of this turn.
      */
     public int getCurrentMove() {
@@ -496,7 +493,7 @@ final public class GameEngine {
 
     /**
      * Starts a new game.
-     * 
+     *
      * @param numPlayers Number of players that take part (minPlayer ... maxPlayer).
      * @return 0 if the game was started.
      */
@@ -527,7 +524,7 @@ final public class GameEngine {
             if (ret != 0) {
                 return ret;
             }
-            getGameDialogsInstance().hideAdvertisementDialog(getMainFrame());            
+            getGameDialogsInstance().hideAdvertisementDialog(getMainFrame());
             activeGame = true;
             stoppedGame = false;
             currentRound = 0;
@@ -547,7 +544,7 @@ final public class GameEngine {
      * On a local game the game state's methods for game, round or turn is called. If it's the server the
      * server's game state is sent to the client afterwards and the server waits for ok. If it's a client the
      * game state is not reseted but it's waited for the server message and ok is sent.
-     * 
+     *
      * @param reset Tells what to reset (RESET_TURN, RESET_ROUND, RESET_GAME).
      * @return 0 if successful.
      */
@@ -600,7 +597,7 @@ final public class GameEngine {
                 public void run() {
                     // stop the game
                     resetDelayActions();
-                    getMainFrame().setStatusProgress(ProgressState.STATE_NORMAL);                    
+                    getMainFrame().setStatusProgress(ProgressState.STATE_NORMAL);
                     GamePlayer player = getCurrentPlayer();
                     if (player != null) {
                         player.stopPlaying();
@@ -660,7 +657,7 @@ final public class GameEngine {
      * Starts a new turn.
      */
     synchronized protected void newTurn() {
-    	//getMainFrame().setCursorWait();
+        //getMainFrame().setCursorWait();
         resetScore(GamePlayer.SCORE_TURN);
         int ret = resetGameState(RESET_TURN);
         if (ret == 0) {
@@ -679,11 +676,11 @@ final public class GameEngine {
 
     /**
      * Performs the move of the current player.
-     * 
+     *
      * @param move The player's move to perform.
      */
     synchronized public void performMove(MoveInformation move) {
-    	getGameManager().getMainFrame().setStatusProgress(ProgressState.STATE_NORMAL);    	
+        getGameManager().getMainFrame().setStatusProgress(ProgressState.STATE_NORMAL);
         // change the game state
         GameState state = getGameState();
         state.changeState(getCurrentPlayer(), move, this);
@@ -724,12 +721,12 @@ final public class GameEngine {
                 // look if the game is finished and inform the listeners in that case
                 if (!isActiveGame()) {
                     contributeGameState(ACTION_GAMEFINISHED);
-                    getGameDialogsInstance().showAdvertisementDialog(getMainFrame(), getGameConfig());                    
+                    getGameDialogsInstance().showAdvertisementDialog(getMainFrame(), getGameConfig());
                 }
                 // show the dialogs after turn, round or game
                 showDialogs(isMoveComplete, turnFinished, rules);
             } else {
-            	proceedGameAfterMove(isMoveComplete, turnFinished, rules);
+                proceedGameAfterMove(isMoveComplete, turnFinished, rules);
             }
         }
     }
@@ -780,59 +777,59 @@ final public class GameEngine {
 
     /**
      * Shows the dialogs after turn, round or/and game.
-     * 
-	 * @param isMoveComplete true if move is complete
-	 * @param turnFinished true if turn is finished
-	 * @param rules the game rules
+     *
+     * @param isMoveComplete true if move is complete
+     * @param turnFinished   true if turn is finished
+     * @param rules          the game rules
      */
     private void showDialogs(boolean isMoveComplete, boolean turnFinished, GameRules rules) {
-    	showDialogsIntern(isMoveComplete, turnFinished, rules, 1);
+        showDialogsIntern(isMoveComplete, turnFinished, rules, 1);
     }
-    
+
     /**
      * <b>Important:</b> This method must not be called from a client but only from the game state info panel!!!<br>
-     * Shows the dialogs after turn, round or/and game depending on the given step. 
-     * 
-	 * @param isMoveComplete true if move is complete
-	 * @param turnFinished true if turn is finished
-	 * @param rules the game rules
-     * @param step the current step to show
+     * Shows the dialogs after turn, round or/and game depending on the given step.
+     *
+     * @param isMoveComplete true if move is complete
+     * @param turnFinished   true if turn is finished
+     * @param rules          the game rules
+     * @param step           the current step to show
      */
     public void showDialogsIntern(boolean isMoveComplete, boolean turnFinished, GameRules rules, int step) {
         if (step == 1) {
-        	if (getGameConfig().showDialogAfterTurn() && rules.isTurnFinished(getGameState())) {
-	            // look if a dialog shall be displayed after every turn
-	            showDialog(AFTER_TURN, isMoveComplete, turnFinished, rules);
-	        } else {
-	        	step++;
-	        }
+            if (getGameConfig().showDialogAfterTurn() && rules.isTurnFinished(getGameState())) {
+                // look if a dialog shall be displayed after every turn
+                showDialog(AFTER_TURN, isMoveComplete, turnFinished, rules);
+            } else {
+                step++;
+            }
         }
-        if (step == 2) { 
-        	if (getGameConfig().showDialogAfterRound() && rules.isRoundFinished(getGameState())) {
-	            // look if a dialog shall be displayed after a round
-	            showDialog(AFTER_ROUND, isMoveComplete, turnFinished, rules);
-	        } else {
-	        	step++;
-	        }
+        if (step == 2) {
+            if (getGameConfig().showDialogAfterRound() && rules.isRoundFinished(getGameState())) {
+                // look if a dialog shall be displayed after a round
+                showDialog(AFTER_ROUND, isMoveComplete, turnFinished, rules);
+            } else {
+                step++;
+            }
         }
-        if (step == 3) { 
-        	if (getGameConfig().showDialogAfterGame() && rules.isGameFinished(getGameState())) {
-	            // look if a dialog shall be displayed after the game
-	            showDialog(AFTER_GAME, isMoveComplete, turnFinished, rules);
-	        } else {
-	        	step++;
-	        }
+        if (step == 3) {
+            if (getGameConfig().showDialogAfterGame() && rules.isGameFinished(getGameState())) {
+                // look if a dialog shall be displayed after the game
+                showDialog(AFTER_GAME, isMoveComplete, turnFinished, rules);
+            } else {
+                step++;
+            }
         }
         if (step == 4) {
-        	proceedGameAfterMove(isMoveComplete, turnFinished, rules);
+            proceedGameAfterMove(isMoveComplete, turnFinished, rules);
         }
     }
 
     /**
-     * @param dialogMode Says which dialog shall be displayed (AFTER_TURN, AFTER_ROUND, AFTER_GAME).
+     * @param dialogMode     Says which dialog shall be displayed (AFTER_TURN, AFTER_ROUND, AFTER_GAME).
      * @param isMoveComplete true if move is complete
-     * @param turnFinished true if turn is finished
-     * @param rules The game rules.
+     * @param turnFinished   true if turn is finished
+     * @param rules          The game rules.
      */
     private void showDialog(int dialogMode, boolean isMoveComplete, boolean turnFinished, GameRules rules) {
         getGameDialogsInstance().showGameStateInfoPanel(getMainFrame(), dialogMode, isMoveComplete, turnFinished, getGameState(), this, rules);
@@ -871,7 +868,7 @@ final public class GameEngine {
 
             @Override
             public void doAction() {
-            	//getMainFrame().setCursorWait();
+                //getMainFrame().setCursorWait();
             }
 
             @Override
@@ -897,7 +894,7 @@ final public class GameEngine {
 
                 @Override
                 public void doAction() {
-                	//getMainFrame().setCursorWait();
+                    //getMainFrame().setCursorWait();
                 }
 
                 @Override
@@ -974,7 +971,7 @@ final public class GameEngine {
     /**
      * Adds a time action that will be interrupted if a games is stopped or started again without stopping.
      * After the action is finished, the object should be removed with <code>removeTimeAction</code>.
-     * 
+     *
      * @param ta The time action to announce to the game engine.
      * @see #removeTimeAction(TimeAction)
      */
@@ -987,7 +984,7 @@ final public class GameEngine {
     /**
      * Removes the time action from the game engine's watch list. This method should be called, after a time
      * action is finished that was added with <code>addTimeAction</code>.
-     * 
+     *
      * @param ta The time action to remove from the game engine's watch list.
      * @see #addTimeAction(TimeAction)
      */
@@ -1017,7 +1014,7 @@ final public class GameEngine {
     public boolean isActiveRound() {
         return activeRound;
     }
-    
+
     /**
      * @return true if the game was stopped (manually), otherwise false
      */
@@ -1049,8 +1046,7 @@ final public class GameEngine {
      */
     private int initActivePlayers(int numberPlayers) {
         int ret = 0;
-        if (numberPlayers < getPlayerManager().getMinPlayers()
-                || numberPlayers > getPlayerManager().getMaxPlayers()) {
+        if (numberPlayers < getPlayerManager().getMinPlayers() || numberPlayers > getPlayerManager().getMaxPlayers()) {
             numberPlayers = getPlayerManager().getMinPlayers();
         }
         this.numberPlayers = numberPlayers;
@@ -1081,7 +1077,7 @@ final public class GameEngine {
 
     /**
      * Reset the score from the given type for all active players.
-     * 
+     *
      * @param scoreType The score type.
      */
     private void resetScore(int scoreType) {
@@ -1107,8 +1103,8 @@ final public class GameEngine {
 
     /**
      * Save the current game engine.
-     * 
-     * @param doc The document object.
+     *
+     * @param doc  The document object.
      * @param root The root for the game engine.
      * @return 0 if saving was successful.
      */
@@ -1119,7 +1115,7 @@ final public class GameEngine {
 
     /**
      * Loads the game engine.
-     * 
+     *
      * @param root The root of the game engine information.
      * @return 0 if loading was successful.
      */
@@ -1127,7 +1123,7 @@ final public class GameEngine {
         if (!GameEngineFileOperator.read(root, this)) {
             return -10706;
         } else {
-        	return 0;
+            return 0;
         }
     }
 }
