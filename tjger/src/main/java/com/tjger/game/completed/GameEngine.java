@@ -41,6 +41,7 @@ final public class GameEngine {
     final public static int ACTION_GAMESTOPPED = 5;
     final public static int ACTION_BEFOREMOVE = 6;
     final public static int ACTION_AFTERMOVE = 7;
+    final public static int RESET_MOVE = 0;
     final public static int RESET_TURN = 1;
     final public static int RESET_ROUND = 2;
     final public static int RESET_GAME = 3;
@@ -547,6 +548,9 @@ final public class GameEngine {
         if (getGameState() != null) {
             // reset the game state
             switch (reset) {
+                case RESET_MOVE:
+                    getGameState().resetMove(this);
+                    break;
                 case RESET_TURN:
                     getGameState().resetTurn(this);
                     break;
@@ -837,6 +841,12 @@ final public class GameEngine {
      * Invokes the move of the current player. Internal use only!
      */
     public void doPlayerMove() {
+        int ret = resetGameState(RESET_MOVE);
+        if (ret != 0) {
+            HGBaseDialog.printError(ret, getMainFrame());
+            return;
+        }
+
         contributeGameState(ACTION_BEFOREMOVE);
         GamePlayer player = getCurrentPlayer();
         if (player != null) {

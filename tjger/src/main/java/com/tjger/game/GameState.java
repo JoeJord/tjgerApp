@@ -36,6 +36,14 @@ public interface GameState extends Cloneable {
     void resetTurn(GameEngine engine);
 
     /**
+     * Resets all information about the current move. Is called when a new move is started.
+     *
+     * @param engine The game engine.
+     */
+    default void resetMove(GameEngine engine) {
+    }
+
+    /**
      * Indicates that the game was stopped irregular (by the user).
      * Resets all values.
      */
