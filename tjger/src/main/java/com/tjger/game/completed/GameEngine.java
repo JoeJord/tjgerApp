@@ -118,21 +118,21 @@ final public class GameEngine {
     /**
      * @return The game configuration.
      */
-    protected GameConfig getGameConfig() {
+    private GameConfig getGameConfig() {
         return getGameManager().getGameConfig();
     }
 
     /**
      * @return The player manager.
      */
-    protected PlayerManager getPlayerManager() {
+    private PlayerManager getPlayerManager() {
         return getGameManager().getPlayerManager();
     }
 
     /**
      * @return The game's rules.
      */
-    protected GameRules getGameRules() {
+    private GameRules getGameRules() {
         return getGameManager().getGameRules();
     }
 
@@ -146,7 +146,7 @@ final public class GameEngine {
     /**
      * @return The game's statistics.
      */
-    protected GameStatistics getGameStatistics() {
+    private GameStatistics getGameStatistics() {
         return getGameManager().getGameStatistics();
     }
 
@@ -173,44 +173,39 @@ final public class GameEngine {
     /**
      * Contributes the new game state for all listeners. Internal use only!
      *
-     * @param beforeMove True to indicate that it's before a player move, false to indicate after a player's
-     *                   move.
+     * @param action The action why the game state has to be contributed.
      */
-    protected void contributeGameState(final int action) {
+    void contributeGameState(final int action) {
         // contribute the game state
         synchronized (gameStateListeners) {
-            getMainFrame().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    GameState state = getGameState();
-                    for (GameStateListener gsListener : gameStateListeners) {
-                        switch (action) {
-                            case ACTION_NEWGAME:
-                                gsListener.newGameStarted(state, GameEngine.this);
-                                break;
-                            case ACTION_NEWROUND:
-                                gsListener.newRoundStarted(state, GameEngine.this);
-                                break;
-                            case ACTION_NEWTURN:
-                                gsListener.newTurnStarted(state, GameEngine.this);
-                                break;
-                            case ACTION_GAMEFINISHED:
-                                gsListener.gameFinished(true);
-                                break;
-                            case ACTION_GAMESTOPPED:
-                                gsListener.gameFinished(false);
-                                break;
-                            case ACTION_BEFOREMOVE:
-                                gsListener.gameStateBeforeMove(state, GameEngine.this);
-                                break;
-                            case ACTION_AFTERMOVE:
-                                gsListener.gameStateAfterMove(state, GameEngine.this);
-                                break;
-                        }
+            getMainFrame().runOnUiThread(() -> {
+                GameState state = getGameState();
+                for (GameStateListener gsListener : gameStateListeners) {
+                    switch (action) {
+                        case ACTION_NEWGAME:
+                            gsListener.newGameStarted(state, GameEngine.this);
+                            break;
+                        case ACTION_NEWROUND:
+                            gsListener.newRoundStarted(state, GameEngine.this);
+                            break;
+                        case ACTION_NEWTURN:
+                            gsListener.newTurnStarted(state, GameEngine.this);
+                            break;
+                        case ACTION_GAMEFINISHED:
+                            gsListener.gameFinished(true);
+                            break;
+                        case ACTION_GAMESTOPPED:
+                            gsListener.gameFinished(false);
+                            break;
+                        case ACTION_BEFOREMOVE:
+                            gsListener.gameStateBeforeMove(state, GameEngine.this);
+                            break;
+                        case ACTION_AFTERMOVE:
+                            gsListener.gameStateAfterMove(state, GameEngine.this);
+                            break;
                     }
-                    updateGamePanel();
                 }
+                updateGamePanel();
             });
         }
     }
@@ -271,12 +266,12 @@ final public class GameEngine {
         }
         if (withoutDropOut) {
             List<GamePlayer> listPlayer = new ArrayList<>();
-            for (int i = 0; i < activePlayers.length; i++) {
-                if (!activePlayers[i].isDropOut()) {
-                    listPlayer.add(activePlayers[i]);
+            for (GamePlayer activePlayer : activePlayers) {
+                if (!activePlayer.isDropOut()) {
+                    listPlayer.add(activePlayer);
                 }
             }
-            return listPlayer.toArray(new GamePlayer[listPlayer.size()]);
+            return listPlayer.toArray(new GamePlayer[0]);
         } else {
             return activePlayers.clone();
         }
@@ -483,7 +478,7 @@ final public class GameEngine {
     }
 
     /**
-     * The current move is reseted to 0 after every turn and increased before a player starts his move.
+     * The current move is reset to 0 after every turn and increased before a player starts his move.
      *
      * @return The current move of this turn.
      */
@@ -494,7 +489,7 @@ final public class GameEngine {
     /**
      * Starts a new game.
      *
-     * @param numPlayers Number of players that take part (minPlayer ... maxPlayer).
+     * @param numberPlayers Number of players that take part (minPlayer ... maxPlayer).
      * @return 0 if the game was started.
      */
     public int startGame(int numberPlayers) {
@@ -543,7 +538,7 @@ final public class GameEngine {
     /**
      * On a local game the game state's methods for game, round or turn is called. If it's the server the
      * server's game state is sent to the client afterwards and the server waits for ok. If it's a client the
-     * game state is not reseted but it's waited for the server message and ok is sent.
+     * game state is not reset but it's waited for the server message and ok is sent.
      *
      * @param reset Tells what to reset (RESET_TURN, RESET_ROUND, RESET_GAME).
      * @return 0 if successful.
@@ -587,42 +582,37 @@ final public class GameEngine {
     public void stopGame() {
         if (stopGameProcessing) {
             return;
-        } else {
-            stopGameProcessing = true;
-            stoppedGame = true;
-            // call the stop in an own thread because of graphics problems
-            Thread t = new Thread() {
-
-                @Override
-                public void run() {
-                    // stop the game
-                    resetDelayActions();
-                    getMainFrame().setStatusProgress(ProgressState.STATE_NORMAL);
-                    GamePlayer player = getCurrentPlayer();
-                    if (player != null) {
-                        player.stopPlaying();
-                    }
-                    initGame();
-                    if (getGameState() != null) {
-                        getGameState().stopGame();
-                    }
-                    if (getGameStatistics() != null) {
-                        getGameStatistics().resetRanking();
-                    }
-                    contributeGameState(ACTION_GAMESTOPPED);
-                    getMainFrame().setCursorDefault();
-                }
-            };
-            t.start();
-            try {
-                while (t.isAlive()) {
-                    Thread.sleep(100);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            stopGameProcessing = false;
         }
+        stopGameProcessing = true;
+        stoppedGame = true;
+        // call the stop in an own thread because of graphics problems
+        Thread t = new Thread(() -> {
+            // stop the game
+            resetDelayActions();
+            getMainFrame().setStatusProgress(ProgressState.STATE_NORMAL);
+            GamePlayer player = getCurrentPlayer();
+            if (player != null) {
+                player.stopPlaying();
+            }
+            initGame();
+            if (getGameState() != null) {
+                getGameState().stopGame();
+            }
+            if (getGameStatistics() != null) {
+                getGameStatistics().resetRanking();
+            }
+            contributeGameState(ACTION_GAMESTOPPED);
+            getMainFrame().setCursorDefault();
+        });
+        t.start();
+        try {
+            while (t.isAlive()) {
+                Thread.sleep(100);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        stopGameProcessing = false;
     }
 
     /**
@@ -656,7 +646,7 @@ final public class GameEngine {
     /**
      * Starts a new turn.
      */
-    synchronized protected void newTurn() {
+    synchronized void newTurn() {
         //getMainFrame().setCursorWait();
         resetScore(GamePlayer.SCORE_TURN);
         int ret = resetGameState(RESET_TURN);
@@ -1026,7 +1016,7 @@ final public class GameEngine {
      * @param index A player's index.
      * @return The index of the next player.
      */
-    protected int getNextPlayerIndex(int index) {
+    private int getNextPlayerIndex(int index) {
         int numPlayers = getNumberPlayers();
         return (numPlayers == 0) ? 0 : ((index + 1) % numPlayers);
     }
@@ -1035,7 +1025,7 @@ final public class GameEngine {
      * @param index A player's index.
      * @return The index of the previous player.
      */
-    protected int getPrevPlayerIndex(int index) {
+    private int getPrevPlayerIndex(int index) {
         int numPlayers = getNumberPlayers();
         return (numPlayers == 0) ? 0 : ((index + numPlayers - 1) % numPlayers);
     }
@@ -1056,7 +1046,7 @@ final public class GameEngine {
         int playersOrder = getGameConfig().getPlayersOrder();
         Arrays.sort(playerIndex, new PlayerOrderComparator(playersOrder));
         for (int i = 0; i < activePlayers.length; i++) {
-            int allPlayerIndex = playerIndex[i].intValue();
+            int allPlayerIndex = playerIndex[i];
             activePlayers[i] = allPlayers[allPlayerIndex];
             getGameStatistics().resetScore(activePlayers[i], GamePlayer.SCORE_GAME);
         }
@@ -1070,7 +1060,7 @@ final public class GameEngine {
     private Integer[] createPlayerIndexArray(int numPlayers) {
         Integer[] indexList = new Integer[numPlayers];
         for (int i = 0; i < indexList.length; i++) {
-            indexList[i] = Integer.valueOf(i);
+            indexList[i] = i;
         }
         return indexList;
     }
@@ -1085,7 +1075,7 @@ final public class GameEngine {
         for (int i = 0; player != null && i < player.length; i++) {
             getGameStatistics().resetScore(player[i], scoreType);
             if (scoreType == GamePlayer.SCORE_GAME) {
-                // always when the game score is resetted, reset the drop-out state of a player
+                // always when the game score is reset, reset the drop-out state of a player
                 player[i].setDropOut(false);
             }
         }
@@ -1096,8 +1086,8 @@ final public class GameEngine {
      */
     public void resetGamePlayersDropOut() {
         GamePlayer[] players = engine.getActivePlayers();
-        for (int i = 0; i < players.length; i++) {
-            players[i].setDropOut(false);
+        for (GamePlayer player : players) {
+            player.setDropOut(false);
         }
     }
 
