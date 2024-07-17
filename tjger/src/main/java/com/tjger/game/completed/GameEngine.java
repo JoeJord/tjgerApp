@@ -32,28 +32,28 @@ import at.hagru.hgbase.lib.HGBaseTools;
  *
  * @author hagru
  */
-final public class GameEngine {
+public final class GameEngine {
 
-    final public static int ACTION_NEWGAME = 1;
-    final public static int ACTION_NEWROUND = 2;
-    final public static int ACTION_NEWTURN = 3;
-    final public static int ACTION_GAMEFINISHED = 4;
-    final public static int ACTION_GAMESTOPPED = 5;
-    final public static int ACTION_BEFOREMOVE = 6;
-    final public static int ACTION_AFTERMOVE = 7;
-    final public static int RESET_MOVE = 0;
-    final public static int RESET_TURN = 1;
-    final public static int RESET_ROUND = 2;
-    final public static int RESET_GAME = 3;
-    final public static int AFTER_TURN = 1;
-    final public static int AFTER_ROUND = 2;
-    final public static int AFTER_GAME = 3;
+    public static final int ACTION_NEWGAME = 1;
+    public static final int ACTION_NEWROUND = 2;
+    public static final int ACTION_NEWTURN = 3;
+    public static final int ACTION_GAMEFINISHED = 4;
+    public static final int ACTION_GAMESTOPPED = 5;
+    public static final int ACTION_BEFOREMOVE = 6;
+    public static final int ACTION_AFTERMOVE = 7;
+    public static final int RESET_MOVE = 0;
+    public static final int RESET_TURN = 1;
+    public static final int RESET_ROUND = 2;
+    public static final int RESET_GAME = 3;
+    public static final int AFTER_TURN = 1;
+    public static final int AFTER_ROUND = 2;
+    public static final int AFTER_GAME = 3;
 
     private static final GameEngine engine = new GameEngine();
-    final private List<GameStateListener> gameStateListeners; // array with the GameStateListeners that shall
+    private final List<GameStateListener> gameStateListeners; // array with the GameStateListeners that shall
     // be invoked
-    final private GameState gameState;
-    final private List<TimeAction> timeActionList;
+    private final GameState gameState;
+    private final List<TimeAction> timeActionList;
     /*
      * All data needs to be package-protected for the game engine file reader/writer.
      */ int numberPlayers; // number of active players of the current game
@@ -203,6 +203,8 @@ final public class GameEngine {
                             break;
                         case ACTION_AFTERMOVE:
                             gsListener.gameStateAfterMove(state, GameEngine.this);
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -369,9 +371,9 @@ final public class GameEngine {
         GamePlayer next = null;
         int index = getIndexOfPlayer(player);
         if (index != -1) {
-            final GamePlayer[] activePlayers = getActivePlayers();
-            if (activePlayers != null) {
-                next = activePlayers[getNextPlayerIndex(index)];
+            final GamePlayer[] players = getActivePlayers();
+            if (players != null) {
+                next = players[getNextPlayerIndex(index)];
                 if (next.isDropOut() && withoutDropOut && getNumberPlayers(withoutDropOut) > 0) {
                     return getNextPlayer(next, ConstantValue.EXCLUDE_DROPOUT);
                 }
@@ -560,6 +562,8 @@ final public class GameEngine {
                 case RESET_GAME:
                     getGameState().resetGame(this);
                     break;
+                default:
+                    break;
             }
             updateGamePanel();
         }
@@ -673,7 +677,7 @@ final public class GameEngine {
      *
      * @param move The player's move to perform.
      */
-    synchronized public void performMove(MoveInformation move) {
+    public synchronized void performMove(MoveInformation move) {
         getGameManager().getMainFrame().setStatusProgress(ProgressState.STATE_NORMAL);
         // change the game state
         GameState state = getGameState();
