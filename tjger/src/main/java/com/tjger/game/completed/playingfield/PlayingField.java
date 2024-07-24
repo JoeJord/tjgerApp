@@ -636,23 +636,30 @@ public class PlayingField {
     }
 
     /**
-     * Returns a collection of single fields that is reachable from the start field with the given weight.
+     * Returns a collection of single fields that are reachable from the start field with the given weight.
      *
      * @param start         the start field
      * @param weight        the exact weight to reach possible targets
-     * @param allowTurnBack true if it is allowed to turn back during the way, i.e., the same field between
-     *                      start and target can be used multiple times
+     * @param allowTurnBack true if it is allowed to turn back during the way, i.e. the same field between start and target can be used multiple times
      * @return an unmodifiable collection of all possible targets, may be empty
      */
     public Collection<SingleField> getReachableFields(SingleField start, int weight, boolean allowTurnBack) {
-        Set<SingleField> targets = getReachableFields(start, weight);
+        return getReachableFields(start, weight, allowTurnBack, (origin, target) -> true);
+    }
+
+    /**
+     * Returns a collection of single fields that are reachable from the start field with the given weight.
+     *
+     * @param start         The start field.
+     * @param weight        The exact weight to reach possible targets.
+     * @param allowTurnBack {@code true} if it is allowed to turn back during the way, i.e. the same field between start and target can be used multiple times.
+     * @param condition     The condition a connection to a target field must met. The parameters for the {@link BiPredicate} are the origin and the target fields.
+     * @return An unmodifiable collection of all possible targets, may be empty.
+     */
+    public Collection<SingleField> getReachableFields(SingleField start, int weight, boolean allowTurnBack, BiPredicate<SingleField, SingleField> condition) {
+        Set<SingleField> targets = getReachableFields(start, weight, condition);
         if (!allowTurnBack) {
-            for (SingleField target : new HashSet<>(targets)) {
-                ShortestPath<SingleField> path = getShortestPath(start, target, weight);
-                if (path.getPathWeight() < weight) {
-                    targets.remove(target);
-                }
-            }
+            targets.removeIf(target -> getShortestPath(start, target, weight).getPathWeight() < weight);
         }
         return (!targets.isEmpty()) ? Collections.unmodifiableCollection(targets) : Collections.emptySet();
     }
@@ -660,19 +667,20 @@ public class PlayingField {
     /**
      * Internal method to calculate the reachable fields (including turn back).
      *
-     * @param start  the start field
-     * @param weight the exact weight to reach possible targets
+     * @param start     the start field
+     * @param weight    the exact weight to reach possible targets
+     * @param condition The condition a connection to a target field must met. The parameters for the {@link BiPredicate} are the origin and the target fields.
      * @return an modifiable collection of all possible targets, may be empty
      */
-    private Set<SingleField> getReachableFields(SingleField start, int weight) {
+    private Set<SingleField> getReachableFields(SingleField start, int weight, BiPredicate<SingleField, SingleField> condition) {
         Set<SingleField> targets = new HashSet<>();
-        for (SingleField neighbour : getNeighbours(start)) {
+        for (SingleField neighbour : getNeighbours(start, condition)) {
             int w = getWeight(start, neighbour);
             int remaining = weight - w;
             if (remaining == 0) {
                 targets.add(neighbour);
             } else if (remaining > 0) {
-                targets.addAll(getReachableFields(neighbour, remaining));
+                targets.addAll(getReachableFields(neighbour, remaining, condition));
             }
         }
         return targets;
