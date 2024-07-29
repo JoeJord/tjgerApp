@@ -1,12 +1,5 @@
 package com.tjger.game.completed;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.tjger.MainFrame;
 import com.tjger.game.GameRules;
 import com.tjger.game.GameState;
@@ -15,6 +8,13 @@ import com.tjger.game.internal.PlayerProfiles;
 import com.tjger.game.internal.RulesFactory;
 import com.tjger.gui.PartSorter;
 import com.tjger.lib.ConstantValue;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import at.hagru.hgbase.lib.HGBaseTools;
 import at.hagru.hgbase.lib.internal.IntBooleanStringMap;
@@ -34,7 +34,7 @@ final public class GameManager {
     private static PlayerManager playerManager;
     private static GameRules gameRules;
     private IntBooleanStringMap gameInfoMap;
-    private Map<String,PartSorter> sorterMap;
+    private Map<String, PartSorter> sorterMap;
     private int loadError;
 
     private GameManager() {
@@ -42,6 +42,26 @@ final public class GameManager {
         this.sorterMap = new HashMap<>();
         readGameConfiguration();
         resetNewGameInformation();
+    }
+
+    /**
+     * Creates and returns the one and only instance of the game manager.
+     * This implementation is not thread-safe but called only on creation of the main frame.
+     *
+     * @return the one and only instance of the game manager.
+     */
+    public static GameManager createInstance(MainFrame main) {
+        if (manager == null) {
+            manager = new GameManager();
+        }
+        return manager;
+    }
+
+    /**
+     * @return The one and only instance of the game manager or null if it was not created.
+     */
+    public static GameManager getInstance() {
+        return manager;
     }
 
     /**
@@ -62,30 +82,10 @@ final public class GameManager {
     }
 
     /**
-     * Creates and returns the one and only instance of the game manager.
-     * This implementation is not thread-safe but called only on creation of the main frame.
-     *
-     * @return the one and only instance of the game manager.
-     */
-    public static GameManager createInstance(MainFrame main) {
-    	if (manager == null) {
-            manager = new GameManager();
-        }
-        return manager;
-    }
-
-    /**
-     * @return The one and only instance of the game manager or null if it was not created.
-     */
-    public static GameManager getInstance() {
-        return manager;
-    }
-    
-    /**
      * @return The application's main frame.
      */
     public MainFrame getMainFrame() {
-    	return MainFrame.getInstance();
+        return MainFrame.getInstance();
     }
 
     /**
@@ -145,27 +145,27 @@ final public class GameManager {
     }
 
     /**
-     * @see ConstantValue.GAMEINFO_xxx
-     * @param infoKey Information to set.
+     * @param infoKey     Information to set.
      * @param information A piece of information.
+     * @see ConstantValue.GAMEINFO_xxx
      */
     public void setNewGameInformation(String infoKey, String information) {
         gameInfoMap.set(infoKey, information);
     }
 
     /**
-     * @see ConstantValue.GAMEINFO_xxx
-     * @param infoKey Information to set.
+     * @param infoKey     Information to set.
      * @param information A piece of information.
+     * @see ConstantValue.GAMEINFO_xxx
      */
     public void setNewGameInformation(String infoKey, int information) {
         gameInfoMap.set(infoKey, information);
     }
 
     /**
-     * @see ConstantValue.GAMEINFO_xxx
-     * @param infoKey Information to set.
+     * @param infoKey     Information to set.
      * @param information A piece of information.
+     * @see ConstantValue.GAMEINFO_xxx
      */
     public void setNewGameInformation(String infoKey, boolean information) {
         gameInfoMap.set(infoKey, information);
@@ -188,14 +188,14 @@ final public class GameManager {
     }
 
     /**
-     * @param infoKey Information that is required.
+     * @param infoKey      Information that is required.
      * @param defaultValue The default value if there exists no such information
      * @return The information or {@code defaultValue} if there exists no such information
      */
     public String getNewGameInformationText(String infoKey, String defaultValue) {
         return gameInfoMap.get(infoKey, defaultValue);
     }
-    
+
     /**
      * @param infoKey Information that is required.
      * @return The information or INVALID_INT if there exists no such information
@@ -205,7 +205,7 @@ final public class GameManager {
     }
 
     /**
-     * @param infoKey Information that is required.
+     * @param infoKey      Information that is required.
      * @param defaultValue The default value if there exists no such information
      * @return The information or {@code defaultValue} if there exists no such information
      */
@@ -222,7 +222,7 @@ final public class GameManager {
     }
 
     /**
-     * @param infoKey Information that is required.
+     * @param infoKey      Information that is required.
      * @param defaultValue The default value if there exists no such information
      * @return The information or  {@code defaultValue} if there exists no such information
      */
@@ -242,7 +242,7 @@ final public class GameManager {
      * For one type there can only exist one sorter. If a sorter is set,
      * the standard sorting algorithm is ignored.
      *
-     * @param partType The type of the part, see Part.getType().
+     * @param partType   The type of the part, see Part.getType().
      * @param partSorter The part sorter.
      */
     public void setPartSorter(String partType, PartSorter partSorter) {
@@ -264,7 +264,7 @@ final public class GameManager {
      * @return 0 if saving was successful.
      */
     public int saveGame(Document doc) {
-        if (doc==null) {
+        if (doc == null) {
             return -10705;
         }
         String gameStateXmlRoot = GameConfig.getInstance().getGameStateXmlRoot();
@@ -272,7 +272,7 @@ final public class GameManager {
             // only the game state is saved in a user defined xml root
             Element root = doc.createElement(gameStateXmlRoot);
             doc.appendChild(root);
-            return getGameState().save(doc, root);            
+            return getGameState().save(doc, root);
         } else {
             // save all game information
             Element root = doc.createElement("tjgergame");
@@ -283,21 +283,21 @@ final public class GameManager {
             // save the game engine values
             Element gameEngine = doc.createElement("gameengine");
             ret = getGameEngine().saveEngine(doc, gameEngine);
-            if (ret!=0) {
+            if (ret != 0) {
                 return ret;
             }
             root.appendChild(gameEngine);
             // save the game statistics
             Element gameStats = doc.createElement("gamestatistics");
             ret = getGameStatistics().saveStatistics(doc, gameStats);
-            if (ret!=0) {
+            if (ret != 0) {
                 return ret;
             }
             root.appendChild(gameStats);
             // save the game state
             Element gameState = doc.createElement("gamestate");
             ret = getGameState().save(doc, gameState);
-            if (ret!=0) {
+            if (ret != 0) {
                 return ret;
             }
             root.appendChild(gameState);
@@ -321,28 +321,28 @@ final public class GameManager {
             // load the user defined game state
             loadError = getGameState().load(root);
         } else {
-        // load game engine, statistics and game state
+            // load game engine, statistics and game state
             ChildNodeIterator.run(new ChildNodeIterator(root, "tjgergame", this) {
                 @Override
                 public void performNode(Node node, int index, Object obj) {
-                    GameManager manager = (GameManager)obj;
+                    GameManager manager = (GameManager) obj;
                     if (node.getNodeName().equals("newgameinfo")) {
                         loadNewGameInformation(node);
                     }
-                    if (node.getNodeName().equals("gameengine") && manager.loadError==0) {
+                    if (node.getNodeName().equals("gameengine") && manager.loadError == 0) {
                         manager.loadError = manager.getGameEngine().loadEngine(node);
                     }
-                    if (node.getNodeName().equals("gamestatistics") && manager.loadError==0) {
+                    if (node.getNodeName().equals("gamestatistics") && manager.loadError == 0) {
                         manager.loadError = manager.getGameStatistics().loadStatistics(node);
                     }
-                    if (node.getNodeName().equals("gamestate") && manager.loadError==0) {
+                    if (node.getNodeName().equals("gamestate") && manager.loadError == 0) {
                         manager.loadError = manager.getGameState().load(node);
                     }
                 }
             });
         }
         // init the game if loading was successful
-        if (loadError==0) {
+        if (loadError == 0) {
             // signal a normal game start
             engine.contributeGameState(GameEngine.ACTION_NEWGAME);
             engine.contributeGameState(GameEngine.ACTION_NEWROUND);
@@ -352,17 +352,17 @@ final public class GameManager {
             // look what to do
             if (engine.isActiveRound()) {
                 // test if turn is finished
-                if (getGameRules().isTurnFinished(getGameState()) || engine.getCurrentMove()==0) {
+                if (getGameRules().isTurnFinished(getGameState()) || engine.getCurrentMove() == 0) {
                     // start a new turn
                     engine.newTurn();
                 } else {
-		            // just let the player do it's move
-		            engine.doPlayerMove();
+                    // just let the player do it's move
+                    engine.doPlayerMove();
                 }
-            } else if (engine.isActiveGame()){
+            } else if (engine.isActiveGame()) {
                 engine.contributeGameState(GameEngine.ACTION_AFTERMOVE);
                 // the round is not active, activate it automatically if the user can't do that
-                if (!getGameConfig().isInterruptAfterRound() || engine.getCurrentRound()==0) {
+                if (!getGameConfig().isInterruptAfterRound() || engine.getCurrentRound() == 0) {
                     engine.newRound();
                 }
             } else {
@@ -378,13 +378,13 @@ final public class GameManager {
     /**
      * Saves the data of the gameInfoMap.
      *
-     * @param doc The document object.
+     * @param doc  The document object.
      * @param root The root node.
      */
     private void saveNewGameInformation(Document doc, Element root) {
         Element ngi = doc.createElement("newgameinfo");
         String[] keys = getNewGameInformationKeys();
-        for (int i=0; i<keys.length; i++) {
+        for (int i = 0; i < keys.length; i++) {
             Element info = doc.createElement("info");
             info.setAttribute("key", keys[i]);
             Object value = getNewGameInformation(keys[i]);
