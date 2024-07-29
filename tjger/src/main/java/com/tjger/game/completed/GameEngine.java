@@ -925,6 +925,7 @@ public final class GameEngine {
     /**
      * Call the method <code>doPlayerMove</code> with the defined delay.
      *
+     * @param delay     The minimum time in milliseconds that the move should take to execute.
      * @param continued If {@code true}, this move is a continuation of the previous move, which means, the previous move was not completed.
      */
     private void delayDoPlayerMove(int delay, boolean continued) {
