@@ -41,6 +41,7 @@ public final class GameEngine {
     public static final int ACTION_GAMESTOPPED = 5;
     public static final int ACTION_BEFOREMOVE = 6;
     public static final int ACTION_AFTERMOVE = 7;
+    public static final int RESET_CONTINUED_MOVE = -1;
     public static final int RESET_MOVE = 0;
     public static final int RESET_TURN = 1;
     public static final int RESET_ROUND = 2;
@@ -543,7 +544,7 @@ public final class GameEngine {
      * server's game state is sent to the client afterwards and the server waits for ok. If it's a client the
      * game state is not reset but it's waited for the server message and ok is sent.
      *
-     * @param reset Tells what to reset (RESET_TURN, RESET_ROUND, RESET_GAME).
+     * @param reset Tells what to reset (RESET_CONTINUED_MOVE, RESET_MOVE, RESET_TURN, RESET_ROUND, RESET_GAME).
      * @return 0 if successful.
      */
     public int resetGameState(int reset) {
@@ -551,7 +552,8 @@ public final class GameEngine {
             // reset the game state
             switch (reset) {
                 case RESET_MOVE:
-                    getGameState().resetMove(this);
+                case RESET_CONTINUED_MOVE:
+                    getGameState().resetMove(this, (reset == RESET_CONTINUED_MOVE));
                     break;
                 case RESET_TURN:
                     getGameState().resetTurn(this);
@@ -666,7 +668,7 @@ public final class GameEngine {
             }
             //getMainFrame().setCursorDefault();
             getMainFrame().showHintsDialog(ConstantValue.HINTS_TURN);
-            delayDoPlayerMove(0);
+            delayDoPlayerMove(0, false);
         } else {
             HGBaseDialog.printError("err_newturn", getMainFrame());
         }
@@ -753,7 +755,7 @@ public final class GameEngine {
                 if (isMoveComplete) {
                     currentMove.incrementAndGet();
                 }
-                delayDoPlayerMove(getGameConfig().getDelayMoveWithSpeedFactor());
+                delayDoPlayerMove(getGameConfig().getDelayMoveWithSpeedFactor(), !isMoveComplete);
             }
         } else if (isActiveGame()) {
             // the round is finished, but the game is still active - check
@@ -843,9 +845,11 @@ public final class GameEngine {
 
     /**
      * Invokes the move of the current player. Internal use only!
+     *
+     * @param continued If {@code true}, this move is a continuation of the previous move, which means, the previous move was not completed.
      */
-    public void doPlayerMove() {
-        int ret = resetGameState(RESET_MOVE);
+    public void doPlayerMove(boolean continued) {
+        int ret = resetGameState(continued ? RESET_CONTINUED_MOVE : RESET_MOVE);
         if (ret != 0) {
             HGBaseDialog.printError(ret, getMainFrame());
             return;
@@ -920,8 +924,10 @@ public final class GameEngine {
 
     /**
      * Call the method <code>doPlayerMove</code> with the defined delay.
+     *
+     * @param continued If {@code true}, this move is a continuation of the previous move, which means, the previous move was not completed.
      */
-    private void delayDoPlayerMove(int delay) {
+    private void delayDoPlayerMove(int delay, boolean continued) {
         if (delay > 0) {
             TimeAction t = new TimeAction(delay) {
 
@@ -932,7 +938,7 @@ public final class GameEngine {
 
                 @Override
                 public void afterAction() {
-                    doPlayerMove();
+                    doPlayerMove(continued);
                     //getMainFrame().setCursorDefault();
                 }
 
@@ -943,7 +949,7 @@ public final class GameEngine {
             };
             TimeAction.run(t);
         } else {
-            doPlayerMove();
+            doPlayerMove(continued);
         }
     }
 

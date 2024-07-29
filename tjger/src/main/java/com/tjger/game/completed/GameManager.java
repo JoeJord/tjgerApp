@@ -357,7 +357,7 @@ final public class GameManager {
                     engine.newTurn();
                 } else {
                     // just let the player do it's move
-                    engine.doPlayerMove();
+                    engine.doPlayerMove(false);
                 }
             } else if (engine.isActiveGame()) {
                 engine.contributeGameState(GameEngine.ACTION_AFTERMOVE);

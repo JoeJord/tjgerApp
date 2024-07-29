@@ -38,9 +38,10 @@ public interface GameState extends Cloneable {
     /**
      * Resets all information about the current move. Is called when a new move is started.
      *
-     * @param engine The game engine.
+     * @param engine    The game engine.
+     * @param continued If {@code true}, this move is a continuation of the previous move, which means, the previous move was not completed.
      */
-    default void resetMove(GameEngine engine) {
+    default void resetMove(GameEngine engine, boolean continued) {
     }
 
     /**
