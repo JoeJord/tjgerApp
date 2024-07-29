@@ -199,7 +199,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
     }
 
     /**
-     * @return the active fragement, can be null at the start of the application
+     * @return the active fragment, can be null at the start of the application
      */
     protected Fragment getActiveFragment() {
         return activeFragment;
