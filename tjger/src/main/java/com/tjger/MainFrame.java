@@ -9,8 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import com.tjger.game.GamePlayer;
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.GameEngine;
@@ -41,6 +39,7 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import androidx.drawerlayout.widget.DrawerLayout;
 import at.hagru.hgbase.HGBaseWelcomeActivity;
 import at.hagru.hgbase.android.HGBaseAdvertisements;
 import at.hagru.hgbase.android.HGBaseResources;
