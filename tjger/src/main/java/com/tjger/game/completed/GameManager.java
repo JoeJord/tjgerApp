@@ -34,7 +34,7 @@ final public class GameManager {
     private static PlayerManager playerManager;
     private static GameRules gameRules;
     private IntBooleanStringMap gameInfoMap;
-    private Map<String, PartSorter> sorterMap;
+    private final Map<String, PartSorter> sorterMap;
     private int loadError;
 
     private GameManager() {
@@ -50,7 +50,7 @@ final public class GameManager {
      *
      * @return the one and only instance of the game manager.
      */
-    public static GameManager createInstance(MainFrame main) {
+    public static GameManager createInstance() {
         if (manager == null) {
             manager = new GameManager();
         }
@@ -277,7 +277,7 @@ final public class GameManager {
             // save all game information
             Element root = doc.createElement("tjgergame");
             doc.appendChild(root);
-            int ret = 0;
+            int ret;
             // save the game information values
             saveNewGameInformation(doc, root);
             // save the game engine values
@@ -384,10 +384,10 @@ final public class GameManager {
     private void saveNewGameInformation(Document doc, Element root) {
         Element ngi = doc.createElement("newgameinfo");
         String[] keys = getNewGameInformationKeys();
-        for (int i = 0; i < keys.length; i++) {
+        for (String key : keys) {
             Element info = doc.createElement("info");
-            info.setAttribute("key", keys[i]);
-            Object value = getNewGameInformation(keys[i]);
+            info.setAttribute("key", key);
+            Object value = getNewGameInformation(key);
             info.setAttribute("value", value.toString());
             ngi.appendChild(info);
         }

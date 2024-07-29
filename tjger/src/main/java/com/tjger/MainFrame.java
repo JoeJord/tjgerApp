@@ -114,7 +114,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
 
     @Override
     protected void onCreateDuringWelcome() {
-        gameManager = GameManager.createInstance(this);
+        gameManager = GameManager.createInstance();
         if (gameManager.getGameConfig().hasErrors()) {
             throw new GameConfigurationException();
         }
