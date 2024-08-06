@@ -1002,6 +1002,20 @@ public class SimpleGamePanel extends AppCompatImageView {
     }
 
     /**
+     * Draws an oval zoom dependent into the specified position of the specified playing field.
+     *
+     * @param field      The playing field.
+     * @param positionId The id of the position in the playing field.
+     * @param margin     The margin to the border of the field the oval should have.
+     * @param filled     If {@code true} the oval will be filled.
+     * @param g          The canvas object.
+     */
+    public void drawOval(PlayingField field, String positionId, int margin, boolean filled, Canvas g) {
+        Rectangle rect = field.getFieldRectangle(field.getField(positionId));
+        drawOval(rect.x + margin, rect.y + margin, rect.width - (margin * 2), rect.height - (margin * 2), filled, g);
+    }
+
+    /**
      * Draw an arc zoom dependent.
      */
     public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle, boolean filled, Canvas g) {
