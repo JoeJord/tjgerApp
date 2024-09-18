@@ -29,8 +29,8 @@ public class NetworkUtil {
             return ConstantValue.NETWORK_NULL;
         }
         HGBaseStringBuilder msg = new HGBaseStringBuilder(ConstantValue.NETWORK_DIVIDEPART);
-        for (int i = 0; i < array.length; i++) {
-            msg.append(String.valueOf(array[i]));
+        for (int element : array) {
+            msg.append(String.valueOf(element));
         }
         return msg.toString();
     }
@@ -60,8 +60,8 @@ public class NetworkUtil {
             return ConstantValue.NETWORK_NULL;
         }
         HGBaseStringBuilder msg = new HGBaseStringBuilder(ConstantValue.NETWORK_DIVIDEPART);
-        for (int i = 0; i < array.length; i++) {
-            msg.append((array[i]) ? "1" : "0");
+        for (boolean element : array) {
+            msg.append(element ? "1" : "0");
         }
         return msg.toString();
     }
@@ -91,9 +91,9 @@ public class NetworkUtil {
             return ConstantValue.NETWORK_NULL;
         }
         HGBaseStringBuilder msg = new HGBaseStringBuilder(ConstantValue.NETWORK_DIVIDEPART);
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] != null) {
-                msg.append(array[i]);
+        for (String element : array) {
+            if (element != null) {
+                msg.append(element);
             }
         }
         return msg.toString();
@@ -125,8 +125,8 @@ public class NetworkUtil {
             return ConstantValue.NETWORK_NULL;
         }
         HGBaseStringBuilder msg = new HGBaseStringBuilder(ConstantValue.NETWORK_DIVIDEPART);
-        for (int i = 0; i < array.length; i++) {
-            msg.append(fromCard(array[i]));
+        for (Card card : array) {
+            msg.append(fromCard(card));
         }
         return msg.toString();
     }
@@ -168,7 +168,7 @@ public class NetworkUtil {
             return null;
         }
         String[] array = msg.split(ConstantValue.NETWORK_DIVIDEPART);
-        if (array.length == 1 && array[0].equals("")) {
+        if (array.length == 1 && array[0].isEmpty()) {
             return new Card[0];
         }
         Card[] values = new Card[array.length];
@@ -195,7 +195,7 @@ public class NetworkUtil {
         if (msg == null || msg.equals(ConstantValue.NETWORK_NULL)) {
             return null;
         } else {
-            String parts[] = msg.split("-");
+            String[] parts = msg.split("-");
             if (parts.length < 2) {
                 return null;
             }
