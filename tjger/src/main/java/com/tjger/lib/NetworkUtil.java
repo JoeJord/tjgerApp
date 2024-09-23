@@ -7,7 +7,9 @@ import com.tjger.gui.completed.CardSet;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import at.hagru.hgbase.lib.HGBaseStringBuilder;
@@ -242,5 +244,48 @@ public class NetworkUtil {
             return null;
         }
         return Arrays.stream(msg.split(ConstantValue.NETWORK_DIVIDEPART)).map(converter).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a string for the specified map, which can be transferred over the network.
+     *
+     * @param map            The map.
+     * @param keyConverter   The converter for the keys.
+     * @param valueConverter The converter for the values.
+     * @param <K>            The type of the keys in the map.
+     * @param <V>            The type of the values in the map.
+     * @return A string for the specified map, which can be transferred over the network.
+     */
+    public static <K, V> String fromMap(Map<K, V> map, Function<K, String> keyConverter, Function<V, String> valueConverter) {
+        if (map == null) {
+            return ConstantValue.NETWORK_NULL;
+        }
+        return map.entrySet().stream().map(entry -> keyConverter.apply(entry.getKey()) + ConstantValue.NETWORK_DIVIDEPART2 + valueConverter.apply(entry.getValue())).collect(Collectors.joining(ConstantValue.NETWORK_DIVIDEPART));
+    }
+
+    /**
+     * Returns a map from the specified string, which was transferred over the network.
+     *
+     * @param msg            A network message part to convert.
+     * @param mapSupplier    The supplier for the map where to store the elements.
+     * @param keyConverter   The converter for the keys.
+     * @param valueConverter The converter for the values.
+     * @param <K>            The type of the keys in the map.
+     * @param <V>            The type of the values in the map.
+     * @return A map from the specified string, which was transferred over the network.
+     */
+    public static <K, V> Map<K, V> toMap(String msg, Supplier<Map<K, V>> mapSupplier, Function<String, K> keyConverter, Function<String, V> valueConverter) {
+        if ((msg == null) || (ConstantValue.NETWORK_NULL.equals(msg))) {
+            return null;
+        }
+        Map<K, V> map = mapSupplier.get();
+        Arrays.stream(msg.split(ConstantValue.NETWORK_DIVIDEPART)).forEach(entry -> {
+            String[] entryElements = entry.split(ConstantValue.NETWORK_DIVIDEPART2);
+            int countElements = entryElements.length;
+            K key = (countElements > 0) ? keyConverter.apply(entryElements[0]) : null;
+            V value = (countElements > 1) ? valueConverter.apply(entryElements[1]) : null;
+            map.put(key, value);
+        });
+        return map;
     }
 }
