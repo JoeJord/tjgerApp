@@ -4,7 +4,11 @@ import com.tjger.game.completed.GameConfig;
 import com.tjger.gui.completed.Card;
 import com.tjger.gui.completed.CardSet;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import at.hagru.hgbase.lib.HGBaseStringBuilder;
 import at.hagru.hgbase.lib.HGBaseTools;
@@ -208,5 +212,35 @@ public class NetworkUtil {
             }
             return set.getCard(color, sequence);
         }
+    }
+
+    /**
+     * Returns a string for the specified collection, which can be transferred over the network.
+     *
+     * @param collection The collection.
+     * @param converter  The converter of one element.
+     * @param <T>        The type of the elements in the collection.
+     * @return A string for the specified collection, which can be transferred over the network.
+     */
+    public static <T> String fromCollection(Collection<T> collection, Function<T, String> converter) {
+        if (collection == null) {
+            return ConstantValue.NETWORK_NULL;
+        }
+        return collection.stream().map(converter).collect(Collectors.joining(ConstantValue.NETWORK_DIVIDEPART));
+    }
+
+    /**
+     * Returns a collection from the specified string, which was transferred over the network.
+     *
+     * @param msg       A network message part to convert.
+     * @param converter The converter of one element.
+     * @param <T>       The type of the elements in the collection.
+     * @return A collection from the specified string, which was transferred over the network.
+     */
+    public static <T> Collection<T> toCollection(String msg, Function<String, T> converter) {
+        if ((msg == null) || (ConstantValue.NETWORK_NULL.equals(msg))) {
+            return null;
+        }
+        return Arrays.stream(msg.split(ConstantValue.NETWORK_DIVIDEPART)).map(converter).collect(Collectors.toList());
     }
 }
