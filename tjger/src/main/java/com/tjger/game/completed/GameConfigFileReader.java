@@ -1355,9 +1355,10 @@ class GameConfigFileReader {
             if (port != HGBaseTools.INVALID_INT) {
                 config.networkPort = port;
             }
-            config.localGameStateTurn = HGBaseXMLTools.getAttributeValue(node, CONFIG_TURN).equals(CONFIG_LOCAL);
-            config.localGameStateRound = HGBaseXMLTools.getAttributeValue(node, CONFIG_ROUND).equals(CONFIG_LOCAL);
-            config.localGameStateGame = HGBaseXMLTools.getAttributeValue(node, CONFIG_GAME).equals(CONFIG_LOCAL);
+            config.localGameStateMove = CONFIG_LOCAL.equals(HGBaseXMLTools.getAttributeValue(node, CONFIG_MOVE));
+            config.localGameStateTurn = CONFIG_LOCAL.equals(HGBaseXMLTools.getAttributeValue(node, CONFIG_TURN));
+            config.localGameStateRound = CONFIG_LOCAL.equals(HGBaseXMLTools.getAttributeValue(node, CONFIG_ROUND));
+            config.localGameStateGame = CONFIG_LOCAL.equals(HGBaseXMLTools.getAttributeValue(node, CONFIG_GAME));
 
         }
     }

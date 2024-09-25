@@ -112,6 +112,10 @@ public final class GameConfig {
     boolean dialogAfterGame;
     boolean interruptAfterRound;
     IntBooleanStringMap setOrderBy;
+    /**
+     * Flag, if the {@code resetMove} method of the game state shall be called local during network games.
+     */
+    boolean localGameStateMove;
     boolean localGameStateTurn;
     boolean localGameStateRound;
     boolean localGameStateGame;
@@ -449,6 +453,15 @@ public final class GameConfig {
      */
     public void setLocalGameStateTurn(boolean local) {
         localGameStateTurn = local;
+    }
+
+    /**
+     * Returns {@code true} if the {@code resetMove} method of the game state shall be called local during network games.
+     *
+     * @return {@code true} if the {@code resetMove} method of the game state shall be called local during network games.
+     */
+    public boolean isLocalGameStateMove() {
+        return localGameStateMove;
     }
 
     /**
