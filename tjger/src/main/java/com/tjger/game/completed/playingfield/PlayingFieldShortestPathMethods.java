@@ -1,9 +1,9 @@
 package com.tjger.game.completed.playingfield;
 
+import com.tjger.lib.AbstractShortestPathMethods;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.tjger.lib.AbstractShortestPathMethods;
 
 /**
  * Shortest path calculation for a playing field.
@@ -21,36 +21,23 @@ public class PlayingFieldShortestPathMethods extends AbstractShortestPathMethods
         this.fieldList = new ArrayList<>(playingField.getFields());
     }
 
-    /* (non-Javadoc)
-     * @see tjger.lib.ShortestPathMethods#getAllFields()
-     */
     @Override
     public SingleField[] getAllFields() {
         return fieldList.toArray(new SingleField[0]);
     }
 
-    /* (non-Javadoc)
-     * @see tjger.lib.ShortestPathMethods#getIndexOfField(java.lang.Object)
-     */
     @Override
     public int getIndexOfField(SingleField field) {
         return fieldList.indexOf(field);
     }
 
-    /* (non-Javadoc)
-     * @see tjger.lib.ShortestPathMethods#getNeighbours(java.lang.Object)
-     */
     @Override
     public SingleField[] getNeighbours(SingleField field) {
         return playingField.getNeighbours(field).toArray(new SingleField[0]);
     }
-    
-    /* (non-Javadoc)
-     * @see tjger.lib.AbstractShortestPathMethods#getWeight(java.lang.Object, java.lang.Object)
-     */
+
     @Override
     public int getWeight(SingleField from, SingleField to) {
         return playingField.getConnectionWeight(from, to);
     }
-
 }
