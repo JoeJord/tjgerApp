@@ -632,7 +632,20 @@ public class PlayingField {
      * @return the shortest path object, will be null if there is no path available
      */
     public ShortestPath<SingleField> getShortestPath(SingleField start, SingleField target, int maxDepth) {
-        return ShortestPathFinder.find(new PlayingFieldShortestPathMethods(this, start, target, maxDepth));
+        return getShortestPath(start, target, maxDepth, (connectionOrigin, connectionTarget) -> true);
+    }
+
+    /**
+     * Returns the shortest path from the start field to the target field with a maximum search depth.
+     *
+     * @param start     the start field
+     * @param target    the target field
+     * @param maxDepth  the maximum search depth, 0 for infinite depth
+     * @param condition The condition a connection to a target field must met. The parameters for the {@link BiPredicate} are the origin and the target fields.
+     * @return the shortest path object, will be null if there is no path available
+     */
+    public ShortestPath<SingleField> getShortestPath(SingleField start, SingleField target, int maxDepth, BiPredicate<SingleField, SingleField> condition) {
+        return ShortestPathFinder.find(new PlayingFieldShortestPathMethods(this, start, target, maxDepth, condition));
     }
 
     /**
@@ -659,7 +672,7 @@ public class PlayingField {
     public Collection<SingleField> getReachableFields(SingleField start, int weight, boolean allowTurnBack, BiPredicate<SingleField, SingleField> condition) {
         Set<SingleField> targets = getReachableFields(start, weight, condition);
         if (!allowTurnBack) {
-            targets.removeIf(target -> getShortestPath(start, target, weight).getPathWeight() < weight);
+            targets.removeIf(target -> getShortestPath(start, target, weight, condition).getPathWeight() < weight);
         }
         return (!targets.isEmpty()) ? Collections.unmodifiableCollection(targets) : Collections.emptySet();
     }
