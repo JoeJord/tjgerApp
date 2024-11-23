@@ -1,6 +1,9 @@
 package com.tjger.game.completed.playingfield;
 
 import android.graphics.Point;
+import android.util.Pair;
+
+import androidx.annotation.NonNull;
 
 import com.tjger.lib.ShortestPath;
 import com.tjger.lib.ShortestPathFinder;
@@ -19,7 +22,6 @@ import java.util.TreeSet;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
-import androidx.annotation.NonNull;
 import at.hagru.hgbase.android.awt.Dimension;
 import at.hagru.hgbase.android.awt.Rectangle;
 import at.hagru.hgbase.gui.HGBaseGuiTools;
@@ -657,7 +659,7 @@ public class PlayingField {
      * @return An unmodifiable collection of all possible targets, may be empty.
      */
     public Collection<SingleField> getReachableFields(SingleField start, int weight, boolean allowTurnBack, BiPredicate<SingleField, SingleField> condition) {
-        Set<SingleField> targets = getReachableFields(start, weight, condition);
+        Set<SingleField> targets = getReachableFields(start, weight, condition, new HashMap<>());
         if (!allowTurnBack) {
             targets.removeIf(target -> getShortestPath(start, target, weight).getPathWeight() < weight);
         }
@@ -667,12 +669,19 @@ public class PlayingField {
     /**
      * Internal method to calculate the reachable fields (including turn back).
      *
-     * @param start     the start field
-     * @param weight    the exact weight to reach possible targets
-     * @param condition The condition a connection to a target field must met. The parameters for the {@link BiPredicate} are the origin and the target fields.
+     * @param start          the start field
+     * @param weight         the exact weight to reach possible targets
+     * @param condition      The condition a connection to a target field must met. The parameters for the {@link BiPredicate} are the origin and the target fields.
+     * @param neighbourCache Cache of already determined neighbors.
      * @return an modifiable collection of all possible targets, may be empty
      */
-    private Set<SingleField> getReachableFields(SingleField start, int weight, BiPredicate<SingleField, SingleField> condition) {
+    private Set<SingleField> getReachableFields(SingleField start, int weight, BiPredicate<SingleField, SingleField> condition,
+                                                Map<Pair<SingleField, Integer>, Set<SingleField>> neighbourCache) {
+        Pair<SingleField, Integer> key = new Pair<>(start, weight);
+        if (neighbourCache.containsKey(key)) {
+            return neighbourCache.get(key);
+        }
+
         Set<SingleField> targets = new HashSet<>();
         for (SingleField neighbour : getNeighbours(start, condition)) {
             int w = getWeight(start, neighbour);
@@ -680,9 +689,10 @@ public class PlayingField {
             if (remaining == 0) {
                 targets.add(neighbour);
             } else if (remaining > 0) {
-                targets.addAll(getReachableFields(neighbour, remaining, condition));
+                targets.addAll(getReachableFields(neighbour, remaining, condition, neighbourCache));
             }
         }
+        neighbourCache.put(key, targets);
         return targets;
     }
 
