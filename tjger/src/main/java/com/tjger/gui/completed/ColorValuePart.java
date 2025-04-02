@@ -2,6 +2,8 @@ package com.tjger.gui.completed;
 
 import android.graphics.Bitmap;
 
+import androidx.annotation.NonNull;
+
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.GameManager;
 import com.tjger.gui.PartSorter;
@@ -16,9 +18,9 @@ import at.hagru.hgbase.lib.HGBaseTools;
  */
 public class ColorValuePart extends Part {
 
-    final private String color;
-    final private int sequence;
-    final private int value;
+    private final String color;
+    private final int sequence;
+    private final int value;
     protected PartSet partSet;
 
     public ColorValuePart(PartSet partSet, String partType, String color, int sequence, int value, Bitmap image, boolean proTeaser) {
@@ -58,9 +60,7 @@ public class ColorValuePart extends Part {
     }
 
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
+    @NonNull
     @Override
     public String toString() {
         return HGBaseText.getText(getPartSet().getName()) + " " + getIntraId();
@@ -73,9 +73,6 @@ public class ColorValuePart extends Part {
         return getColor() + "-" + getSequence();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object o2) {
         if (o2 != null && o2.getClass().equals(this.getClass())) {
@@ -85,17 +82,11 @@ public class ColorValuePart extends Part {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return getIntraId().hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(Part p2) {
         if (p2 instanceof ColorValuePart) {
@@ -111,37 +102,9 @@ public class ColorValuePart extends Part {
                 return 0;
             }
             if (orderMode == GameConfig.ORDERBY_VALUE) {
-                // sort value and color
-                int compare = this.getPartSet().getName().compareToIgnoreCase(c2.getPartSet().getName());
-                if (compare != 0) {
-                    return compare;
-                }
-                String[] colors = getPartSet().getColors();
-                compare = Integer.valueOf(this.getValue()).compareTo(Integer.valueOf(c2.getValue()));
-                if (compare != 0) {
-                    return compare;
-                }
-                compare = Integer.valueOf(this.getSequence()).compareTo(Integer.valueOf(c2.getSequence()));
-                if (compare != 0) {
-                    return compare;
-                }
-                return HGBaseTools.getIndexOf(colors, this.getColor()) - HGBaseTools.getIndexOf(colors, c2.getColor());
+                return compareByValue(c2);
             } else if (orderMode == GameConfig.ORDERBY_COLOR) {
-                // sort color and value
-                int compare = this.getPartSet().getName().compareToIgnoreCase(c2.getPartSet().getName());
-                if (compare != 0) {
-                    return compare;
-                }
-                String[] colors = getPartSet().getColors();
-                compare = HGBaseTools.getIndexOf(colors, this.getColor()) - HGBaseTools.getIndexOf(colors, c2.getColor());
-                if (compare != 0) {
-                    return compare;
-                }
-                compare = Integer.valueOf(this.getValue()).compareTo(Integer.valueOf(c2.getValue()));
-                if (compare != 0) {
-                    return compare;
-                }
-                return Integer.valueOf(this.getSequence()).compareTo(Integer.valueOf(c2.getSequence()));
+                return compareByColor(c2);
             } else {
                 return -1;
             }
@@ -150,4 +113,53 @@ public class ColorValuePart extends Part {
         }
     }
 
+    /**
+     * Compares this color value part with the specified by the value.
+     *
+     * @param c2 The other color value part.
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+     */
+    private int compareByValue(ColorValuePart c2) {
+        // sort value and color
+        int compare = this.getPartSet().getName().compareToIgnoreCase(c2.getPartSet().getName());
+        if (compare != 0) {
+            return compare;
+        }
+        String[] colors = getPartSet().getColors();
+        compare = Integer.compare(this.getValue(), c2.getValue());
+        if (compare != 0) {
+            return compare;
+        }
+        compare = Integer.compare(this.getSequence(), c2.getSequence());
+        if (compare != 0) {
+            return compare;
+        }
+        return HGBaseTools.getIndexOf(colors, this.getColor())
+                - HGBaseTools.getIndexOf(colors, c2.getColor());
+    }
+
+    /**
+     * Compares this color value part with the specified by the color.
+     *
+     * @param c2 The other color value part.
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+     */
+    private int compareByColor(ColorValuePart c2) {
+        // sort color and value
+        int compare = this.getPartSet().getName().compareToIgnoreCase(c2.getPartSet().getName());
+        if (compare != 0) {
+            return compare;
+        }
+        String[] colors = getPartSet().getColors();
+        compare = HGBaseTools.getIndexOf(colors, this.getColor())
+                - HGBaseTools.getIndexOf(colors, c2.getColor());
+        if (compare != 0) {
+            return compare;
+        }
+        compare = Integer.compare(this.getValue(), c2.getValue());
+        if (compare != 0) {
+            return compare;
+        }
+        return Integer.compare(this.getSequence(), c2.getSequence());
+    }
 }
