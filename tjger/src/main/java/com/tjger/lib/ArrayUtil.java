@@ -31,7 +31,7 @@ public class ArrayUtil {
         if (list==null) {
             return new GamePlayer[0];
         }
-        return list.toArray(new GamePlayer[list.size()]);
+        return list.toArray(new GamePlayer[0]);
     }
 
     /**
@@ -42,7 +42,7 @@ public class ArrayUtil {
         if (list==null) {
             return new PlayerType[0];
         }
-        return list.toArray(new PlayerType[list.size()]);
+        return list.toArray(new PlayerType[0]);
     }
     /**
      * Transforms an array with player types to a string array with the ids of the type.
@@ -63,7 +63,7 @@ public class ArrayUtil {
         if (list==null) {
             return new Card[0];
         }
-        return list.toArray(new Card[list.size()]);
+        return list.toArray(new Card[0]);
     }
 
     /**
@@ -74,7 +74,7 @@ public class ArrayUtil {
         if (list==null) {
             return new Piece[0];
         }
-        return list.toArray(new Piece[list.size()]);
+        return list.toArray(new Piece[0]);
     }
 
     /**
