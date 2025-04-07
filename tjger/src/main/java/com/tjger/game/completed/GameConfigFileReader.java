@@ -743,13 +743,13 @@ class GameConfigFileReader {
             String partClass = HGBaseXMLTools.getAttributeValue(node, CONFIG_PARTCLASS);
             String setClass = HGBaseXMLTools.getAttributeValue(node, CONFIG_SETCLASS);
             String cvpClass = HGBaseXMLTools.getAttributeValue(node, CONFIG_CVPCLASS);
-            if (partClass.length() > 0) {
+            if (!partClass.isEmpty()) {
                 config.extendPartMap.put(type, partClass);
             }
-            if (setClass.length() > 0) {
+            if (!setClass.isEmpty()) {
                 config.extendPartSetMap.put(type, setClass);
             }
-            if (cvpClass.length() > 0) {
+            if (!cvpClass.isEmpty()) {
                 config.extendCvpMap.put(type, cvpClass);
             }
         }
@@ -822,7 +822,7 @@ class GameConfigFileReader {
             }
         });
         // look for part sets
-        new PartSetContructor<PartSet>(CONFIG_PARTS, CONFIG_PARTSET, CONFIG_PART, config.partSetMap) {
+        new PartSetContructor<>(CONFIG_PARTS, CONFIG_PARTSET, CONFIG_PART, config.partSetMap) {
 
             @Override
             protected PartSet createPartSet(String type, String name, Node node, boolean hidden) {
@@ -892,7 +892,7 @@ class GameConfigFileReader {
         fillImageInformation(CONFIG_PIECE, node, config);
         final Map<String, ImageEffect> topLevelEffects = readEffectsFromNode(node);
         config.helpHidden = isHiddenEntry(node);
-        new PartSetContructor<PieceSet>(CONFIG_PIECES, CONFIG_PIECESET, CONFIG_PIECE, pieceSetList) {
+        new PartSetContructor<>(CONFIG_PIECES, CONFIG_PIECESET, CONFIG_PIECE, pieceSetList) {
             @Override
             protected PieceSet createPartSet(String type, String name, Node node, boolean hidden) {
                 PieceSet pieceSetPart = new PieceSet(name, hidden, isProTeaser(node));
@@ -937,7 +937,7 @@ class GameConfigFileReader {
         fillImageInformation(CONFIG_CARD, node, config);
         final Map<String, ImageEffect> topLevelEffects = readEffectsFromNode(node);
         config.helpHidden = isHiddenEntry(node);
-        new PartSetContructor<CardSet>(CONFIG_CARDS, CONFIG_CARDSET, CONFIG_CARD, config.cardSetsMap) {
+        new PartSetContructor<>(CONFIG_CARDS, CONFIG_CARDSET, CONFIG_CARD, config.cardSetsMap) {
             @Override
             protected CardSet createPartSet(String type, String name, Node node, boolean hidden) {
                 String validType = (type == null || type.isEmpty()) ? ConstantValue.CONFIG_CARDSET : type;
