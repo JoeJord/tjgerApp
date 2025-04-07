@@ -15,7 +15,7 @@ import at.hagru.hgbase.lib.HGBaseTools;
  *
  * @author hagru
  */
-final public class PlayerManager {
+public final class PlayerManager {
 
     public static final int HUMAN_PLAYER_INDEX = 0;
 
@@ -113,9 +113,6 @@ final public class PlayerManager {
      */
     public String getDefaultHumanPlayerName() {
         return HGBaseText.getText(R.string.default_human_name);
-        //String name = HGBaseAppTools.getUserName().split(" ")[0];
-        //return (name.isEmpty()) ? getDefaultPlayerName(HUMAN_PLAYER_INDEX)
-        //                        : HGBaseTools.capitalizeFirstLetter(name);
     }
 
     /**
