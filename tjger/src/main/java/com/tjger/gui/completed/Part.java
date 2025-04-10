@@ -2,6 +2,8 @@ package com.tjger.gui.completed;
 
 import android.graphics.Bitmap;
 
+import androidx.annotation.NonNull;
+
 import com.tjger.game.completed.GameManager;
 import com.tjger.gui.PartSorter;
 
@@ -15,10 +17,10 @@ import at.hagru.hgbase.lib.HGBaseText;
  */
 public class Part implements HGBaseItem, Comparable<Part> {
 
-    final private String partType;
-    final private String name;
-    final private Bitmap image;
-    final private boolean hidden;
+    private final String partType;
+    private final String name;
+    private final Bitmap image;
+    private final boolean hidden;
     /**
      * Flag if this part is only available in the pro version but should be shown in the free version as teaser for the pro version.
      */
@@ -97,25 +99,17 @@ public class Part implements HGBaseItem, Comparable<Part> {
         this.reflection = reflection;
     }
 
-    /* (non-Javadoc)
-     * @see hgb.gui.HGBaseItem#getId()
-     */
     @Override
     public String getId() {
         return getName();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
+    @NonNull
     @Override
     public String toString() {
         return HGBaseText.getText(getName());
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(Part p2) {
         if (p2 == null) {
@@ -129,9 +123,6 @@ public class Part implements HGBaseItem, Comparable<Part> {
         }
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object o2) {
         return (o2 instanceof Part && this.toString().equals(o2.toString()));
@@ -144,9 +135,6 @@ public class Part implements HGBaseItem, Comparable<Part> {
         return this.partType;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return toString().hashCode();

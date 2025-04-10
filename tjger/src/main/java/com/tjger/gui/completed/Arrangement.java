@@ -5,6 +5,7 @@ import com.tjger.lib.ConstantValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.lib.HGBaseTools;
@@ -16,15 +17,15 @@ import at.hagru.hgbase.lib.HGBaseTools;
  */
 public class Arrangement extends Part {
 
-    final private Color backgroundColor;
-    final private String background;
-    final private String board;
-    final private String cover;
-    final private String pieceSet;
-    final private Map<String, String> mapCardSets = new LinkedHashMap<>();
-    final private Map<String, String> mapParts = new LinkedHashMap<>();
-    final private Map<String, String> mapPartSets = new LinkedHashMap<>();
-    final private Map<String, Color> mapColors = new LinkedHashMap<>();
+    private final Color backgroundColor;
+    private final String background;
+    private final String board;
+    private final String cover;
+    private final String pieceSet;
+    private final Map<String, String> mapCardSets = new LinkedHashMap<>();
+    private final Map<String, String> mapParts = new LinkedHashMap<>();
+    private final Map<String, String> mapPartSets = new LinkedHashMap<>();
+    private final Map<String, Color> mapColors = new LinkedHashMap<>();
 
     public Arrangement(String name, Color defaultBackColor, String defaultBack, String defaultBoard, String defaultPieceSet, String defaultCover, String cardSet, boolean proTeaser) {
         super(ConstantValue.CONFIG_ARRANGEMENT, name, null, false, proTeaser);
@@ -38,12 +39,20 @@ public class Arrangement extends Part {
         }
     }
 
-    /* (non-Javadoc)
-     * @see tjger.gui.completed.Part#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object o2) {
+        if (o2 == null) {
+            return false;
+        }
+        if (!(o2 instanceof Arrangement)) {
+            return false;
+        }
         return (HGBaseTools.equalClass(this, o2) && this.toString().equals(o2.toString()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(background, board, pieceSet, mapCardSets, mapParts, mapPartSets, mapColors);
     }
 
     /**
@@ -156,7 +165,7 @@ public class Arrangement extends Part {
     }
 
     /**
-     * @param colorType
+     * @param colorType A color type.
      * @return The color for this arrangement or null if not defined.
      */
     public Color getColor(String colorType) {

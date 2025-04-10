@@ -1,10 +1,10 @@
 package com.tjger.lib;
 
+import android.graphics.Paint;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-
-import android.graphics.Paint;
 
 /**
  * All constant values that are used for tjger.
@@ -14,9 +14,9 @@ import android.graphics.Paint;
 public class ConstantValue {
 
     // font alignment (GamePanel.drawString...)
-    public static final Paint.Align ALIGN_LEFT   =  Paint.Align.LEFT;
-    public static final Paint.Align ALIGN_CENTER =  Paint.Align.CENTER;
-    public static final Paint.Align ALIGN_RIGHT  =  Paint.Align.RIGHT;
+    public static final Paint.Align ALIGN_LEFT = Paint.Align.LEFT;
+    public static final Paint.Align ALIGN_CENTER = Paint.Align.CENTER;
+    public static final Paint.Align ALIGN_RIGHT = Paint.Align.RIGHT;
 
     // Vertical alignments.
     public static final int ALIGN_TOP = 1;
@@ -65,17 +65,16 @@ public class ConstantValue {
     public static final String HINTS_ROUND = "round";
     public static final String HINTS_TURN = "turn";
     public static final String HINTS_MOVE = "move";
-    private static final String[] HINTS_LIST = { HINTS_APPLICATION, HINTS_GAME, HINTS_ROUND, HINTS_TURN, HINTS_MOVE};
-
     // network transfer constants
-    public static final int NETWORK_WAITINTERVAL  = 150;
-    public static final String NETWORK_SEPARATE   = ";"; // take this for seperating different network datas
+    public static final int NETWORK_WAITINTERVAL = 150;
+    public static final String NETWORK_SEPARATE = ";"; // take this for seperating different network datas
     public static final String NETWORK_DIVIDEPART = "/"; // used for internal structs (e.g. Lists, PlayerCardMap)
-    public static final String NETWORK_DIVIDEPART2= "$"; // - "" -
+    public static final String NETWORK_DIVIDEPART2 = "$"; // - "" -
     public static final String NETWORK_DIVIDEPAIR = "="; // - "" -
-    public static final String NETWORK_NULL       = "^";
-    private static final String[] NETWORK_SPECIALCHAR = { NETWORK_SEPARATE, NETWORK_DIVIDEPART, NETWORK_DIVIDEPART2, NETWORK_DIVIDEPAIR, NETWORK_NULL };
-    
+    public static final String NETWORK_NULL = "^";
+    private static final String[] HINTS_LIST = {HINTS_APPLICATION, HINTS_GAME, HINTS_ROUND, HINTS_TURN, HINTS_MOVE};
+    private static final String[] NETWORK_SPECIALCHAR = {NETWORK_SEPARATE, NETWORK_DIVIDEPART, NETWORK_DIVIDEPART2, NETWORK_DIVIDEPAIR, NETWORK_NULL};
+
     /**
      * @return all hint types as unmodifiable collection
      */

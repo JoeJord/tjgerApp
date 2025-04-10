@@ -971,11 +971,7 @@ public final class GameConfig {
      * @return The extension for this piece type.
      */
     public String getImageExtension(String pieceType) {
-        if (extensionMap.containsKey(pieceType)) {
-            return extensionMap.get(pieceType);
-        } else {
-            return EMPTY_STRING;
-        }
+        return extensionMap.getOrDefault(pieceType, EMPTY_STRING);
     }
 
     /**
@@ -983,11 +979,7 @@ public final class GameConfig {
      * @return The image path for this piece type.
      */
     public String getImagePath(String pieceType) {
-        if (pathMap.containsKey(pieceType)) {
-            return pathMap.get(pieceType);
-        } else {
-            return EMPTY_STRING;
-        }
+        return pathMap.getOrDefault(pieceType, EMPTY_STRING);
     }
 
     /**
@@ -1126,7 +1118,7 @@ public final class GameConfig {
 
     /**
      * Returns a setting that is defined at the "hints". The key for this settings
-     * can be taken from ConstanValue.HINTS_xxx.
+     * can be taken from ConstantValue.HINTS_xxx.
      *
      * @param setting The setting's key.
      * @return The setting or null.
