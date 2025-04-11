@@ -356,8 +356,8 @@ final public class GameManager {
                     // start a new turn
                     engine.newTurn();
                 } else {
-                    // just let the player do it's move
-                    engine.doPlayerMove(false);
+                    // just let the player do it's move - without calling GameState.resetMove, because the game state should be as loaded.
+                    engine.doPlayerMove(false, false);
                 }
             } else if (engine.isActiveGame()) {
                 engine.contributeGameState(GameEngine.ACTION_AFTERMOVE);

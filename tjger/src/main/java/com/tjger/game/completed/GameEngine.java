@@ -847,12 +847,15 @@ public final class GameEngine {
      * Invokes the move of the current player. Internal use only!
      *
      * @param continued If {@code true}, this move is a continuation of the previous move, which means, the previous move was not completed.
+     * @param performResetMove If {@code true}, {@link GameState#resetMove(GameEngine, boolean)} is called before the player does his move.
      */
-    public void doPlayerMove(boolean continued) {
-        int ret = resetGameState(continued ? RESET_CONTINUED_MOVE : RESET_MOVE);
-        if (ret != 0) {
-            HGBaseDialog.printError(ret, getMainFrame());
-            return;
+    public void doPlayerMove(boolean continued, boolean performResetMove) {
+        if (performResetMove) {
+            int ret = resetGameState(continued ? RESET_CONTINUED_MOVE : RESET_MOVE);
+            if (ret != 0) {
+                HGBaseDialog.printError(ret, getMainFrame());
+                return;
+            }
         }
 
         contributeGameState(ACTION_BEFOREMOVE);
@@ -939,7 +942,7 @@ public final class GameEngine {
 
                 @Override
                 public void afterAction() {
-                    doPlayerMove(continued);
+                    doPlayerMove(continued, true);
                     //getMainFrame().setCursorDefault();
                 }
 
@@ -950,7 +953,7 @@ public final class GameEngine {
             };
             TimeAction.run(t);
         } else {
-            doPlayerMove(continued);
+            doPlayerMove(continued, true);
         }
     }
 
