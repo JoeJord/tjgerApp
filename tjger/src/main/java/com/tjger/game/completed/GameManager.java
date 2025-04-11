@@ -353,8 +353,8 @@ final public class GameManager {
             if (engine.isActiveRound()) {
                 // test if turn is finished
                 if (getGameRules().isTurnFinished(getGameState()) || engine.getCurrentMove() == 0) {
-                    // start a new turn
-                    engine.newTurn();
+                    // start a new turn - without calling GameState.resetMove, because the game state should be as loaded.
+                    engine.newTurn(false);
                 } else {
                     // just let the player do it's move - without calling GameState.resetMove, because the game state should be as loaded.
                     engine.doPlayerMove(false, false);

@@ -655,8 +655,10 @@ public final class GameEngine {
 
     /**
      * Starts a new turn.
+     *
+     * @param performResetMove If {@code true}, {@link GameState#resetMove(GameEngine, boolean)} is called before the player does his move.
      */
-    synchronized void newTurn() {
+    synchronized void newTurn(boolean performResetMove) {
         //getMainFrame().setCursorWait();
         resetScore(GamePlayer.SCORE_TURN);
         int ret = resetGameState(RESET_TURN);
@@ -668,7 +670,7 @@ public final class GameEngine {
             }
             //getMainFrame().setCursorDefault();
             getMainFrame().showHintsDialog(ConstantValue.HINTS_TURN);
-            delayDoPlayerMove(0, false);
+            delayDoPlayerMove(0, false, performResetMove);
         } else {
             HGBaseDialog.printError("err_newturn", getMainFrame());
         }
@@ -755,7 +757,7 @@ public final class GameEngine {
                 if (isMoveComplete) {
                     currentMove.incrementAndGet();
                 }
-                delayDoPlayerMove(getGameConfig().getDelayMoveWithSpeedFactor(), !isMoveComplete);
+                delayDoPlayerMove(getGameConfig().getDelayMoveWithSpeedFactor(), !isMoveComplete, true);
             }
         } else if (isActiveGame()) {
             // the round is finished, but the game is still active - check
@@ -910,7 +912,7 @@ public final class GameEngine {
 
                 @Override
                 public void afterAction() {
-                    newTurn();
+                    newTurn(true);
                     //getMainFrame().setCursorDefault();
                 }
 
@@ -921,7 +923,7 @@ public final class GameEngine {
             };
             TimeAction.run(t);
         } else {
-            newTurn();
+            newTurn(true);
         }
     }
 
@@ -930,8 +932,9 @@ public final class GameEngine {
      *
      * @param delay     The minimum time in milliseconds that the move should take to execute.
      * @param continued If {@code true}, this move is a continuation of the previous move, which means, the previous move was not completed.
+     * @param performResetMove If {@code true}, {@link GameState#resetMove(GameEngine, boolean)} is called before the player does his move.
      */
-    private void delayDoPlayerMove(int delay, boolean continued) {
+    private void delayDoPlayerMove(int delay, boolean continued, boolean performResetMove) {
         if (delay > 0) {
             TimeAction t = new TimeAction(delay) {
 
@@ -942,7 +945,7 @@ public final class GameEngine {
 
                 @Override
                 public void afterAction() {
-                    doPlayerMove(continued, true);
+                    doPlayerMove(continued, performResetMove);
                     //getMainFrame().setCursorDefault();
                 }
 
@@ -953,7 +956,7 @@ public final class GameEngine {
             };
             TimeAction.run(t);
         } else {
-            doPlayerMove(continued, true);
+            doPlayerMove(continued, performResetMove);
         }
     }
 
