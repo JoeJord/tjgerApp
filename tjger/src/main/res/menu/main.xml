@@ -1,32 +1,33 @@
 <!-- the defeault main menu for a tjger game -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.tjger.MainFrame" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.tjger.MainFrame">
 
     <item 
         android:id="@+id/settings_playsound" 
         android:title="@string/settings_playsound"
         android:icon="@drawable/sound_on"
-        android:showAsAction="always"></item>
+        app:showAsAction="always"/>
     <item 
         android:id="@+id/action_preferences" 
         android:title="@string/action_preferences"
-        android:icon="@drawable/preferences"></item>
+        android:icon="@drawable/preferences"/>
     <item 
         android:id="@+id/help_instructions" 
-        android:title="@string/help_instructions"></item>
+        android:title="@string/help_instructions"/>
     <item 
         android:id="@+id/help_gamehints" 
-        android:title="@string/help_gamehints"></item>
+        android:title="@string/help_gamehints"/>
     <item 
         android:id="@+id/help_tjger" 
-        android:title="@string/help_tjger"></item>
+        android:title="@string/help_tjger"/>
     <item 
         android:id="@+id/action_about" 
         android:title="@string/action_about"
-        android:icon="@drawable/about"></item>
+        android:icon="@drawable/about"/>
     <item 
         android:id="@+id/action_gameinfo" 
-        android:title="@string/action_gameinfo"></item>
+        android:title="@string/action_gameinfo"/>
     
 </menu>
