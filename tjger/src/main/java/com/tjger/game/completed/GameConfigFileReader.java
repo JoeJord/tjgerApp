@@ -19,11 +19,14 @@ import com.tjger.gui.completed.Card;
 import com.tjger.gui.completed.CardSet;
 import com.tjger.gui.completed.ColorValuePart;
 import com.tjger.gui.completed.Cover;
+import com.tjger.gui.completed.GameElement;
 import com.tjger.gui.completed.ImageEffect;
 import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.PartSet;
 import com.tjger.gui.completed.Piece;
 import com.tjger.gui.completed.PieceSet;
+import com.tjger.gui.completed.Sound;
+import com.tjger.gui.completed.SoundArrangement;
 import com.tjger.gui.completed.configurablelayout.layoutelement.AreaLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.CardsetLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.PartLayout;
@@ -65,6 +68,31 @@ import at.hagru.hgbase.lib.xml.HGBaseXMLTools;
  */
 class GameConfigFileReader {
 
+    public static final String CONFIG_FILE = "file";
+    /**
+     * The configuration tag for a sound set.
+     */
+    public static final String CONFIG_SOUNDSET = "soundset";
+    /**
+     * The configuration tag for sounds.
+     */
+    public static final String CONFIG_SOUNDS = "sounds";
+    /**
+     * The configuration tag for one sound.
+     */
+    public static final String CONFIG_SOUND = "sound";
+    /**
+     * The configuration tag for the sequence.
+     */
+    public static final String CONFIG_SEQUENCE = "sequence";
+    /**
+     * The configuration tag for the start sequence.
+     */
+    public static final String CONFIG_SEQUENCE_START = "sequencestart";
+    /**
+     * The configuration tag for the end sequence.
+     */
+    public static final String CONFIG_SEQUENCE_END = "sequenceend";
     static final String CONFIG_NAME = "name";
     static final String CONFIG_IMAGE = "image";
     static final String CONFIG_TYPE = "type";
@@ -173,7 +201,6 @@ class GameConfigFileReader {
     private static final String CONFIG_ARRANGEMENT = "arrangement";
     private static final String CONFIG_PLAYING_FIELDS = "playingfields";
     private static final String CONFIG_PLAYING_FIELD = "playingfield";
-    private static final String CONFIG_FILE = "file";
     private static final String CONFIG_MAIN_MENU = "mainmenu";
     private static final String CONFIG_SCALE_TYPE = "scaletype";
     /**
@@ -248,13 +275,24 @@ class GameConfigFileReader {
      * The configuration tag for the covered flag.
      */
     private static final String CONFIG_COVERED = "covered";
-
+    /**
+     * The configuration tag for the sound arrangements.
+     */
+    private static final String CONFIG_SOUND_ARRANGEMENTS = "soundarrangements";
+    /**
+     * The configuration tag for one sound arrangement.
+     */
+    private static final String CONFIG_SOUND_ARRANGEMENT = "soundarrangement";
     private static final List<Background> backgroundList = new ArrayList<>();
     private static final List<Board> boardList = new ArrayList<>();
     private static final List<Cover> coverList = new ArrayList<>();
     private static final List<PieceSet> pieceSetList = new ArrayList<>();
     private static final List<Arrangement> arrangementList = new ArrayList<>();
     private static final Map<String, AbstractImageEffectReader<? extends ImageEffect>> effectReaders = new HashMap<>();
+    /**
+     * The list of the available sound arrangements.
+     */
+    private static List<SoundArrangement> soundArrangementList = new ArrayList<>();
     private static BackgroundColor backgroundColor = null;
 
     static {
@@ -325,6 +363,12 @@ class GameConfigFileReader {
                     case CONFIG_ARRANGEMENTS:
                         readArrangements(node, config);
                         break;
+                    case CONFIG_SOUNDS:
+                        readSounds(node, config);
+                        break;
+                    case CONFIG_SOUND_ARRANGEMENTS:
+                        readSoundArrangements(node, config);
+                        break;
                     case CONFIG_PLAYING_FIELDS:
                         readPlayingFields(node, config);
                         break;
@@ -342,21 +386,21 @@ class GameConfigFileReader {
         config.covers = coverList.toArray(new Cover[0]);
         config.pieceSets = pieceSetList.toArray(new PieceSet[0]);
         config.arrangements = arrangementList.toArray(new Arrangement[0]);
+        config.soundArrangements = soundArrangementList.toArray(new SoundArrangement[0]);
         // test if needed values are not set
         testForErrors(config);
     }
 
     /**
-     * Fills the hash maps with the information for the images of the given
-     * piece type.
+     * Fills the hash maps with the information for the game elements of the given type.
      *
-     * @param pieceType The piece type.
-     * @param node      The xml node with the information (extension, path).
-     * @param config    The GameConfig object.
+     * @param elementType The type of the game element.
+     * @param node        The xml node with the information (extension, path).
+     * @param config      The GameConfig object.
      */
-    private static void fillImageInformation(String pieceType, Node node, GameConfig config) {
-        config.extensionMap.put(pieceType, HGBaseXMLTools.getAttributeValue(node, CONFIG_EXTENSION));
-        config.pathMap.put(pieceType, HGBaseXMLTools.getAttributeValue(node, CONFIG_PATH));
+    private static void fillElementInformation(String elementType, Node node, GameConfig config) {
+        config.extensionMap.put(elementType, HGBaseXMLTools.getAttributeValue(node, CONFIG_EXTENSION));
+        config.pathMap.put(elementType, HGBaseXMLTools.getAttributeValue(node, CONFIG_PATH));
     }
 
     /**
@@ -445,6 +489,138 @@ class GameConfigFileReader {
                 }
             }
         });
+    }
+
+    /**
+     * Reads all sounds.
+     *
+     * @param node   The settings node.
+     * @param config The game configuration object.
+     */
+    protected static void readSounds(Node node, GameConfig config) {
+        fillElementInformation(CONFIG_SOUND, node, config);
+        fillElementInformation(CONFIG_SOUNDSET, node, config);
+        config.helpHidden = isHiddenEntry(node);
+        readUserDefinesSounds(node, config);
+        readUserDefinesSoundSets(node, config);
+    }
+
+    /**
+     * Reads all user defined sounds.
+     *
+     * @param node   The settings node.
+     * @param config The game configuration object.
+     */
+    protected static void readUserDefinesSounds(Node node, GameConfig config) {
+        ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_SOUNDS, config) {
+            @Override
+            public void performNode(Node node, int index, Object obj) {
+                GameConfig config = (GameConfig) obj;
+                if (CONFIG_SOUND.equals(node.getNodeName())) {
+                    readUserDefinedSound(node, config);
+                }
+            }
+        });
+    }
+
+    /**
+     * Reads one user defined sound.
+     *
+     * @param node   The sound node.
+     * @param config The game configuration object.
+     */
+    protected static void readUserDefinedSound(Node node, GameConfig config) {
+        String name = HGBaseXMLTools.getAttributeValue(node, CONFIG_NAME);
+        String type = HGBaseXMLTools.getAttributeValue(node, CONFIG_TYPE);
+        if (!HGBaseTools.hasContent(type)) {
+            HGBaseLog.logWarn("No type defined for sound '" + name + "'!");
+            return;
+        }
+        String soundFilename = HGBaseXMLTools.getAttributeValue(node, CONFIG_FILE);
+        if (!HGBaseTools.hasContent(soundFilename)) {
+            soundFilename = calculateElementFilename(CONFIG_SOUND, name, config);
+        }
+        boolean hidden = isHiddenPart(node, config);
+        boolean proTeaser = isProTeaser(node);
+        List<Sound> listSound = getListFromMap(config.soundMap, type);
+        listSound.add(new Sound(type, name, soundFilename, hidden, proTeaser));
+    }
+
+    /**
+     * Reads all user defined sound sets.
+     *
+     * @param node   The settings node.
+     * @param config The game configuration object.
+     */
+    protected static void readUserDefinesSoundSets(Node node, GameConfig config) {
+        SoundSetConstructor.construct(node, config);
+    }
+
+    /**
+     * Reads all sound arrangements.
+     *
+     * @param node   The sound arrangements node.
+     * @param config The game configuration object.
+     */
+    protected static void readSoundArrangements(Node node, GameConfig config) {
+        config.completeSoundArrangement = HGBaseXMLTools.getAttributeBooleanValue(node, CONFIG_COMPLETE,
+                false);
+        ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_SOUND_ARRANGEMENTS, config) {
+            @Override
+            public void performNode(Node node, int index, Object obj) {
+                if (CONFIG_SOUND_ARRANGEMENT.equals(node.getNodeName())) {
+                    readSoundArrangement(node);
+                }
+            }
+        });
+    }
+
+    /**
+     * Reads one sound arrangements.
+     *
+     * @param node The sound arrangement node.
+     */
+    protected static void readSoundArrangement(Node node) {
+        String name = HGBaseXMLTools.getAttributeValue(node, CONFIG_NAME);
+        boolean proTeaser = isProTeaser(node);
+        SoundArrangement newSoundArrangement = new SoundArrangement(name, proTeaser);
+        soundArrangementList.add(newSoundArrangement);
+        readSoundArrangementSounds(node, newSoundArrangement);
+    }
+
+    /**
+     * Reads all sounds for the specified sound arrangement.
+     *
+     * @param node             The sound arrangement node.
+     * @param soundArrangement The sound arrangement to which the sound belongs.
+     */
+    protected static void readSoundArrangementSounds(Node node, SoundArrangement soundArrangement) {
+        ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_SOUND_ARRANGEMENT, soundArrangement) {
+            @Override
+            public void performNode(Node node, int index, Object obj) {
+                readSoundArrangementSound(node, (SoundArrangement) obj);
+            }
+        });
+    }
+
+    /**
+     * Reads one sound for the specified sound arrangement.
+     *
+     * @param node             The sound node.
+     * @param soundArrangement The sound arrangement to which the sound belongs.
+     */
+    protected static void readSoundArrangementSound(Node node, SoundArrangement soundArrangement) {
+        String type = HGBaseXMLTools.getAttributeValue(node, CONFIG_TYPE);
+        String value = HGBaseXMLTools.getAttributeValue(node, CONFIG_VALUE);
+        if ((!HGBaseTools.hasContent(type)) || (!HGBaseTools.hasContent(value))) {
+            return;
+        }
+        String nodeName = node.getNodeName();
+        if (CONFIG_SOUND.equals(nodeName)) {
+            soundArrangement.setSound(type, value);
+        } else if (CONFIG_SOUNDSET.equals(nodeName)) {
+            soundArrangement.setSoundSet(type, value);
+        }
     }
 
     /**
@@ -709,7 +885,7 @@ class GameConfigFileReader {
      * @param node The node to check.
      * @return {@code true} if the specified node is only available in the pro version but is shown in the free version as teaser for the pro version.
      */
-    private static boolean isProTeaser(Node node) {
+    protected static boolean isProTeaser(Node node) {
         return HGBaseXMLTools.getAttributeBooleanValue(node, CONFIG_TEASER);
     }
 
@@ -720,7 +896,7 @@ class GameConfigFileReader {
      * @param type The part or part set type.
      * @return A list.
      */
-    static <T extends Part> List<T> getListFromMap(Map<String, List<T>> map, String type) {
+    static <T extends GameElement> List<T> getListFromMap(Map<String, List<T>> map, String type) {
         List<T> list = map.get(type);
         if (list != null) {
             return list;
@@ -774,7 +950,7 @@ class GameConfigFileReader {
         }
         String image = HGBaseXMLTools.getAttributeValue(node, CONFIG_IMAGE);
         if (!HGBaseTools.hasContent(image)) {
-            image = calculateImage(CONFIG_PART, name, config);
+            image = calculateElementFilename(CONFIG_PART, name, config);
         }
         Bitmap imgPart = HGBaseGuiTools.loadImage(image);
         boolean hidden = isHiddenPart(node, config);
@@ -802,8 +978,8 @@ class GameConfigFileReader {
      * @param config The game configuration object.
      */
     protected static void readParts(Node node, final GameConfig config) {
-        fillImageInformation(CONFIG_PART, node, config);
-        fillImageInformation(CONFIG_PARTSET, node, config);
+        fillElementInformation(CONFIG_PART, node, config);
+        fillElementInformation(CONFIG_PARTSET, node, config);
         final Map<String, ImageEffect> topLevelEffects = readEffectsFromNode(node);
         config.helpHidden = isHiddenEntry(node);
         // look for classes that shall extend Part, PartSet or ColorValuePart
@@ -823,9 +999,8 @@ class GameConfigFileReader {
         });
         // look for part sets
         new PartSetConstructor<>(CONFIG_PARTS, CONFIG_PARTSET, CONFIG_PART, config.partSetMap) {
-
             @Override
-            protected PartSet createPartSet(String type, String name, Node node, boolean hidden) {
+            protected PartSet createPartSet(String type, String name, boolean hidden, Node node) {
                 String setClass = config.extendPartSetMap.get(type);
                 PartSet newPartSet = null;
                 if (setClass != null) {
@@ -889,24 +1064,23 @@ class GameConfigFileReader {
      */
     protected static void readPieceSets(Node node, GameConfig config) {
         setOrderBy(config, ConstantValue.CONFIG_PIECESET, node);
-        fillImageInformation(CONFIG_PIECE, node, config);
+        fillElementInformation(CONFIG_PIECE, node, config);
         final Map<String, ImageEffect> topLevelEffects = readEffectsFromNode(node);
         config.helpHidden = isHiddenEntry(node);
         new PartSetConstructor<>(CONFIG_PIECES, CONFIG_PIECESET, CONFIG_PIECE, pieceSetList) {
             @Override
-            protected PieceSet createPartSet(String type, String name, Node node, boolean hidden) {
+            protected PieceSet createPartSet(String type, String name, boolean hidden, Node node) {
                 PieceSet pieceSetPart = new PieceSet(name, hidden, isProTeaser(node));
                 setEffectsForPart(pieceSetPart, node, topLevelEffects);
                 return pieceSetPart;
             }
 
             @Override
-            protected ColorValuePart createColorValuePart(PartSet set, String color, int sequence, int value, Bitmap image, Node node) {
-                Piece piecePart = new Piece((PieceSet) set, color, sequence, value, image, isProTeaser(node));
+            protected ColorValuePart createColorValuePart(PieceSet set, String color, int sequence, int value, Bitmap image, Node node) {
+                Piece piecePart = new Piece(set, color, sequence, value, image, isProTeaser(node));
                 setEffectsForPart(piecePart, node, set);
                 return piecePart;
             }
-
         }.run(node, config);
     }
 
@@ -934,25 +1108,23 @@ class GameConfigFileReader {
      */
     protected static void readCardSets(Node node, GameConfig config) {
         setOrderBy(config, ConstantValue.CONFIG_CARDSET, node);
-        fillImageInformation(CONFIG_CARD, node, config);
+        fillElementInformation(CONFIG_CARD, node, config);
         final Map<String, ImageEffect> topLevelEffects = readEffectsFromNode(node);
         config.helpHidden = isHiddenEntry(node);
         new PartSetConstructor<>(CONFIG_CARDS, CONFIG_CARDSET, CONFIG_CARD, config.cardSetsMap) {
             @Override
-            protected CardSet createPartSet(String type, String name, Node node, boolean hidden) {
-                String validType = (type == null || type.isEmpty()) ? ConstantValue.CONFIG_CARDSET : type;
-                CardSet cardSetPart = new CardSet(validType, name, hidden, isProTeaser(node));
+            protected CardSet createPartSet(String type, String name, boolean hidden, Node node) {
+                CardSet cardSetPart = new CardSet(type, name, hidden, isProTeaser(node));
                 setEffectsForPart(cardSetPart, node, topLevelEffects);
                 return cardSetPart;
             }
 
             @Override
-            protected ColorValuePart createColorValuePart(PartSet set, String color, int sequence, int value, Bitmap image, Node node) {
-                Card cardPart = new Card((CardSet) set, color, sequence, value, image, isProTeaser(node));
+            protected ColorValuePart createColorValuePart(CardSet set, String color, int sequence, int value, Bitmap image, Node node) {
+                Card cardPart = new Card(set, color, sequence, value, image, isProTeaser(node));
                 setEffectsForPart(cardPart, node, set);
                 return cardPart;
             }
-
         }.run(node, config);
 
         // check for all type of card sets if an order by was defined,
@@ -984,7 +1156,7 @@ class GameConfigFileReader {
      * @param config The game configuration object.
      */
     protected static void readCovers(Node node, GameConfig config) {
-        fillImageInformation(CONFIG_COVER, node, config);
+        fillElementInformation(CONFIG_COVER, node, config);
         final Map<String, ImageEffect> topLevelEffects = readEffectsFromNode(node);
         config.helpHidden = isHiddenEntry(node);
         ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_COVERS, config) {
@@ -996,7 +1168,7 @@ class GameConfigFileReader {
                     String name = HGBaseXMLTools.getAttributeValue(node, CONFIG_NAME);
                     String image = HGBaseXMLTools.getAttributeValue(node, CONFIG_IMAGE);
                     if (!HGBaseTools.hasContent(image)) {
-                        image = calculateImage(CONFIG_COVER, name, config);
+                        image = calculateElementFilename(CONFIG_COVER, name, config);
                     }
                     Bitmap imgCover = HGBaseGuiTools.loadImage(image);
                     boolean hidden = isHiddenPart(node, config);
@@ -1024,7 +1196,7 @@ class GameConfigFileReader {
             String name = HGBaseXMLTools.getAttributeValue(node, CONFIG_NAME);
             String image = HGBaseXMLTools.getAttributeValue(node, CONFIG_IMAGE);
             if (!HGBaseTools.hasContent(image)) {
-                image = calculateImage(CONFIG_BOARD, name, config);
+                image = calculateElementFilename(CONFIG_BOARD, name, config);
             }
             Bitmap imgBoard = HGBaseGuiTools.loadImage(image);
             int xPos = HGBaseTools.toInt(HGBaseXMLTools.getAttributeValue(node, CONFIG_XPOS));
@@ -1055,7 +1227,7 @@ class GameConfigFileReader {
      * @param config The game configuration object.
      */
     protected static void readBoards(Node node, GameConfig config) {
-        fillImageInformation(CONFIG_BOARD, node, config);
+        fillElementInformation(CONFIG_BOARD, node, config);
         final Map<String, ImageEffect> topLevelEffects = readEffectsFromNode(node);
         config.helpHidden = isHiddenEntry(node);
         ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_BOARDS, config) {
@@ -1080,7 +1252,7 @@ class GameConfigFileReader {
             String image = HGBaseXMLTools.getAttributeValue(node, CONFIG_IMAGE);
             boolean hidden = isHiddenPart(node, config);
             if (!HGBaseTools.hasContent(image)) {
-                image = calculateImage(CONFIG_BACKGROUND, name, config);
+                image = calculateElementFilename(CONFIG_BACKGROUND, name, config);
             }
             Bitmap imgBack = HGBaseGuiTools.loadImage(image);
             if (imgBack != null) {
@@ -1106,7 +1278,7 @@ class GameConfigFileReader {
      * @param config The game configuration object.
      */
     protected static void readBackgrounds(Node node, GameConfig config) {
-        fillImageInformation(CONFIG_BACKGROUND, node, config);
+        fillElementInformation(CONFIG_BACKGROUND, node, config);
         final Map<String, ImageEffect> topLevelEffects = readEffectsFromNode(node);
         config.helpHidden = isHiddenEntry(node);
         // read the background color from the root (either color or backcolor attribute)
@@ -1130,13 +1302,15 @@ class GameConfigFileReader {
     }
 
     /**
-     * @param pieceType The name of the piece type.
-     * @param name      Name of the piece.
-     * @param config    The GameConfig object.
-     * @return The standard file name.
+     * Returns the standard filename for the specified game element type.
+     *
+     * @param elementType The name of the game element type.
+     * @param name        The name of the game element.
+     * @param config      The GameConfig object.
+     * @return The standard filename for the specified game element type.
      */
-    protected static String calculateImage(String pieceType, String name, GameConfig config) {
-        return config.getImagePath(pieceType) + "/" + name + "." + config.getImageExtension(pieceType);
+    protected static String calculateElementFilename(String elementType, String name, GameConfig config) {
+        return config.getElementPath(elementType) + "/" + name + "." + config.getElementExtension(elementType);
     }
 
     /**
@@ -1190,7 +1364,7 @@ class GameConfigFileReader {
      * @param config The game configuration object.
      */
     protected static void readPlayers(Node node, GameConfig config) {
-        fillImageInformation(CONFIG_PLAYER, node, config);
+        fillElementInformation(CONFIG_PLAYER, node, config);
         config.playerPieceColor = HGBaseXMLTools.getAttributeValue(node, CONFIG_PIECECOLOR);
         PlayerFactory.getInstance().setDefaultComputerType(HGBaseXMLTools.getAttributeValue(node, CONFIG_DEFAULTCOMPUTER));
         ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_PLAYERS, config) {
@@ -1203,7 +1377,7 @@ class GameConfigFileReader {
                     String classPath = HGBaseXMLTools.getAttributeValue(node, CONFIG_CLASS);
                     String image = HGBaseXMLTools.getAttributeValue(node, CONFIG_IMAGE);
                     if (!HGBaseTools.hasContent(image)) {
-                        image = calculateImage(CONFIG_PLAYER, playerType, config);
+                        image = calculateElementFilename(CONFIG_PLAYER, playerType, config);
                     }
                     Bitmap typeImage = HGBaseGuiTools.loadImage(image);
                     if ((PlayerFactory.getInstance().addPlayerType(playerType, classPath, typeImage, isProTeaser(node))) && (typeImage == null)) {
@@ -1622,6 +1796,8 @@ class GameConfigFileReader {
         config.extendPartSetMap = new HashMap<>();
         config.extendCvpMap = new HashMap<>();
         config.setOrderBy = new IntBooleanStringMap();
+        config.soundMap = new LinkedHashMap<>();
+        config.soundSetMap = new LinkedHashMap<>();
         config.localGameStateTurn = false;
         config.localGameStateRound = false;
         config.localGameStateGame = false;

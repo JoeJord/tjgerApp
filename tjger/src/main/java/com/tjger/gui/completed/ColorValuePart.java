@@ -88,14 +88,14 @@ public class ColorValuePart extends Part {
     }
 
     @Override
-    public int compareTo(Part p2) {
+    public int compareTo(GameElement p2) {
         if (p2 instanceof ColorValuePart) {
             ColorValuePart c2 = (ColorValuePart) p2;
             // look for the way of ordering
             // Use the part sorter if there is one.
             PartSorter sorter = GameManager.getInstance().getPartSorter(getType());
             if (sorter != null) {
-                return sorter.compareParts(this, p2);
+                return sorter.compareParts(this, c2);
             }
             int orderMode = GameManager.getInstance().getGameConfig().getOrderby(getPartSet().getType());
             if (orderMode == GameConfig.ORDERBY_NONE) {

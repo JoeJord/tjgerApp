@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import com.tjger.game.GamePlayer;
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.GameEngine;
@@ -21,12 +23,14 @@ import com.tjger.gui.actions.ShowGameHintsDlgAction;
 import com.tjger.gui.actions.ShowGameInfoDlgAction;
 import com.tjger.gui.actions.ShowGameInstructionsDlgAction;
 import com.tjger.gui.actions.ShowPartsDlgAction;
+import com.tjger.gui.actions.ShowSoundSettingsDlgAction;
 import com.tjger.gui.actions.ShowTjgerDlgAction;
 import com.tjger.gui.actions.SoundConfigurationAction;
 import com.tjger.gui.actions.TjgerGameCloseAction;
 import com.tjger.gui.actions.TjgerGameNewAction;
 import com.tjger.gui.actions.TjgerGameResumeAction;
 import com.tjger.gui.actions.TjgerGameSettingsAction;
+import com.tjger.gui.completed.Sound;
 import com.tjger.gui.internal.GameDialogFactory;
 import com.tjger.gui.internal.TjgerWelcome;
 import com.tjger.lib.ConstantValue;
@@ -39,7 +43,6 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import androidx.drawerlayout.widget.DrawerLayout;
 import at.hagru.hgbase.HGBaseWelcomeActivity;
 import at.hagru.hgbase.android.HGBaseAdvertisements;
 import at.hagru.hgbase.android.HGBaseResources;
@@ -143,7 +146,8 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
         registerAction(MainMenu.MENU_ID_HELP_INSTRUCTIONS, new ShowGameInstructionsDlgAction(this));
         registerAction(MainMenu.MENU_ID_HELP_GAMEHINTS, new ShowGameHintsDlgAction(this));
         registerAction(MainMenu.MENU_ID_SETTINGS_PARTS, new ShowPartsDlgAction(this));
-        registerAction(MainMenu.MENU_ID_SETTINGS_SOUND, new SoundConfigurationAction(this));
+        registerAction(MainMenu.MENU_ID_SETTINGS_SOUNDS, new ShowSoundSettingsDlgAction(this));
+        registerAction(MainMenu.MENU_ID_SETTINGS_PLAYSOUND, new SoundConfigurationAction(this));
         registerAction(MainMenu.MENU_ID_CREDITS, new ShowCreditsDlgAction(this));
     }
 
@@ -279,7 +283,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * @return the id of the sound settings
      */
     int getSoundSettingsMenuId() {
-        return HGBaseResources.getResourceIdByName(MainMenu.MENU_ID_SETTINGS_SOUND, HGBaseResources.ID);
+        return HGBaseResources.getResourceIdByName(MainMenu.MENU_ID_SETTINGS_PLAYSOUND, HGBaseResources.ID);
     }
 
     /**
@@ -579,6 +583,18 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
         if (HGBaseConfig.getBoolean(ConstantValue.CONFIG_PLAYSOUND, true)) {
             HGBaseSound.playAudio(sound);
         }
+    }
+
+    /**
+     * Plays the specified sound if the configuration is set.
+     *
+     * @param sound The sound to play.
+     */
+    public void playAudio(Sound sound) {
+        if (sound == null) {
+            return;
+        }
+        playAudio(sound.getFilename());
     }
 
     /**

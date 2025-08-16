@@ -64,7 +64,11 @@ public class MainMenu extends Fragment {
     public static final String MENU_ID_HELP_INSTRUCTIONS = "help_instructions";
     public static final String MENU_ID_HELP_GAMEHINTS = "help_gamehints";
     public static final String MENU_ID_SETTINGS_PARTS = "settings_parts";
-    public static final String MENU_ID_SETTINGS_SOUND = "settings_playsound";
+    /**
+     * The menu id for the sound settings dialog.
+     */
+    public static final String MENU_ID_SETTINGS_SOUNDS = "settings_sounds";
+    public static final String MENU_ID_SETTINGS_PLAYSOUND = "settings_playsound";
     /**
      * The menu id for the show credits dialog action.
      */
@@ -259,7 +263,7 @@ public class MainMenu extends Fragment {
      * @return the new created button
      */
     protected Button createSoundMenuIcon(final int soundMenuId) {
-        int imageId = HGBaseConfig.getBoolean(MainMenu.MENU_ID_SETTINGS_SOUND) ? R.drawable.sound_on : R.drawable.sound_off;
+        int imageId = HGBaseConfig.getBoolean(MainMenu.MENU_ID_SETTINGS_PLAYSOUND) ? R.drawable.sound_on : R.drawable.sound_off;
         return createMenuIcon(imageId, 1, view -> getMainFrame().getOptionsMenuAction(soundMenuId).perform(soundMenuId, null));
     }
 
@@ -314,11 +318,24 @@ public class MainMenu extends Fragment {
         setEnabledNewGame(getMainFrame().isNewGameAllowed());
         addButton(layout, MENU_ID_NEW_GAME_DLG);
         addButton(layout, MENU_ID_SETTINGS_PARTS);
+        if (showSoundSettingsDlgButton(config)) {
+            addButton(layout, MENU_ID_SETTINGS_SOUNDS);
+        }
         if (config.isRememberGames() || config.isRememberScores() || config.getHighScoreLength() > 0) {
             addButton(layout, MENU_ID_GAMEINFO);
         }
         layout.setBackgroundColor(Color.TRANSPARENT);
         return layout;
+    }
+
+    /**
+     * Returns {@code true} if the button for sound settings dialog should be shown.
+     *
+     * @param config The configuration object.
+     * @return {@code true} if the button for sound settings dialog should be shown.
+     */
+    protected boolean showSoundSettingsDlgButton(GameConfig config) {
+        return (config.getSoundTypes().length > 0) || (config.getSoundSetTypes().length > 0);
     }
 
     /**

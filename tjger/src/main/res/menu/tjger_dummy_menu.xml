@@ -8,6 +8,7 @@
     <item android:id="@+id/game_close" android:title="@string/game_close"/>
     <item android:id="@+id/dlg_new_game" android:title="@string/dlg_new_game"/>
     <item android:id="@+id/action_gameinfo" android:title="@string/action_gameinfo"/>
-    <item android:id="@+id/settings_parts" android:title="@string/settings_parts"></item>
+    <item android:id="@+id/settings_parts" android:title="@string/settings_parts"/>
+    <item android:id="@+id/settings_sounds" android:title="@string/settings_sounds"/>
     
 </menu>

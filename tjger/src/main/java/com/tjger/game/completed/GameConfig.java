@@ -9,19 +9,26 @@ import com.tjger.gui.completed.BackgroundColor;
 import com.tjger.gui.completed.Board;
 import com.tjger.gui.completed.CardSet;
 import com.tjger.gui.completed.Cover;
+import com.tjger.gui.completed.GameElement;
 import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.PartSet;
 import com.tjger.gui.completed.PieceSet;
+import com.tjger.gui.completed.Sound;
+import com.tjger.gui.completed.SoundArrangement;
+import com.tjger.gui.completed.SoundSet;
 import com.tjger.gui.completed.configurablelayout.layoutelement.AreaLayout;
 import com.tjger.gui.completed.configurablelayout.layoutelement.LayoutElement;
 import com.tjger.lib.ArrayUtil;
 import com.tjger.lib.ConstantValue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.android.awt.Insets;
@@ -77,6 +84,22 @@ public final class GameConfig {
     Map<String, String> extendPartSetMap; // for extending part and partset
     Map<String, String> extendCvpMap; // for extending color value part
     boolean completeArrangement;
+    /**
+     * The possible sound arrangements.
+     */
+    SoundArrangement[] soundArrangements;
+    /**
+     * Map for user defined sounds.
+     */
+    Map<String, List<Sound>> soundMap;
+    /**
+     * Map for user defined sound sets.
+     */
+    Map<String, List<SoundSet>> soundSetMap;
+    /**
+     * The flag if the sound arrangements are complete.
+     */
+    boolean completeSoundArrangement;
     int minZoom;
     int maxZoom;
     Map<String, String> extensionMap;
@@ -533,7 +556,7 @@ public final class GameConfig {
      * @return The arrangement or null.
      */
     public Arrangement getArrangement(String name) {
-        Part part = getPartByName(getArrangements(), name);
+        Part part = (Part) getGameElementByName(getArrangements(), name);
         if (part != null) {
             return (Arrangement) part;
         }
@@ -545,7 +568,7 @@ public final class GameConfig {
      * @return The background or null.
      */
     public Background getBackground(String name) {
-        Part part = getPartByName(getBackgrounds(), name);
+        Part part = (Part) getGameElementByName(getBackgrounds(), name);
         if (part != null) {
             return (Background) part;
         }
@@ -557,7 +580,7 @@ public final class GameConfig {
      * @return The board or null.
      */
     public Board getBoard(String name) {
-        Part part = getPartByName(getBoards(), name);
+        Part part = (Part) getGameElementByName(getBoards(), name);
         if (part != null) {
             return (Board) part;
         }
@@ -569,7 +592,7 @@ public final class GameConfig {
      * @return The cover or null.
      */
     public Cover getCover(String name) {
-        Part part = getPartByName(getCovers(), name);
+        Part part = (Part) getGameElementByName(getCovers(), name);
         if (part != null) {
             return (Cover) part;
         }
@@ -590,8 +613,7 @@ public final class GameConfig {
      * @return The card set or null.
      */
     public CardSet getCardSet(String type, String name) {
-        Part part = getPartByName(getCardSets(type), name);
-        return (CardSet) part;
+        return (CardSet) getGameElementByName(getCardSets(type), name);
     }
 
     /**
@@ -599,8 +621,7 @@ public final class GameConfig {
      * @return The piece set or null.
      */
     public PieceSet getPieceSet(String name) {
-        Part part = getPartByName(getPieceSets(), name);
-        return (PieceSet) part;
+        return (PieceSet) getGameElementByName(getPieceSets(), name);
     }
 
     /**
@@ -689,7 +710,7 @@ public final class GameConfig {
      * @return The part or null.
      */
     public Part getPart(String type, String name) {
-        return getPartByName(getParts(type), name);
+        return (Part) getGameElementByName(getParts(type), name);
     }
 
     /**
@@ -711,7 +732,7 @@ public final class GameConfig {
      * @return The part set or null.
      */
     public PartSet getPartSet(String type, String name) {
-        return (PartSet) getPartByName(getPartSets(type), name);
+        return (PartSet) getGameElementByName(getPartSets(type), name);
     }
 
     /**
@@ -907,21 +928,6 @@ public final class GameConfig {
     }
 
     /**
-     * @param parts An array with a sort of parts.
-     * @param name  Name of the active part.
-     * @return The active part or null.
-     */
-    private Part getPartByName(Part[] parts, String name) {
-        if (HGBaseTools.hasContent(name)) {
-            int index = getIndexOfPart(parts, name);
-            if (index >= 0 && parts.length > index) {
-                return parts[index];
-            }
-        }
-        return null;
-    }
-
-    /**
      * Returns the first available part from the specified parts.<br>
      * Hidden parts will be skipped.<br>
      * If the game is not the pro version, then teaser parts will also be skipped.
@@ -949,7 +955,7 @@ public final class GameConfig {
      */
     private String getActivePartName(Part[] parts, String configKey) {
         String name = HGBaseConfig.get(configKey);
-        int index = getIndexOfPart(parts, name);
+        int index = getIndexOfGameElement(parts, name);
         if (index >= 0 && index < parts.length && !parts[index].isHidden()) {
             return parts[index].getName();
         }
@@ -957,29 +963,23 @@ public final class GameConfig {
     }
 
     /**
-     * @param parts Array with parts (Background, Board, CardSet).
-     * @param name  Name of the part that is searched.
-     * @return index of the item or -1 if it was not found.
+     * Returns the path for the specified element type.
+     *
+     * @param elementType The type of the game element.
+     * @return The path for the specified element type.
      */
-    private int getIndexOfPart(Part[] parts, String name) {
-        String[] itemNames = ArrayUtil.toPartNames(parts);
-        return HGBaseTools.getIndexOf(itemNames, name);
+    public String getElementExtension(String elementType) {
+        return extensionMap.getOrDefault(elementType, EMPTY_STRING);
     }
 
     /**
-     * @param pieceType A piece type
-     * @return The extension for this piece type.
+     * Returns the path for the specified element type.
+     *
+     * @param elementType The type of the game element.
+     * @return The path for the specified element type.
      */
-    public String getImageExtension(String pieceType) {
-        return extensionMap.getOrDefault(pieceType, EMPTY_STRING);
-    }
-
-    /**
-     * @param pieceType A piece type
-     * @return The image path for this piece type.
-     */
-    public String getImagePath(String pieceType) {
-        return pathMap.getOrDefault(pieceType, EMPTY_STRING);
+    public String getElementPath(String elementType) {
+        return pathMap.getOrDefault(elementType, EMPTY_STRING);
     }
 
     /**
@@ -994,6 +994,233 @@ public final class GameConfig {
      */
     public boolean isCompleteArrangement() {
         return this.completeArrangement;
+    }
+
+    /**
+     * Returns all possible sound arrangements.
+     *
+     * @return All possible sound arrangements.
+     */
+    public SoundArrangement[] getSoundArrangements() {
+        return HGBaseTools.clone(soundArrangements);
+    }
+
+    /**
+     * Returns the active sound arrangement or {@code null}.
+     *
+     * @return The active sound arrangement or {@code null}.
+     */
+    public SoundArrangement getActiveSoundArrangement() {
+        String name = getActivePartName(arrangements, ConstantValue.CONFIG_SOUND_ARRANGEMENT);
+        if ((HGBaseConfig.existsKey(ConstantValue.CONFIG_SOUND_ARRANGEMENT))
+                && (!name.equals(HGBaseConfig.get(ConstantValue.CONFIG_SOUND_ARRANGEMENT)))) {
+            return null;
+        }
+        return getSoundArrangement(name);
+    }
+
+    /**
+     * Returns a list of sounds for the specified type.
+     *
+     * @param map  The map to look for a list.
+     * @param type The sound type.
+     * @return A list, can be empty.
+     */
+    private List<Sound> getSoundsFromMap(Map<String, List<Sound>> map, String type) {
+        List<Sound> list = map.get(type);
+        return (list != null) ? list : new ArrayList<>();
+    }
+
+    /**
+     * Returns the name of the active sound configuration or an empty string.
+     *
+     * @param sounds    An array with a sort of sounds.
+     * @param configKey Name of the sound configuration.
+     * @return The name of the active sound configuration or an empty string.
+     */
+    private String getActiveSoundName(Sound[] sounds, String configKey) {
+        String name = HGBaseConfig.get(configKey);
+        int index = getIndexOfGameElement(sounds, name);
+        if (index >= 0 && index < sounds.length && !sounds[index].isHidden()) {
+            return sounds[index].getName();
+        }
+        // If the sound has not been found, then return the first not hidden sound.
+        return Stream.of(sounds).filter(sound -> !sound.isHidden()).map(Sound::getName).findFirst()
+                .orElse(EMPTY_STRING);
+    }
+
+    /**
+     * Returns all sounds from the specified type.<br>
+     * Only user defined sounds are returned.
+     *
+     * @param type The user defined sound type.
+     * @return An array with sounds.
+     */
+    public Sound[] getSounds(String type) {
+        return getSoundsFromMap(soundMap, type).toArray(new Sound[0]);
+    }
+
+    /**
+     * Returns the types of all user defined sounds.
+     *
+     * @return All user defined sound types that aren't hidden.
+     */
+    public String[] getSoundTypes() {
+        return soundMap.keySet().toArray(new String[0]);
+    }
+
+    /**
+     * Returns the sound arrangement with the specified name or {@code null}.
+     *
+     * @param name The name of the sound arrangement to get.
+     * @return The sound arrangement with the specified name or {@code null}.
+     */
+    public SoundArrangement getSoundArrangement(String name) {
+        return (SoundArrangement) getGameElementByName(getSoundArrangements(), name);
+    }
+
+    /**
+     * Returns a user defined sound from the specified type with the specified name.
+     *
+     * @param type The user defined sound type.
+     * @param name The name of the sound.
+     * @return The sound or {@code null}.
+     */
+    public Sound getSound(String type, String name) {
+        return (Sound) getGameElementByName(getSounds(type), name);
+    }
+
+    /**
+     * Returns the active sound from the specified user defined type.<br>
+     * An active sound must not be hidden.
+     *
+     * @param type The user defined sound type.
+     * @return The active sound or {@code null}.
+     */
+    public Sound getActiveSound(String type) {
+        String name = getActiveSoundName(getSounds(type), type);
+        return getSound(type, name);
+    }
+
+    /**
+     * Returns a list of sound sets for the specified type.
+     *
+     * @param map  The map to look for a list.
+     * @param type The sound set type.
+     * @return A list, can be empty.
+     */
+    private List<SoundSet> getSoundSetsFromMap(Map<String, List<SoundSet>> map, String type) {
+        List<SoundSet> list = map.get(type);
+        return (list != null) ? list : new ArrayList<>();
+    }
+
+    /**
+     * Returns the index of the sound set with the specified name.
+     *
+     * @param soundSets An array with sound sets.
+     * @param name      The name of the sound set that is searched.
+     * @return The index of the item or -1 if it was not found.
+     */
+    private int getIndexOfSoundSet(SoundSet[] soundSets, String name) {
+        String[] itemNames = ArrayUtil.toSoundSetNames(soundSets);
+        return HGBaseTools.getIndexOf(itemNames, name);
+    }
+
+    /**
+     * Returns the name of the active sound set configuration or an empty string.
+     *
+     * @param soundSets An array with a sort of sound sets.
+     * @param configKey Name of the sound set configuration.
+     * @return The name of the active sound set configuration or an empty string.
+     */
+    private String getActiveSoundSetName(SoundSet[] soundSets, String configKey) {
+        String name = HGBaseConfig.get(configKey);
+        int index = getIndexOfSoundSet(soundSets, name);
+        if (index >= 0 && index < soundSets.length && !soundSets[index].isHidden()) {
+            return soundSets[index].getName();
+        }
+        // If the sound set has not been found, then return the first not hidden sound set.
+        return Stream.of(soundSets).filter(soundSet -> !soundSet.isHidden()).map(SoundSet::getName)
+                .findFirst().orElse(EMPTY_STRING);
+    }
+
+    /**
+     * Returns all sound sets from the specified type.<br>
+     * Only user defined sound sets are returned.
+     *
+     * @param type The user defined sound set type.
+     * @return An array with sound sets.
+     */
+    public SoundSet[] getSoundSets(String type) {
+        return getSoundSetsFromMap(soundSetMap, type).toArray(new SoundSet[0]);
+    }
+
+    /**
+     * Returns type type of all user defined sound sets.
+     *
+     * @return All user defined sound set types that aren't hidden.
+     */
+    public String[] getSoundSetTypes() {
+        return soundSetMap.keySet().toArray(new String[0]);
+    }
+
+    /**
+     * Returns a user defined sound set from the specified type with the specified name.
+     *
+     * @param type The user defined sound set type.
+     * @param name The name of the sound set.
+     * @return The sound set or {@code null}.
+     */
+    public SoundSet getSoundSet(String type, String name) {
+        return (SoundSet) getGameElementByName(getSoundSets(type), name);
+    }
+
+    /**
+     * Return the index of the game element with the specified name in the specified array of elements.
+     *
+     * @param elements The list of game elements.
+     * @param name     The name of the game element to search.
+     * @return The index of the game element or -1 if it was not found.
+     */
+    private int getIndexOfGameElement(GameElement[] elements, String name) {
+        return IntStream.range(0, elements.length).filter(i -> elements[i].getName().equals(name)).findFirst()
+                .orElse(-1);
+    }
+
+    /**
+     * Returns the game element with the specified name in the specified array of elements.
+     *
+     * @param elements The list of game elements.
+     * @param name     The name of the game element to search.
+     * @return The game element with the specified name or {@code null} if it was not found.
+     */
+    private GameElement getGameElementByName(GameElement[] elements, String name) {
+        if (elements == null || name == null) {
+            return null;
+        }
+        return Arrays.stream(elements).filter(element -> element != null && name.equals(element.getName()))
+                .findFirst().orElse(null);
+    }
+
+    /**
+     * Returns the active sound set from the specified user defined type.<br>
+     * An active sound set must not be hidden.
+     *
+     * @param type The user defined sound set type.
+     * @return The active sound set or {@code null}.
+     */
+    public SoundSet getActiveSoundSet(String type) {
+        String name = getActiveSoundSetName(getSoundSets(type), type);
+        return getSoundSet(type, name);
+    }
+
+    /**
+     * Returns {@code true} if the sound arrangements are complete or {@code false} if the user may alter the sound arrangements.
+     *
+     * @return {@code true} if the sound arrangements are complete or {@code false} if the user may alter the sound arrangements.
+     */
+    public boolean isCompleteSoundArrangement() {
+        return this.completeSoundArrangement;
     }
 
     /**

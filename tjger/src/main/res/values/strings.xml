@@ -35,6 +35,7 @@
     <string name="help_instructions">Game instructions</string>    
     <string name="help_instructionsurl">gameinstructions.html</string>
     <string name="settings_parts">Game Look</string>
+    <string name="settings_sounds">Sounds</string>
     <string name="category_sound_graphics">Sound and Graphics</string>
     <string name="settings_playsound">Play sound</string>
     <string name="settings_drawshadows">Draw shadows</string>
@@ -53,6 +54,8 @@
     <string name="gamespeed_slow">Slow</string>
     <string name="gamespeed_normal">Normal</string>
     <string name="gamespeed_fast">Fast</string>
+    <string name="button_close">Close</string>
+    <string name="sound_name_with_sequence">%1$s %2$s</string>
 
     <string name="game_cardset">Cards set</string>
     <string name="game_cover">Cover</string>
@@ -61,6 +64,7 @@
     <string name="game_backcolor">Background color</string>
     <string name="game_background">Background</string>
     <string name="game_arrangement">Arrangement</string>
+    <string name="game_soundarrangement">Arrangement</string>
     <string name="arrangement_userdefined">&#8230;</string>
             
     <string name="status_roundfinished">Round finished</string>        

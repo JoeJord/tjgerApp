@@ -52,6 +52,10 @@ public class ConstantValue {
     public static final String CONFIG_PLAYSOUND = "settings_playsound";
     public static final String CONFIG_DRAW_SHADOWS = "settings_drawshadows";
     public static final String CONFIG_DRAW_REFLECTIONS = "settings_drawreflections";
+    /**
+     * The configuration key for the sound arrangement.
+     */
+    public static final String CONFIG_SOUND_ARRANGEMENT = "game_soundarrangement";
 
     // stadard classes that can be redefined
     public static final String STANDARD_NEWGAMEDIALOG = "com.tjger.gui.NewGameDialog";

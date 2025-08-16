@@ -3,9 +3,11 @@ package com.tjger.gui.completed;
 import com.tjger.game.completed.GameConfig;
 import com.tjger.lib.ConstantValue;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.lib.HGBaseTools;
@@ -170,5 +172,24 @@ public class Arrangement extends Part {
      */
     public Color getColor(String colorType) {
         return mapColors.get(colorType);
+    }
+
+    /**
+     * Returns all type that are included in this arrangement.
+     *
+     * @return All type that are included in this arrangement.
+     */
+    public Set<String> getTypes() {
+        Set<String> types = new HashSet<>();
+        types.add(ConstantValue.CONFIG_BACKCOLOR);
+        types.add(ConstantValue.CONFIG_BACKGROUND);
+        types.add(ConstantValue.CONFIG_BOARD);
+        types.add(ConstantValue.CONFIG_PIECESET);
+        types.add(ConstantValue.CONFIG_COVER);
+        types.addAll(mapCardSets.keySet());
+        types.addAll(mapParts.keySet());
+        types.addAll(mapPartSets.keySet());
+        types.addAll(mapColors.keySet());
+        return types;
     }
 }

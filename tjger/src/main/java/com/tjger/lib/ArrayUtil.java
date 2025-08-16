@@ -5,10 +5,12 @@ import com.tjger.game.completed.PlayerType;
 import com.tjger.gui.completed.Card;
 import com.tjger.gui.completed.Part;
 import com.tjger.gui.completed.Piece;
+import com.tjger.gui.completed.SoundSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import at.hagru.hgbase.lib.HGBaseTools;
 
@@ -47,7 +49,7 @@ public class ArrayUtil {
 
     /**
      * Transforms an array with player types to a string array with the ids of the type.
-     * Does not use the toString()-method, because this is language dependend.
+     * Does not use the toString()-method, because this is language dependent.
      *
      * @param list array with parts.
      * @return string array.
@@ -90,6 +92,16 @@ public class ArrayUtil {
             strLines[i] = list[i].getName();
         }
         return strLines;
+    }
+
+    /**
+     * Transforms an array with sound sets to a string array with the names.
+     *
+     * @param list The array with sound sets.
+     * @return The string array with the names.
+     */
+    public static String[] toSoundSetNames(SoundSet[] list) {
+        return Stream.of(list).map(SoundSet::getName).toArray(String[]::new);
     }
 
     /**

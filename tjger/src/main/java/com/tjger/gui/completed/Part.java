@@ -2,39 +2,22 @@ package com.tjger.gui.completed;
 
 import android.graphics.Bitmap;
 
-import androidx.annotation.NonNull;
-
 import com.tjger.game.completed.GameManager;
 import com.tjger.gui.PartSorter;
-
-import at.hagru.hgbase.lib.HGBaseItem;
-import at.hagru.hgbase.lib.HGBaseText;
 
 /**
  * A graphical game part, like a board or cards.
  *
  * @author hagru
  */
-public class Part implements HGBaseItem, Comparable<Part> {
-
-    private final String partType;
-    private final String name;
+public class Part extends GameElement {
     private final Bitmap image;
-    private final boolean hidden;
-    /**
-     * Flag if this part is only available in the pro version but should be shown in the free version as teaser for the pro version.
-     */
-    private final boolean proTeaser;
     private ImageShadow shadow;
     private ImageReflection reflection;
 
     public Part(String partType, String name, Bitmap image, boolean hidden, boolean proTeaser) {
-        super();
-        this.partType = partType;
-        this.name = name;
+        super(partType, name, hidden, proTeaser);
         this.image = image;
-        this.hidden = hidden;
-        this.proTeaser = proTeaser;
     }
 
     /**
@@ -42,23 +25,6 @@ public class Part implements HGBaseItem, Comparable<Part> {
      */
     public Bitmap getImage() {
         return image;
-    }
-
-    /**
-     * @return The name of this game part.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * If the part is hidden, it will not be displayed in the settings dialog
-     * and can not be an active part.
-     *
-     * @return True if this part is hidden.
-     */
-    public boolean isHidden() {
-        return hidden;
     }
 
     /**
@@ -100,24 +66,16 @@ public class Part implements HGBaseItem, Comparable<Part> {
     }
 
     @Override
-    public String getId() {
-        return getName();
-    }
-
-    @NonNull
-    @Override
-    public String toString() {
-        return HGBaseText.getText(getName());
-    }
-
-    @Override
-    public int compareTo(Part p2) {
+    public int compareTo(GameElement p2) {
         if (p2 == null) {
             return 1;
         }
+        if (!(p2 instanceof Part)) {
+            return super.compareTo(p2);
+        }
         PartSorter sorter = GameManager.getInstance().getPartSorter(getType());
         if (sorter != null) {
-            return sorter.compareParts(this, p2);
+            return sorter.compareParts(this, (Part) p2);
         } else {
             return getName().compareToIgnoreCase(p2.getName());
         }
@@ -128,24 +86,8 @@ public class Part implements HGBaseItem, Comparable<Part> {
         return (o2 instanceof Part && this.toString().equals(o2.toString()));
     }
 
-    /**
-     * @return The type of this game part.
-     */
-    public String getType() {
-        return this.partType;
-    }
-
     @Override
     public int hashCode() {
-        return toString().hashCode();
-    }
-
-    /**
-     * Returns {@code true} if this part is only available in the pro version but should be shown in the free version as teaser for the pro version.
-     *
-     * @return {@code true} if this part is only available in the pro version but should be shown in the free version as teaser for the pro version.
-     */
-    public boolean isProTeaser() {
-        return proTeaser;
+        return super.hashCode();
     }
 }

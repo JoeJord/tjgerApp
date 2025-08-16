@@ -1,18 +1,16 @@
 package com.tjger.gui.internal;
 
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Handler;
-import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import com.tjger.MainFrame;
-import com.tjger.R;
+import androidx.annotation.Nullable;
+
 import com.tjger.game.completed.GameConfig;
 import com.tjger.gui.GameDialogs;
 import com.tjger.gui.completed.Arrangement;
@@ -21,149 +19,82 @@ import com.tjger.gui.completed.BackgroundColor;
 import com.tjger.gui.completed.Board;
 import com.tjger.gui.completed.CardSet;
 import com.tjger.gui.completed.Cover;
+import com.tjger.gui.completed.GameElement;
 import com.tjger.gui.completed.Part;
+import com.tjger.gui.completed.PartSet;
 import com.tjger.gui.completed.PieceSet;
 import com.tjger.lib.ConstantValue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import at.hagru.hgbase.android.awt.Color;
 import at.hagru.hgbase.gui.HGBaseGuiTools;
 import at.hagru.hgbase.gui.config.HGBaseColorPreference;
-import at.hagru.hgbase.gui.config.HGBaseConfigStateDialog;
 import at.hagru.hgbase.gui.config.HGBaseConfigTools;
-import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseText;
-import at.hagru.hgbase.lib.HGBaseTools;
-import at.hagru.hgbase.lib.internal.IntBooleanStringMap;
 
 /**
  * The dialog for choosing the game parts.
  *
  * @author hagru
  */
-public class PartsDlg extends HGBaseConfigStateDialog implements OnSharedPreferenceChangeListener {
-    private static final String ARRANGE_USERDEFINED_ID = "arrangement_userdefined";
-    private static final int INDEX_BACKCOLOR = 0; // the index in the configColorList
-    private static PreviewPanel pnPreview;
-    private final IntBooleanStringMap indexMapStandard;
-    private final IntBooleanStringMap indexMapUserDef;
-    private final String[] userParts;
-    private final String[] userPartSets;
+public class PartsDlg extends GameElementsDlg<Arrangement> {
+    /**
+     * The list of the card sets.
+     */
     private final String[] cardSetTypes;
+    /**
+     * The list of the user defined part sets.
+     */
+    private final String[] userPartSets;
+    /**
+     * The list of the user defined parts.
+     */
+    private final String[] userParts;
+    /**
+     * The list of the user defined colors.
+     */
     private final String[] colorTypes;
-    private PartsComboBox[] configComboList;
-    private HGBaseColorPreference[] configColorList;
-    private Color newBackColor;
-    private boolean backColorDefined;
-    private boolean completeArrangement;
-    private boolean onChangeArrangement;
+    /**
+     * The current background color.
+     */
+    private Color backgroundColor;
+    /**
+     * The preview panel
+     */
+    private PreviewPanel pnPreview;
 
+    /**
+     * Constructs a new instance.
+     */
     public PartsDlg() {
-        super(HGBaseText.getText("settings_parts").replace('.', ' '));
-        this.onChangeArrangement = false;
-        this.indexMapStandard = new IntBooleanStringMap();
-        this.indexMapUserDef = new IntBooleanStringMap();
-        // Get the types of the user defined parts
+        super(HGBaseText.getText("settings_parts").replace('.', ' '), ConstantValue.CONFIG_ARRANGEMENT);
         GameConfig config = GameConfig.getInstance();
         cardSetTypes = config.getCardSetTypes();
-        userParts = config.getPartTypes();
         userPartSets = config.getPartSetTypes();
+        userParts = config.getPartTypes();
         colorTypes = config.getColorTypes();
-        // add a listener to react on changes of the preference
-        HGBaseConfig.getPreferences().registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    protected boolean canLeave(Preference preference, String s) {
-        (new Handler()).post(this::setStateMessage); // The status message must be displayed with a slight delay, otherwise it cannot be determined correctly.
-        return true;
-    }
-
-    /**
-     * Sets the state message.
-     */
-    private void setStateMessage() {
-        Integer warningMsg = getWarningMessage();
-        if (warningMsg != null) {
-            setWarnMessage(HGBaseText.getText(warningMsg));
-        } else {
-            setWarnMessage("");
-        }
-    }
-
-    /**
-     * Returns the message that should be displayed as a warning.
-     *
-     * @return The message that should be displayed as a warning.
-     */
-    private Integer getWarningMessage() {
-        return getTeaserPartWarning();
-    }
-
-    /**
-     * Returns the warning message if a teaser part is selected or {@code null} if no warning is needed.
-     *
-     * @return The warning message if a teaser part is selected or {@code null} if no warning is needed.
-     */
-    private Integer getTeaserPartWarning() {
-        GameConfig gameConfig = GameConfig.getInstance();
-        return (!gameConfig.isProVersion() && gameConfig.isProTeaserPartSelected()) ? R.string.teaser_part_warning : null;
-    }
-
-    @Override
-    public void onBackPressed() {
-        MainFrame.getInstance().checkNewGame(); // Check if it is allowed to start a new game with the current selection.
-        super.onBackPressed();
     }
 
     @Override
     protected void createComponents() {
-        onChangeArrangement = true;
-        final GameConfig config = GameConfig.getInstance();
-        completeArrangement = (config.isCompleteArrangement() && config.getArrangements().length > 0);
-        List<PartsComboBox> cbList = new ArrayList<>();
-        ArrayList<HGBaseColorPreference> ccList = new ArrayList<>();
-        // get the standard combo boxes
-        addComboBox(ConstantValue.CONFIG_ARRANGEMENT, config.getArrangements(), config.getActiveArrangement(), cbList, true);
-        BackgroundColor backColor = config.getBackgroundColor();
-        if (backColor != null) {
-            backColorDefined = true;
-            newBackColor = backColor.getActiveColor();
-            addColorChooser(ConstantValue.CONFIG_BACKCOLOR, backColor.getDefaultColor(), backColor.getActiveColor(), ccList);
-        }
-        addComboBox(ConstantValue.CONFIG_BACKGROUND, config.getBackgrounds(), config.getActiveBackground(), cbList, true);
-        addComboBox(ConstantValue.CONFIG_BOARD, config.getBoards(), config.getActiveBoard(), cbList, true);
-        addComboBox(ConstantValue.CONFIG_COVER, config.getCovers(), config.getActiveCover(), cbList, true);
+        super.createComponents();
+        addPreviewPanel();
+    }
 
-        for (String cardType : cardSetTypes) {
-            addComboBox(cardType, config.getCardSets(cardType), config.getActiveCardSet(cardType), cbList, true);
-        }
-        addComboBox(ConstantValue.CONFIG_PIECESET, config.getPieceSets(), config.getActivePieceSet(), cbList, true);
-        // get the user defined combo boxes
-        for (String userPartSet : userPartSets) {
-            addComboBox(userPartSet, config.getPartSets(userPartSet), config.getActivePartSet(userPartSet), cbList, false);
-        }
-        for (String userPart : userParts) {
-            addComboBox(userPart, config.getParts(userPart), config.getActivePart(userPart), cbList, false);
-        }
-        // get the color choosers
-        for (String colorType : colorTypes) {
-            addColorChooser(colorType, config.getDefaultColor(colorType), config.getActiveColor(colorType), ccList);
-        }
-        // add the combo boxes and the color chooser to the panel
-        configComboList = cbList.toArray(new PartsComboBox[0]);
-        configColorList = ccList.toArray(new HGBaseColorPreference[0]);
-
-        onChangeArrangement = false;
-        changeArrangement();
-        // the preview panel
-        GameDialogs dlg = GameDialogFactory.getInstance().createGameDialogs(this);
+    /**
+     * Adds the preview panel to the dialog.
+     */
+    protected void addPreviewPanel() {
+        createPreviewPanel();
         int previewWidth = getPreviewWidth();
         int previewHeight = getPreviewHeight();
-        pnPreview = dlg.getPreviewPanel(this, previewWidth, previewHeight);
-        HGBaseGuiTools.setBlackBorder(pnPreview);
         LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent();
         if (root != null) {
             // use a trick to get the linear layout where the preferences are added
@@ -190,414 +121,533 @@ public class PartsDlg extends HGBaseConfigStateDialog implements OnSharedPrefere
         }
     }
 
+    @Override
+    public boolean isCompleteArrangement() {
+        GameConfig config = GameConfig.getInstance();
+        return (config.isCompleteArrangement() && config.getArrangements().length > 0);
+    }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (ConstantValue.CONFIG_ARRANGEMENT.equals(key)) {
-            changeArrangement();
-        } else {
-            testChangedArrangement(getSelectedArrangement());
-        }
-        if (ConstantValue.CONFIG_BACKCOLOR.equals(key)) {
-            newBackColor = HGBaseConfig.getColor(ConstantValue.CONFIG_BACKCOLOR);
-        }
-        if (pnPreview != null) {
-            pnPreview.invalidate();
-        }
+    protected List<ConfigItem> loadConfigItems() {
+        GameConfig config = GameConfig.getInstance();
+        List<ConfigItem> configItems = new ArrayList<>();
+        addArrangements(configItems, config);
+        addBackgroundColor(configItems, config);
+        addBackgrounds(configItems, config);
+        addBoards(configItems, config);
+        addCovers(configItems, config);
+        addCardSets(configItems, config);
+        addPieceSets(configItems, config);
+        addPartSets(configItems, config);
+        addParts(configItems, config);
+        addColorChoosers(configItems, config);
+        return configItems;
     }
 
     /**
-     * @return the width of the preview panel
+     * Adds a combobox for the arrangements.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
      */
-    private int getPreviewWidth() {
+    private void addArrangements(List<ConfigItem> configItems, GameConfig config) {
+        configItems.add(createGameElementComboBox(ConstantValue.CONFIG_ARRANGEMENT, config.getArrangements(), config.getActiveArrangement()));
+    }
+
+    /**
+     * Adds a color chooser for the background color.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addBackgroundColor(List<ConfigItem> configItems, GameConfig config) {
+        BackgroundColor bgColor = config.getBackgroundColor();
+        if (bgColor == null) {
+            return;
+        }
+        backgroundColor = bgColor.getActiveColor();
+        configItems.add(createColorChooser(ConstantValue.CONFIG_BACKCOLOR, bgColor.getDefaultColor(), backgroundColor));
+    }
+
+    /**
+     * Adds a combobox for the backgrounds.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addBackgrounds(List<ConfigItem> configItems, GameConfig config) {
+        configItems.add(createGameElementComboBox(ConstantValue.CONFIG_BACKGROUND, config.getBackgrounds(), config.getActiveBackground()));
+    }
+
+    /**
+     * Adds a combobox for the boards.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addBoards(List<ConfigItem> configItems, GameConfig config) {
+        configItems.add(createGameElementComboBox(ConstantValue.CONFIG_BOARD, config.getBoards(), config.getActiveBoard()));
+    }
+
+    /**
+     * Adds a combobox for the covers.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addCovers(List<ConfigItem> configItems, GameConfig config) {
+        configItems.add(createGameElementComboBox(ConstantValue.CONFIG_COVER, config.getCovers(), config.getActiveCover()));
+    }
+
+    /**
+     * Adds a combobox for the card sets.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addCardSets(List<ConfigItem> configItems, GameConfig config) {
+        Arrays.asList(cardSetTypes).forEach(cardSetType -> configItems.add(createGameElementComboBox(cardSetType, config.getCardSets(cardSetType), config.getActiveCardSet(cardSetType))));
+    }
+
+    /**
+     * Adds a combobox for the piece sets.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addPieceSets(List<ConfigItem> configItems, GameConfig config) {
+        configItems.add(createGameElementComboBox(ConstantValue.CONFIG_PIECESET, config.getPieceSets(), config.getActivePieceSet()));
+    }
+
+    /**
+     * Adds a combobox for the user defined part sets.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addPartSets(List<ConfigItem> configItems, GameConfig config) {
+        Arrays.asList(userPartSets).forEach(partSetType -> configItems.add(createGameElementComboBox(partSetType, config.getPartSets(partSetType), config.getActivePartSet(partSetType))));
+    }
+
+    /**
+     * Adds a combobox for the user defined parts.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addParts(List<ConfigItem> configItems, GameConfig config) {
+        Arrays.asList(userParts).forEach(partType -> configItems.add(createGameElementComboBox(partType, config.getParts(partType), config.getActivePart(partType))));
+    }
+
+    /**
+     * Adds a color chooser for the user defined color.
+     *
+     * @param configItems The list of the configuration items.
+     * @param config      The game configuration object.
+     */
+    private void addColorChoosers(List<ConfigItem> configItems, GameConfig config) {
+        Arrays.asList(colorTypes).forEach(colorType -> configItems.add(createColorChooser(colorType, config.getDefaultColor(colorType), config.getActiveColor(colorType))));
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, @Nullable String key) {
+        super.onSharedPreferenceChanged(sharedPreferences, key);
+
+        ConfigColorChooser colorChooser = getColorChooser(key);
+        if (colorChooser != null) {
+            if (ConstantValue.CONFIG_BACKCOLOR.equals(key)) {
+                onBackgroundColorChanged(colorChooser);
+            } else {
+                onColorChooserChanged(colorChooser);
+            }
+        }
+    }
+
+    @Override
+    protected void onArrangementChanged() {
+        super.onArrangementChanged();
+        refreshPreview();
+    }
+
+    @Override
+    protected void onGameElementComboBoxChanged(GameElementsDlg<Arrangement>.GameElementComboBox combobox) {
+        super.onGameElementComboBoxChanged(combobox);
+        refreshPreview();
+    }
+
+    /**
+     * Handles the change of the chosen background color.
+     *
+     * @param colorChooser The color chooser that was changed.
+     */
+    private void onBackgroundColorChanged(ConfigColorChooser colorChooser) {
+        backgroundColor = colorChooser.getColor();
+        onColorChooserChanged(colorChooser);
+    }
+
+    /**
+     * Handles the change of the chosen color.
+     *
+     * @param colorChooser The color chooser that was changed.
+     */
+    private void onColorChooserChanged(ConfigColorChooser colorChooser) {
+        if (isArrangementElement(colorChooser.getOption())) {
+            testArrangementModified();
+        }
+        refreshPreview();
+    }
+
+    /**
+     * Create a color chooser for the specified color type.
+     *
+     * @param colorType    The type of the color.
+     * @param defaultColor The default color.
+     * @param activeColor  The current active color of the type.
+     * @return The created color chooser.
+     */
+    private ConfigColorChooser createColorChooser(String colorType, Color defaultColor, Color activeColor) {
+        return new ConfigColorChooser(this, colorType, (activeColor != null) ? activeColor : defaultColor);
+    }
+
+    /**
+     * Returns the width of the preview panel.
+     *
+     * @return The width of the preview panel.
+     */
+    protected int getPreviewWidth() {
         double factor = HGBaseGuiTools.isScreenLandscape(this) ? 0.4 : 0.7;
         return (int) (HGBaseGuiTools.getScreenSize(this).x * factor);
     }
 
     /**
-     * @return the height of the preview panel
+     * Returns the height of the preview panel.
+     *
+     * @return the height of the preview panel,
      */
-    private int getPreviewHeight() {
+    protected int getPreviewHeight() {
         return (int) (getPreviewWidth() * 0.75);
     }
 
     /**
-     * Returns the panel's index of the given part type.
+     * Creates the preview panel.
+     */
+    protected void createPreviewPanel() {
+        GameDialogs dlg = GameDialogFactory.getInstance().createGameDialogs(this);
+        pnPreview = dlg.getPreviewPanel(this, getPreviewWidth(), getPreviewHeight());
+        HGBaseGuiTools.setBlackBorder(pnPreview);
+    }
+
+    /**
+     * Refreshes the preview panel.
+     */
+    private void refreshPreview() {
+        if (pnPreview == null) {
+            return;
+        }
+        pnPreview.invalidate();
+    }
+
+    /**
+     * Returns the color chooser for the specified type or {@code null}.
      *
-     * @param id           The part type (either standard or user defined).
-     * @param standardType <code>true</code> for a standard type, <code>false</code> for a user defined one.
-     * @return The index or a number < 0.
+     * @param type The type of the color chooser.
+     * @return The color chooser for the specified type or {@code null}.
      */
-    public int indexOf(String id, boolean standardType) {
-        if (standardType) {
-            return (indexMapStandard.existsKey(id)) ? indexMapStandard.getInt(id) : -1;
-        } else {
-            return (indexMapUserDef.existsKey(id)) ? indexMapUserDef.getInt(id) : -1;
-        }
-    }
-
-    /**
-     * Returns the panel's index of the given color chooser type.
-     *
-     * @param id The color chooser type.
-     * @return The index or a number < 0.
-     */
-    public int indexOfColorChooser(String id) {
-        return indexMapUserDef.getInt(id);
-    }
-
-    /**
-     * Change all parts depending on the current arrangement.
-     */
-    private void changeArrangement() {
-        Arrangement a = getSelectedArrangement();
-        if (a != null) {
-            onChangeArrangement = true;
-            newBackColor = a.getBackgroundColor();
-            changePartOfArrangement(indexOf(ConstantValue.CONFIG_BACKGROUND, true), a.getBackground());
-            changePartOfArrangement(indexOf(ConstantValue.CONFIG_BOARD, true), a.getBoard());
-            changePartOfArrangement(indexOf(ConstantValue.CONFIG_PIECESET, true), a.getPieceSet());
-            changePartOfArrangement(indexOf(ConstantValue.CONFIG_COVER, true), a.getCover());
-            for (String cardSetType : cardSetTypes) {
-                changePartOfArrangement(indexOf(cardSetType, true), a.getCardSet(cardSetType));
-            }
-            for (String userPart : userParts) {
-                changePartOfArrangement(indexOf(userPart, false), a.getPart(userPart));
-            }
-            for (String userPartSet : userPartSets) {
-                changePartOfArrangement(indexOf(userPartSet, false), a.getPartSet(userPartSet));
-            }
-            for (int i = 0; i < configColorList.length; i++) {
-                Color c = getArrangementColorByIndex(a, i);
-                if (c != null) {
-                    configColorList[i].setColor(c);
-                }
-            }
-            onChangeArrangement = false;
-        }
-    }
-
-    /**
-     * Returns the color specified in the given arrangement by the color index.
-     * This may be also the background color, if one is defined.
-     *
-     * @param a     the arrangement
-     * @param index the index of the color type
-     * @return the color or null
-     */
-    private Color getArrangementColorByIndex(Arrangement a, int index) {
-        if (backColorDefined && index == INDEX_BACKCOLOR) {
-            return a.getBackgroundColor();
-        } else {
-            index = (backColorDefined) ? index - 1 : index;
-            return a.getColor(colorTypes[index]);
-        }
-    }
-
-    /**
-     * @param index The index of the combo box.
-     * @param part  The part to select.
-     */
-    private void changePartOfArrangement(int index, Part part) {
-        if (index >= 0 && configComboList != null) {
-            configComboList[index].setSelectedItem(part);
-        }
-    }
-
-    /**
-     * @return The selected arrangement.
-     */
-    public Arrangement getSelectedArrangement() {
-        int indexCombo = indexOf(ConstantValue.CONFIG_ARRANGEMENT, true);
-        if (indexCombo >= 0 && configComboList != null) {
-            Object oSel = configComboList[indexCombo].getSelectedItem();
-            if (oSel instanceof Arrangement) {
-                return (Arrangement) oSel;
-            }
+    private ConfigColorChooser getColorChooser(String type) {
+        ConfigItem configItem = getConfigItem(type);
+        if (configItem instanceof ConfigColorChooser) {
+            return (ConfigColorChooser) configItem;
         }
         return null;
     }
 
     /**
-     * @return The selected Background.
+     * Returns the selected color of the color chooser for the specified type or {@code null}.
+     *
+     * @param type The type of the color chooser.
+     * @return The selected color of the color chooser for the specified type or {@code null}.
+     */
+    private Color getSelectedColorChooserValue(String type) {
+        ConfigColorChooser colorChooser = getColorChooser(type);
+        return (colorChooser != null) ? colorChooser.getColor() : null;
+    }
+
+    /**
+     * Returns the currently selected background color.
+     *
+     * @return The currently selected background color.
+     */
+    public Color getSelectedBackgroundColor() {
+        return backgroundColor;
+    }
+
+    /**
+     * Returns the currently selected background.
+     *
+     * @return The currently selected background.
      */
     public Background getSelectedBackground() {
-        if (indexOf(ConstantValue.CONFIG_BACKGROUND, true) >= 0) {
-            return (Background) getSelectedPart(indexOf(ConstantValue.CONFIG_BACKGROUND, true));
-        } else {
-            return null;
-        }
+        return (Background) getSelectedComboboxValue(ConstantValue.CONFIG_BACKGROUND);
     }
 
     /**
-     * @return The selected Board.
-     */
-    public Board getSelectedBoard() {
-        if (indexOf(ConstantValue.CONFIG_BOARD, true) >= 0) {
-            return (Board) getSelectedPart(indexOf(ConstantValue.CONFIG_BOARD, true));
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @param index Index of the combobox.
-     * @return The selected item.
-     */
-    public Part getSelectedPart(int index) {
-        return configComboList[index].getSelectedItem();
-    }
-
-    /**
-     * Returns the selected color of the specified color chooser.
+     * Returns the currently selected board.
      *
-     * @param index The index of the color chooser.
-     * @return The selected color.
+     * @return The currently selected board.
      */
-    public Color getSelectedColor(int index) {
-        return configColorList[index].getColor();
+    private Board getSelectedBoard() {
+        return (Board) getSelectedComboboxValue(ConstantValue.CONFIG_BOARD);
     }
 
     /**
-     * @return The selected background color.
-     */
-    public Color getBackgroundColor() {
-        return this.newBackColor;
-    }
-
-    /**
-     * Adds a panel for choosing the active part.
-     * If there exists no parts, no panel is added.
-     * If the panel is added, the index is stored in index map with the id as key.
+     * Returns the currently selected pieceset.
      *
-     * @param id           The name of the parts' type (and id for the label).
-     * @param parts        The array with the possible parts.
-     * @param activePart   The active part of the given type.
-     * @param cbList       The list to add the config combobox.
-     * @param standardType True if a standard type is added, false for a user defined one.
+     * @return The currently selected pieceset.
      */
-    private void addComboBox(String id, Part[] parts, Part activePart, List<PartsComboBox> cbList, boolean standardType) {
-        parts = getOnlyVisible(parts);
-        if (parts.length > 0) {
-            // create the preference object
-            PartsComboBox cbHelp = new PartsComboBox(id, parts, activePart);
-            cbList.add(cbHelp);
-            addPreference(cbHelp.getPreference());
-            if (parts.length == 1) {
-                cbHelp.getPreference().setEnabled(false);
-            }
-            if (completeArrangement && !id.equals(ConstantValue.CONFIG_ARRANGEMENT)) {
-                cbHelp.getPreference().setEnabled(false);
-            }
-            // store the index of the new part
-            IntBooleanStringMap indexMap = (standardType) ? indexMapStandard : indexMapUserDef;
-            indexMap.set(id, cbList.size() - 1);
-        }
+    private PieceSet getSelectedPieceSet() {
+        return (PieceSet) getSelectedComboboxValue(ConstantValue.CONFIG_PIECESET);
     }
 
     /**
-     * @param colorType    The color type.
-     * @param defaultColor The default color, can be null.
-     * @param activeColor  The current set color.
-     * @param ccList       The list to add the config object.
-     */
-    private void addColorChooser(String colorType, Color defaultColor, Color activeColor, List<HGBaseColorPreference> ccList) {
-        HGBaseColorPreference ccColor = HGBaseConfigTools.createColorPreference(this, colorType, activeColor);
-        ccList.add(ccColor);
-        addPreference(ccColor);
-        // store the index of the new color chooser
-        indexMapUserDef.set(colorType, ccList.indexOf(ccColor));
-    }
-
-    /**
-     * @param parts An array with parts.
-     * @return A new array with only visible parts.
-     */
-    private Part[] getOnlyVisible(Part[] parts) {
-        List<Part> visibleList = new ArrayList<>();
-        for (Part part : parts) {
-            if (!part.isHidden()) {
-                visibleList.add(part);
-            }
-        }
-        return visibleList.toArray(new Part[0]);
-    }
-
-    /**
-     * Test if the user has changed a part of the arrangement.
+     * Returns the currently selected cover.
      *
-     * @param arrange The arrangement to test.
+     * @return The currently selected cover.
      */
-    protected void testChangedArrangement(Arrangement arrange) {
-        if (!onChangeArrangement && indexOf(ConstantValue.CONFIG_ARRANGEMENT, true) >= 0 && !isGivenArrangement(arrange)) {
-            GameConfig config = GameConfig.getInstance();
-            int selIndex = -1;
-            Arrangement[] all = config.getArrangements();
-            for (int i = 0; all != null && i < all.length && selIndex == -1; i++) {
-                if (isGivenArrangement(all[i])) {
-                    selIndex = i;
+    private Cover getSelectedCover() {
+        return (Cover) getSelectedComboboxValue(ConstantValue.CONFIG_COVER);
+    }
+
+    /**
+     * Returns the currently selected cardset of the specified type.
+     *
+     * @param type The type of the cardset.
+     * @return The currently selected cardset of the specified type.
+     */
+    private CardSet getSelectedCardSet(String type) {
+        return (CardSet) getSelectedComboboxValue(type);
+    }
+
+    /**
+     * Returns the currently selected partset of the specified type.
+     *
+     * @param type The type of the partset.
+     * @return The currently selected partset of the specified type.
+     */
+    private PartSet getSelectedPartSet(String type) {
+        return (PartSet) getSelectedComboboxValue(type);
+    }
+
+    /**
+     * Returns the currently selected part of the specified type.
+     *
+     * @param type The type of the part.
+     * @return The currently selected part of the specified type.
+     */
+    private Part getSelectedPart(String type) {
+        return (Part) getSelectedComboboxValue(type);
+    }
+
+    /**
+     * Returns the currently selected color of the specified type.
+     *
+     * @param type The type of the color.
+     * @return The currently selected color of the specified type.
+     */
+    private Color getSelectedColor(String type) {
+        return getSelectedColorChooserValue(type);
+    }
+
+    /**
+     * Returns {@code true} if the specified type is a cardset.
+     *
+     * @param type The type to check.
+     * @return {@code true} if the specified type is a cardset.
+     */
+    private boolean isCardSet(String type) {
+        return Arrays.asList(cardSetTypes).contains(type);
+    }
+
+    /**
+     * Returns {@code true} if the specified type is a user defined partset.
+     *
+     * @param type The type to check.
+     * @return {@code true} if the specified type is a user defined partset.
+     */
+    private boolean isUserPartSet(String type) {
+        return Arrays.asList(userPartSets).contains(type);
+    }
+
+    /**
+     * Returns {@code true} if the specified type is a user defined part.
+     *
+     * @param type The type to check.
+     * @return {@code true} if the specified type is a user defined part.
+     */
+    private boolean isUserPart(String type) {
+        return Arrays.asList(userParts).contains(type);
+    }
+
+    /**
+     * Returns {@code true} if the specified type is a color.
+     *
+     * @param type The type to check.
+     * @return {@code true} if the specified type is a color.
+     */
+    private boolean isColor(String type) {
+        return Arrays.asList(colorTypes).contains(type);
+    }
+
+    @Override
+    protected Set<String> getArrangementTypes() {
+        return Arrays.stream(GameConfig.getInstance().getArrangements()).flatMap(arrangement -> arrangement.getTypes().stream()).collect(Collectors.toSet());
+    }
+
+    @Override
+    protected Object getArrangementValue(Arrangement arrangement, String type) {
+        switch (type) {
+            case ConstantValue.CONFIG_BACKCOLOR:
+                return arrangement.getBackgroundColor();
+            case ConstantValue.CONFIG_BACKGROUND:
+                return arrangement.getBackground();
+            case ConstantValue.CONFIG_BOARD:
+                return arrangement.getBoard();
+            case ConstantValue.CONFIG_PIECESET:
+                return arrangement.getPieceSet();
+            case ConstantValue.CONFIG_COVER:
+                return arrangement.getCover();
+            default:
+                if (isCardSet(type)) {
+                    return arrangement.getCardSet(type);
+                } else if (isUserPartSet(type)) {
+                    return arrangement.getPartSet(type);
+                } else if (isUserPart(type)) {
+                    return arrangement.getPart(type);
+                } else if (isColor(type)) {
+                    return arrangement.getColor(type);
                 }
-            }
-            if (all == null || selIndex == -1) {
-                configComboList[indexOf(ConstantValue.CONFIG_ARRANGEMENT, true)].setSelectedItem(null);
+        }
+        return null;
+    }
+
+    @Override
+    protected Arrangement[] getAvailableArrangements() {
+        return GameConfig.getInstance().getArrangements();
+    }
+
+    @Override
+    protected boolean isArrangementElement(Arrangement arrangement, String type) {
+        switch (type) {
+            case ConstantValue.CONFIG_BACKGROUND:
+                return isArrangementElement(arrangement.getBackground(), getSelectedBackground());
+            case ConstantValue.CONFIG_BOARD:
+                return isArrangementElement(arrangement.getBoard(), getSelectedBoard());
+            case ConstantValue.CONFIG_PIECESET:
+                return isArrangementElement(arrangement.getPieceSet(), getSelectedPieceSet());
+            case ConstantValue.CONFIG_COVER:
+                return isArrangementElement(arrangement.getCover(), getSelectedCover());
+            default:
+                if (isCardSet(type)) {
+                    return isArrangementElement(arrangement.getCardSet(type), getSelectedCardSet(type));
+                } else if (isUserPartSet(type)) {
+                    return isArrangementElement(arrangement.getPartSet(type), getSelectedPartSet(type));
+                } else if (isUserPart(type)) {
+                    return isArrangementElement(arrangement.getPart(type), getSelectedPart(type));
+                } else if (isColor(type)) {
+                    return Objects.equals(arrangement.getColor(type), getSelectedColor(type));
+                }
+        }
+        return false; // Unknown type is not an element of the arrangement.
+    }
+
+    @Override
+    protected void setConfigItemValue(String type, Object value) {
+        ConfigItem configItem = getConfigItem(type);
+        if (configItem instanceof GameElementsDlg.GameElementComboBox) {
+            ((GameElementsDlg<?>.GameElementComboBox) configItem).setSelectedItem((GameElement) value);
+        } else if ((configItem instanceof ConfigColorChooser) && (value instanceof Color)) {
+            ((ConfigColorChooser) configItem).setColor((Color) value);
+        }
+    }
+
+    @Override
+    protected Object getConfigItemValue(String type) {
+        ConfigItem configItem = getConfigItem(type);
+        if (configItem instanceof GameElementsDlg.GameElementComboBox) {
+            return ((GameElementsDlg<?>.GameElementComboBox) configItem).getSelectedItem();
+        } else if (configItem instanceof ConfigColorChooser) {
+            return ((ConfigColorChooser) configItem).getColor();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the supplier for the parts.
+     *
+     * @return The supplier for the parts.
+     */
+    public Function<String, Object> getPartSupplier() {
+        return type -> {
+            if (ConstantValue.CONFIG_BACKCOLOR.equals(type)) {
+                return getSelectedBackgroundColor();
             } else {
-                configComboList[indexOf(ConstantValue.CONFIG_ARRANGEMENT, true)].setSelectedItem(all[selIndex]);
+                return getSelectedComboboxValue(type);
             }
-        }
+        };
     }
 
     /**
-     * Test if the given arrangement is that one, that is selected.
-     *
-     * @param arrangement The arrangement to test.
-     * @return True if the selected values fit to the given arrangement.
+     * Configuration item for choosing a color.
      */
-    private boolean isGivenArrangement(Arrangement arrangement) {
-        if (arrangement == null) {
-            return false;
-        }
-        if (!belongsStandardPartToArrangement(arrangement)) {
-            return false;
-        }
-        if (!belongsCardsetToArrangement(arrangement)) {
-            return false;
-        }
-        if (!belongsUserPartToArrangement(arrangement)) {
-            return false;
-        }
-        if (!belongsUserPartsetToArrangement(arrangement)) {
-            return false;
-        }
-        return belongsColorToArrangement(arrangement);
-    }
+    protected static class ConfigColorChooser implements ConfigItem {
+        /**
+         * The preference object.
+         */
+        private final HGBaseColorPreference preference;
 
-    /**
-     * Returns {@code true} if all of the selected standard parts belong to the specified arrangement.
-     *
-     * @param arrangement The arrangement to check.
-     * @return {@code true} if all of the selected standard parts belong to the specified arrangement.
-     */
-    private boolean belongsStandardPartToArrangement(Arrangement arrangement) {
-        Background back = arrangement.getBackground();
-        Board board = arrangement.getBoard();
-        PieceSet piece = arrangement.getPieceSet();
-        Cover cover = arrangement.getCover();
-        return isPartOk(back, indexOf(ConstantValue.CONFIG_BACKGROUND, true)) && isPartOk(board, indexOf(ConstantValue.CONFIG_BOARD, true)) && isPartOk(piece, indexOf(ConstantValue.CONFIG_PIECESET, true)) && isPartOk(cover, indexOf(ConstantValue.CONFIG_COVER, true));
-    }
-
-    /**
-     * Returns {@code true} if all of the selected card sets belong to the specified arrangement.
-     *
-     * @param arrangement The arrangement to check.
-     * @return {@code true} if all of the selected card sets belong to the specified arrangement.
-     */
-    private boolean belongsCardsetToArrangement(Arrangement arrangement) {
-        for (String cardSetType : cardSetTypes) {
-            CardSet cards = arrangement.getCardSet(cardSetType);
-            if (!isPartOk(cards, indexOf(cardSetType, true))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Returns {@code true} if all of the selected user parts belong to the specified arrangement.
-     *
-     * @param arrangement The arrangement to check.
-     * @return {@code true} if all of the selected user parts belong to the specified arrangement.
-     */
-    private boolean belongsUserPartToArrangement(Arrangement arrangement) {
-        for (String userPart : userParts) {
-            if (!isPartOk(arrangement.getPart(userPart), indexOf(userPart, false))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Returns {@code true} if all of the selected user part sets belong to the specified arrangement.
-     *
-     * @param arrangement The arrangement to check.
-     * @return {@code true} if all of the selected user part sets belong to the specified arrangement.
-     */
-    private boolean belongsUserPartsetToArrangement(Arrangement arrangement) {
-        for (String userPartSet : userPartSets) {
-            if (!isPartOk(arrangement.getPartSet(userPartSet), indexOf(userPartSet, false))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Returns {@code true} if the selected color belongs to the specified arrangement.
-     *
-     * @param arrangement The arrangement to check.
-     * @return {@code true} if the selected color belongs to the specified arrangement.
-     */
-    private boolean belongsColorToArrangement(Arrangement arrangement) {
-        if (configColorList != null) {
-            for (int i = 0; i < configColorList.length; i++) {
-                Color c = getArrangementColorByIndex(arrangement, i);
-                if (c != null && !c.equals(configColorList[i].getColor())) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @param arrangementPart A part of the arrangement.
-     * @param index           The index of the combo box where the equals part should be selected.
-     * @return False if there exists a part and this is not selected in the combo box.
-     */
-    private boolean isPartOk(Part arrangementPart, int index) {
-        return arrangementPart == null || index <= 0 || arrangementPart.equals(configComboList[index].getSelectedItem());
-    }
-
-    /**
-     * Holds the list preference (instead of a combo box) and stores all necessary parts data.
-     */
-    private class PartsComboBox {
-
-        private final ListPreference preference;
-        private final Part[] parts;
-
-        public PartsComboBox(String id, Part[] parts, Part activePart) {
-            this.parts = parts;
-            String[] values = HGBaseTools.toStringIdArray(parts);
-            String defaultValue = (activePart == null) ? "" : activePart.getId();
-            this.preference = HGBaseConfigTools.createListPreference(PartsDlg.this, id, values, defaultValue, true);
+        /**
+         * Constructs a new instance.
+         *
+         * @param activity    The activity on which the color chooser is shown.
+         * @param colorType   The type of the color.
+         * @param activeColor The current active color of the type.
+         * @noinspection deprecation
+         */
+        public ConfigColorChooser(PreferenceActivity activity, String colorType, Color activeColor) {
+            this.preference = HGBaseConfigTools.createColorPreference(activity, colorType, activeColor);
         }
 
         /**
-         * @return the selected part
+         * @noinspection deprecation
          */
-        public Part getSelectedItem() {
-            String partId = preference.getValue();
-            return (HGBaseTools.hasContent(partId)) ? HGBaseTools.findItemById(parts, partId) : null;
-        }
-
-        /**
-         * @param partToSelect select the given part
-         */
-        public void setSelectedItem(Part partToSelect) {
-            String id = (partToSelect == null) ? null : partToSelect.getId();
-            preference.setValue(id);
-            if (id == null && ConstantValue.CONFIG_ARRANGEMENT.equals(preference.getKey())) {
-                HGBaseConfig.set(preference.getKey(), ARRANGE_USERDEFINED_ID);
-            }
-        }
-
-        /**
-         * @return the preference object for UI interaction
-         */
-        public ListPreference getPreference() {
+        @Override
+        public Preference getPreference() {
             return preference;
         }
-    }
 
+        /**
+         * @noinspection deprecation
+         */
+        @Override
+        public String getOption() {
+            return preference.getKey();
+        }
+
+        /**
+         * Returns the currently set color.
+         *
+         * @return The currently set color.
+         */
+        public Color getColor() {
+            return preference.getColor();
+        }
+
+        /**
+         * Sets the current color.
+         *
+         * @param color The color to set.
+         */
+        public void setColor(Color color) {
+            preference.setColor(color);
+        }
+    }
 }
