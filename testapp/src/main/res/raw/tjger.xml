@@ -74,6 +74,16 @@
   </pieces>
 
   <cards extension="png" path="/gfx/cards/set">
+    <cardset name="std_cardset_pro_teaser" orderby="none" pro="true" teaser="true">
+      <card color="stdcardsetcard" sequencestart="1" sequenceend="2"/>
+    </cardset>
+    <cardset name="std_cardset_free" orderby="none">
+      <card color="stdcardsetcard" sequencestart="1" sequenceend="2"/>
+    </cardset>
+    <cardset name="std_cardset_pro" orderby="none" pro="true">
+      <card color="stdcardsetcard" sequencestart="1" sequenceend="2"/>
+    </cardset>
+
     <cardset type="cardset" name="cardset_pro_teaser" orderby="none" pro="true" teaser="true">
       <card color="cardsetcard" sequencestart="1" sequenceend="2"/>
     </cardset>
@@ -98,17 +108,20 @@
   </covers>
 
   <arrangements complete="false">
-    <arrangement name="arrangement_pro_teaser" background="back_pro_teaser" board="board_pro_teaser" pieceset="pieceset_pro_teaser" cover="cover_pro_teaser" cardset="cardset_pro_teaser" pro="true" teaser="true">
+    <arrangement name="arrangement_pro_teaser" background="back_pro_teaser" board="board_pro_teaser" pieceset="pieceset_pro_teaser" cover="cover_pro_teaser" cardset="std_cardset_pro_teaser" pro="true" teaser="true">
+      <cardset type="cardset" value="cardset_pro_teaser"/>
       <partset type="partset" value="partset_pro_teaser"/>
       <part type="part" value="part_pro_teaser"/>
       <card type="card" value="card_pro_teaser"/>
     </arrangement>
-    <arrangement name="arrangement_free" background="back_free" board="board_free" pieceset="pieceset_free" cover="cover_free" cardset="cardset_free">
+    <arrangement name="arrangement_free" background="back_free" board="board_free" pieceset="pieceset_free" cover="cover_free" cardset="std_cardset_free">
+      <cardset type="cardset" value="cardset_free"/>
       <partset type="partset" value="partset_free"/>
       <part type="part" value="part_free"/>
       <card type="card" value="card_free"/>
     </arrangement>
-    <arrangement name="arrangement_pro" background="back_pro" board="board_pro" pieceset="pieceset_pro" cover="cover_pro" cardset="cardset_pro" pro="true">
+    <arrangement name="arrangement_pro" background="back_pro" board="board_pro" pieceset="pieceset_pro" cover="cover_pro" cardset="std_cardset_pro" pro="true">
+      <cardset type="cardset" value="cardset_pro"/>
       <partset type="partset" value="partset_pro"/>
       <part type="part" value="part_pro"/>
       <card type="card" value="card_pro"/>
@@ -129,4 +142,37 @@
       <part type="part" xpos="0" ypos="0" percentsize="scale" area="part"/>
     </elements>
   </gamefieldlayout>
+
+  <sounds extension="wav" path="/sounds/set">
+    <soundset type="soundset" name="soundset_pro_teaser" pro="true" teaser="true">
+      <sound sequencestart="1" sequenceend="3"/>
+    </soundset>
+    <soundset type="soundset" name="soundset_free">
+      <sound sequencestart="1" sequenceend="2"/>
+    </soundset>
+    <soundset type="soundset" name="soundset_pro" pro="true">
+      <sound sequencestart="1" sequenceend="4"/>
+    </soundset>
+  </sounds>
+
+  <sounds extension="wav" path="/sounds">
+    <sound type="sound" name="sound_pro_teaser" pro="true" teaser="true"/>
+    <sound type="sound" name="sound_free"/>
+    <sound type="sound" name="sound_pro" pro="true"/>
+  </sounds>
+
+  <soundarrangements complete="false">
+    <soundarrangement name="sound_arrangement_free">
+      <sound type="sound" value="sound_free"/>
+      <soundset type="soundset" value="soundset_free"/>
+    </soundarrangement>
+    <soundarrangement name="sound_arrangement_pro_teaser" pro="true" teaser="true">
+      <sound type="sound" value="sound_pro_teaser"/>
+      <soundset type="soundset" value="soundset_pro_teaser"/>
+    </soundarrangement>
+    <soundarrangement name="sound_arrangement_pro" pro="true">
+      <sound type="sound" value="sound_pro"/>
+      <soundset type="soundset" value="soundset_pro"/>
+    </soundarrangement>
+  </soundarrangements>
 </tjger>

@@ -37,10 +37,13 @@
     <string name="piece_free">Piece free</string>
     <string name="piece_pro">Piece pro</string>
     <string name="piece_pro_teaser">Piece pro teaser</string>
-    <string name="cardset">Card-Set</string>
-    <string name="cardset_free">Cardset free</string>
-    <string name="cardset_pro">Cardset pro</string>
-    <string name="cardset_pro_teaser">Cardset pro teaser</string>
+    <string name="std_cardset_free">Cardset (standard) free</string>
+    <string name="std_cardset_pro">Cardset (standard) pro</string>
+    <string name="std_cardset_pro_teaser">Cardset (standard) pro teaser</string>
+    <string name="cardset">Card-Set (user defined)</string>
+    <string name="cardset_free">Cardset (user defined) free</string>
+    <string name="cardset_pro">Cardset (user defined) pro</string>
+    <string name="cardset_pro_teaser">Cardset (user defined) pro teaser</string>
     <string name="card">Card</string>
     <string name="card_free">Card free</string>
     <string name="card_pro">Card pro</string>
@@ -51,4 +54,15 @@
     <string name="arrangement_free">Arrangement free</string>
     <string name="arrangement_pro">Arrangement pro</string>
     <string name="arrangement_pro_teaser">Arrangement pro teaser</string>
+    <string name="soundset">Sound-Set</string>
+    <string name="soundset_free">Soundset free</string>
+    <string name="soundset_pro">Soundset pro</string>
+    <string name="soundset_pro_teaser">Soundset pro teaser</string>
+    <string name="sound">Sound</string>
+    <string name="sound_free">Sound free</string>
+    <string name="sound_pro">Sound pro</string>
+    <string name="sound_pro_teaser">Sound pro teaser</string>
+    <string name="sound_arrangement_free">Arrangement free</string>
+    <string name="sound_arrangement_pro">Arrangement pro</string>
+    <string name="sound_arrangement_pro_teaser">Arrangement pro teaser</string>
 </resources>

@@ -35,6 +35,10 @@
             android:name="com.tjger.gui.internal.PartsDlg"
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity
+            android:name="com.tjger.gui.internal.SoundsDlg"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
     </application>
 
 </manifest>
