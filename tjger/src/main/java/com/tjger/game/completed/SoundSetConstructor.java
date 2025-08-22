@@ -54,8 +54,8 @@ abstract class SoundSetConstructor extends GameElementSetConstructor<SoundSet, S
     }
 
     @Override
-    protected SoundSet createSet(String type, String name, boolean hidden, Node node, GameConfig config) {
-        return new SoundSet(type, name, hidden);
+    protected SoundSet createSet(String type, String name, boolean hidden, boolean proTeaser, Node node, GameConfig config) {
+        return new SoundSet(type, name, hidden, proTeaser);
     }
 
     @Override

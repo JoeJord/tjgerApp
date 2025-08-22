@@ -580,6 +580,11 @@ public class PartsDlg extends GameElementsDlg<Arrangement> {
         return null;
     }
 
+    @Override
+    protected boolean isProTeaserElementSelected(GameConfig config) {
+        return config.isProTeaserPartSelected();
+    }
+
     /**
      * Returns the supplier for the parts.
      *

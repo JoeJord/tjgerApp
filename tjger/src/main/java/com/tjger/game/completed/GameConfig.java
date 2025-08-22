@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -628,7 +629,7 @@ public final class GameConfig {
      * @return The active arrangement or null.
      */
     public Arrangement getActiveArrangement() {
-        String name = getActivePartName(getArrangements(), ConstantValue.CONFIG_ARRANGEMENT);
+        String name = getActiveGameElementName(getArrangements(), ConstantValue.CONFIG_ARRANGEMENT);
         if (HGBaseConfig.existsKey(ConstantValue.CONFIG_ARRANGEMENT) && !name.equals(HGBaseConfig.get(ConstantValue.CONFIG_ARRANGEMENT))) {
             // if there is a user defined arrangement, a dummy id was stored
             return null;
@@ -647,7 +648,7 @@ public final class GameConfig {
      * @return The active background or null.
      */
     public Background getActiveBackground() {
-        String name = getActivePartName(getBackgrounds(), ConstantValue.CONFIG_BACKGROUND);
+        String name = getActiveGameElementName(getBackgrounds(), ConstantValue.CONFIG_BACKGROUND);
         return getBackground(name);
     }
 
@@ -655,7 +656,7 @@ public final class GameConfig {
      * @return The active board or null.
      */
     public Board getActiveBoard() {
-        String name = getActivePartName(getBoards(), ConstantValue.CONFIG_BOARD);
+        String name = getActiveGameElementName(getBoards(), ConstantValue.CONFIG_BOARD);
         return getBoard(name);
     }
 
@@ -663,7 +664,7 @@ public final class GameConfig {
      * @return The active cover or null.
      */
     public Cover getActiveCover() {
-        String name = getActivePartName(getCovers(), ConstantValue.CONFIG_COVER);
+        String name = getActiveGameElementName(getCovers(), ConstantValue.CONFIG_COVER);
         return getCover(name);
     }
 
@@ -679,7 +680,7 @@ public final class GameConfig {
      * @return The active card set or null.
      */
     public CardSet getActiveCardSet(String type) {
-        String name = getActivePartName(getCardSets(type), type);
+        String name = getActiveGameElementName(getCardSets(type), type);
         return getCardSet(type, name);
     }
 
@@ -687,7 +688,7 @@ public final class GameConfig {
      * @return The active piece set or null.
      */
     public PieceSet getActivePieceSet() {
-        String name = getActivePartName(getPieceSets(), ConstantValue.CONFIG_PIECESET);
+        String name = getActiveGameElementName(getPieceSets(), ConstantValue.CONFIG_PIECESET);
         return getPieceSet(name);
     }
 
@@ -757,7 +758,7 @@ public final class GameConfig {
      * @return The active part or null.
      */
     public Part getActivePart(String type) {
-        String name = getActivePartName(getParts(type), type);
+        String name = getActiveGameElementName(getParts(type), type);
         return getPart(type, name);
     }
 
@@ -782,7 +783,7 @@ public final class GameConfig {
      * @return The active part set or null.
      */
     public PartSet getActivePartSet(String type) {
-        String name = getActivePartName(getPartSets(type), type);
+        String name = getActiveGameElementName(getPartSets(type), type);
         return getPartSet(type, name);
     }
 
@@ -928,38 +929,45 @@ public final class GameConfig {
     }
 
     /**
-     * Returns the first available part from the specified parts.<br>
-     * Hidden parts will be skipped.<br>
-     * If the game is not the pro version, then teaser parts will also be skipped.
+     * Returns {@code true} if the game element is available.<br>
+     * It is available, if it is not hidden. If the game is not the pro version, then teaser elements are also not available.
      *
-     * @param parts The parts to check.
-     * @return The name of the found part an empty string if nothing could be found.
+     * @param element The game element to check.
+     * @return {@code true} if the game element is available.
      */
-    private String getFirstAvailablePart(Part[] parts) {
-        if ((parts == null) || (parts.length == 0)) {
-            return null;
-        }
-        for (Part part : parts) {
-            // Search for the first not hidden part. If the game is not the pro version, then teaser parts are also skipped.
-            if ((!part.isHidden()) && (isProVersion() || !part.isProTeaser())) {
-                return part.getName();
-            }
-        }
-        return EMPTY_STRING;
+    private boolean isGameElementAvailable(GameElement element) {
+        return (!element.isHidden()) && (isProVersion() || !element.isProTeaser());
     }
 
     /**
-     * @param parts     An array with a sort of parts.
-     * @param configKey Name of the part configuration.
-     * @return The name of the active part configuration or "".
+     * Returns the first available game element from the specified elements.<br>
+     * Hidden elements will be skipped.<br>
+     * If the game is not the pro version, then teaser parts will also be skipped.
+     *
+     * @param elements The game elements to check.
+     * @return The name of the found game element or an empty string if nothing could be found.
      */
-    private String getActivePartName(Part[] parts, String configKey) {
-        String name = HGBaseConfig.get(configKey);
-        int index = getIndexOfGameElement(parts, name);
-        if (index >= 0 && index < parts.length && !parts[index].isHidden()) {
-            return parts[index].getName();
+    private String getFirstAvailableGameElement(GameElement[] elements) {
+        if ((elements == null) || (elements.length == 0)) {
+            return null;
         }
-        return getFirstAvailablePart(parts);
+        return Arrays.stream(elements).filter(this::isGameElementAvailable).map(GameElement::getName).findFirst().orElse(EMPTY_STRING);
+    }
+
+    /**
+     * Returns the name of the active game element configuration or "".
+     *
+     * @param elements  An array with a sort of game elements.
+     * @param configKey Name of the game element configuration.
+     * @return The name of the active game element configuration or "".
+     */
+    private String getActiveGameElementName(GameElement[] elements, String configKey) {
+        String name = HGBaseConfig.get(configKey);
+        int index = getIndexOfGameElement(elements, name);
+        if (index >= 0 && index < elements.length && !elements[index].isHidden()) {
+            return elements[index].getName();
+        }
+        return getFirstAvailableGameElement(elements);
     }
 
     /**
@@ -1011,9 +1019,10 @@ public final class GameConfig {
      * @return The active sound arrangement or {@code null}.
      */
     public SoundArrangement getActiveSoundArrangement() {
-        String name = getActivePartName(arrangements, ConstantValue.CONFIG_SOUND_ARRANGEMENT);
+        String name = getActiveGameElementName(soundArrangements, ConstantValue.CONFIG_SOUND_ARRANGEMENT);
         if ((HGBaseConfig.existsKey(ConstantValue.CONFIG_SOUND_ARRANGEMENT))
-                && (!name.equals(HGBaseConfig.get(ConstantValue.CONFIG_SOUND_ARRANGEMENT)))) {
+                && (!HGBaseConfig.get(ConstantValue.CONFIG_SOUND_ARRANGEMENT).equals(name))) {
+            // If there is a user defined arrangement, a dummy id was stored.
             return null;
         }
         return getSoundArrangement(name);
@@ -1044,9 +1053,8 @@ public final class GameConfig {
         if (index >= 0 && index < sounds.length && !sounds[index].isHidden()) {
             return sounds[index].getName();
         }
-        // If the sound has not been found, then return the first not hidden sound.
-        return Stream.of(sounds).filter(sound -> !sound.isHidden()).map(Sound::getName).findFirst()
-                .orElse(EMPTY_STRING);
+        // If the sound has not been found, then return the first available sound.
+        return Stream.of(sounds).filter(this::isGameElementAvailable).map(Sound::getName).findFirst().orElse(EMPTY_STRING);
     }
 
     /**
@@ -1139,9 +1147,8 @@ public final class GameConfig {
         if (index >= 0 && index < soundSets.length && !soundSets[index].isHidden()) {
             return soundSets[index].getName();
         }
-        // If the sound set has not been found, then return the first not hidden sound set.
-        return Stream.of(soundSets).filter(soundSet -> !soundSet.isHidden()).map(SoundSet::getName)
-                .findFirst().orElse(EMPTY_STRING);
+        // If the sound set has not been found, then return the first available sound set.
+        return Stream.of(soundSets).filter(this::isGameElementAvailable).map(SoundSet::getName).findFirst().orElse(EMPTY_STRING);
     }
 
     /**
@@ -1516,23 +1523,26 @@ public final class GameConfig {
         partsToCheck.add(getActiveArrangement());
         partsToCheck.add(getActiveBackground());
         partsToCheck.add(getActiveBoard());
+        partsToCheck.add(getActivePieceSet());
         partsToCheck.add(getActiveCardSet());
         partsToCheck.add(getActiveCover());
-        for (String cardSetType : getCardSetTypes()) {
-            partsToCheck.add(getActiveCardSet(cardSetType));
-        }
-        for (String partType : getPartTypes()) {
-            partsToCheck.add(getActivePart(partType));
-        }
-        for (String partSetType : getPartSetTypes()) {
-            partsToCheck.add(getActivePartSet(partSetType));
-        }
-        for (Part part : partsToCheck) {
-            if ((part != null) && (part.isProTeaser())) {
-                return true;
-            }
-        }
-        return false;
+        Arrays.stream(getCardSetTypes()).forEach(cardSetType -> partsToCheck.add(getActiveCardSet(cardSetType)));
+        Arrays.stream(getPartTypes()).forEach(partType -> partsToCheck.add(getActivePart(partType)));
+        Arrays.stream(getPartSetTypes()).forEach(partSetType -> partsToCheck.add(getActivePartSet(partSetType)));
+        return partsToCheck.stream().filter(Objects::nonNull).anyMatch(Part::isProTeaser);
+    }
+
+    /**
+     * Returns {@code true} if at least one selected sound is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     *
+     * @return {@code true} if at least one selected sound is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     */
+    public boolean isProTeaserSoundSelected() {
+        ArrayList<GameElement> soundsToCheck = new ArrayList<>();
+        soundsToCheck.add(getActiveSoundArrangement());
+        Arrays.stream(getSoundSetTypes()).forEach(soundSetType -> soundsToCheck.add(getActiveSoundSet(soundSetType)));
+        Arrays.stream(getSoundTypes()).forEach(soundType -> soundsToCheck.add(getActiveSound(soundType)));
+        return soundsToCheck.stream().filter(Objects::nonNull).anyMatch(GameElement::isProTeaser);
     }
 
     /**

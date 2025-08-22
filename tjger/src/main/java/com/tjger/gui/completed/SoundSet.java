@@ -10,9 +10,10 @@ public class SoundSet extends GameElementSet {
      * @param soundType The type of the sound set.
      * @param name      The name of the sound set.
      * @param hidden    The flag if the sound set is hidden.
+     * @param proTeaser The flag if the element set is only available in the pro version but should be shown in the free version as teaser for the pro version.
      */
-    public SoundSet(String soundType, String name, boolean hidden) {
-        super(soundType, name, hidden, false);
+    public SoundSet(String soundType, String name, boolean hidden, boolean proTeaser) {
+        super(soundType, name, hidden, proTeaser);
     }
 
     /**

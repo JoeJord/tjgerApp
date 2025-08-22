@@ -516,7 +516,7 @@ class GameConfigFileReader {
             @Override
             public void performNode(Node node, int index, Object obj) {
                 GameConfig config = (GameConfig) obj;
-                if (CONFIG_SOUND.equals(node.getNodeName())) {
+                if (CONFIG_SOUND.equals(node.getNodeName()) && isAvailable(node, config)) {
                     readUserDefinedSound(node, config);
                 }
             }
@@ -568,7 +568,7 @@ class GameConfigFileReader {
         ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_SOUND_ARRANGEMENTS, config) {
             @Override
             public void performNode(Node node, int index, Object obj) {
-                if (CONFIG_SOUND_ARRANGEMENT.equals(node.getNodeName())) {
+                if (CONFIG_SOUND_ARRANGEMENT.equals(node.getNodeName()) && isAvailable(node, config)) {
                     readSoundArrangement(node);
                 }
             }
@@ -1000,7 +1000,7 @@ class GameConfigFileReader {
         // look for part sets
         new PartSetConstructor<>(CONFIG_PARTS, CONFIG_PARTSET, CONFIG_PART, config.partSetMap) {
             @Override
-            protected PartSet createPartSet(String type, String name, boolean hidden, Node node) {
+            protected PartSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, Node node) {
                 String setClass = config.extendPartSetMap.get(type);
                 PartSet newPartSet = null;
                 if (setClass != null) {
@@ -1009,7 +1009,7 @@ class GameConfigFileReader {
                     newPartSet = ClassFactory.createClass(setClass, PartSet.class, CONFIG_SETCLASS, classes, params);
                 }
                 if (newPartSet == null) {
-                    newPartSet = new PartSet(type, name, hidden, isProTeaser(node));
+                    newPartSet = new PartSet(type, name, hidden, proTeaser);
                 }
                 setEffectsForPart(newPartSet, node, topLevelEffects);
                 return newPartSet;
@@ -1069,8 +1069,8 @@ class GameConfigFileReader {
         config.helpHidden = isHiddenEntry(node);
         new PartSetConstructor<>(CONFIG_PIECES, CONFIG_PIECESET, CONFIG_PIECE, pieceSetList) {
             @Override
-            protected PieceSet createPartSet(String type, String name, boolean hidden, Node node) {
-                PieceSet pieceSetPart = new PieceSet(name, hidden, isProTeaser(node));
+            protected PieceSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, Node node) {
+                PieceSet pieceSetPart = new PieceSet(name, hidden, proTeaser);
                 setEffectsForPart(pieceSetPart, node, topLevelEffects);
                 return pieceSetPart;
             }
@@ -1113,8 +1113,8 @@ class GameConfigFileReader {
         config.helpHidden = isHiddenEntry(node);
         new PartSetConstructor<>(CONFIG_CARDS, CONFIG_CARDSET, CONFIG_CARD, config.cardSetsMap) {
             @Override
-            protected CardSet createPartSet(String type, String name, boolean hidden, Node node) {
-                CardSet cardSetPart = new CardSet(type, name, hidden, isProTeaser(node));
+            protected CardSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, Node node) {
+                CardSet cardSetPart = new CardSet(type, name, hidden, proTeaser);
                 setEffectsForPart(cardSetPart, node, topLevelEffects);
                 return cardSetPart;
             }

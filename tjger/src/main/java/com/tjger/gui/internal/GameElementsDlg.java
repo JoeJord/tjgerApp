@@ -449,13 +449,21 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
     }
 
     /**
+     * Returns {@code true} if at least one selected game element is only available in the pro version but should be shown in the free version as teaser for the the pro version.
+     *
+     * @param config The game configuration.
+     * @return {@code true} if at least one selected game element is only available in the pro version but should be shown in the free version as teaser for the the pro version.
+     */
+    protected abstract boolean isProTeaserElementSelected(GameConfig config);
+
+    /**
      * Returns the warning message if a teaser part is selected or {@code null} if no warning is needed.
      *
      * @return The warning message if a teaser part is selected or {@code null} if no warning is needed.
      */
     private Integer getTeaserPartWarning() {
         GameConfig gameConfig = GameConfig.getInstance();
-        return (!gameConfig.isProVersion() && gameConfig.isProTeaserPartSelected()) ? R.string.teaser_part_warning : null;
+        return (!gameConfig.isProVersion() && isProTeaserElementSelected(gameConfig)) ? R.string.teaser_part_warning : null;
     }
 
     /**

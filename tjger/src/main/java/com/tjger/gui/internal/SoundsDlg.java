@@ -192,6 +192,11 @@ public class SoundsDlg extends GameElementsDlg<SoundArrangement> {
         return Optional.ofNullable(getConfigItem(type)).filter(GameElementComboBox.class::isInstance).map(GameElementComboBox.class::cast).map(GameElementComboBox::getSelectedItem).orElse(null);
     }
 
+    @Override
+    protected boolean isProTeaserElementSelected(GameConfig config) {
+        return config.isProTeaserSoundSelected();
+    }
+
     /**
      * A combobox for sounds.
      */

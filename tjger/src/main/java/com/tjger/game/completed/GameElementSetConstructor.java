@@ -67,14 +67,15 @@ abstract class GameElementSetConstructor<S extends GameElementSet, E extends Gam
     /**
      * Creates a set with the specified values.
      *
-     * @param type   The type of the set.
-     * @param name   The name of the set.
-     * @param hidden The flag if the set is hidden.
-     * @param node   The set node to read additional information from the XML document.
-     * @param config The game configuration object.
+     * @param type      The type of the set.
+     * @param name      The name of the set.
+     * @param hidden    The flag if the set is hidden.
+     * @param proTeaser The flag if the element set is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param node      The set node to read additional information from the XML document.
+     * @param config    The game configuration object.
      * @return The created set.
      */
-    protected abstract S createSet(String type, String name, boolean hidden, Node node, GameConfig config);
+    protected abstract S createSet(String type, String name, boolean hidden, boolean proTeaser, Node node, GameConfig config);
 
     /**
      * Creates one element.
@@ -109,7 +110,7 @@ abstract class GameElementSetConstructor<S extends GameElementSet, E extends Gam
             @Override
             public void performNode(Node node, int index, Object obj) {
                 final GameConfig config = (GameConfig) obj;
-                if (setConfigKey.equals(node.getNodeName())) {
+                if (setConfigKey.equals(node.getNodeName()) && GameConfigFileReader.isAvailable(node, config)) {
                     readSet(node, config);
                 }
             }
@@ -133,7 +134,8 @@ abstract class GameElementSetConstructor<S extends GameElementSet, E extends Gam
             return;
         }
         boolean hidden = GameConfigFileReader.isHiddenPart(node, config);
-        S newSet = createSet(type, name, hidden, node, config);
+        boolean proTeaser = GameConfigFileReader.isProTeaser(node);
+        S newSet = createSet(type, name, hidden, proTeaser, node, config);
         readSetElements(node, config, newSet);
 
         if (!newSet.isEmpty()) {

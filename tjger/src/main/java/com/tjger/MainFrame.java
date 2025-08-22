@@ -506,7 +506,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * @return {@code true} if at least one of the selected elements is a teaser for the pro version of the app.
      */
     private boolean isProTeaserElementSelected() {
-        return (isProTeaserPartSelected()) || (isProTeaserPlayerTypeSelected());
+        return (isProTeaserPartSelected()) || (isProTeaserSoundSelected()) || (isProTeaserPlayerTypeSelected());
     }
 
     /**
@@ -516,6 +516,15 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      */
     private boolean isProTeaserPartSelected() {
         return getGameConfig().isProTeaserPartSelected();
+    }
+
+    /**
+     * Returns {@code true} if at least one of the selected sounds is a teaser for the pro version of the app.
+     *
+     * @return {@code true} if at least one of the selected sounds is a teaser for the pro version of the app.
+     */
+    private boolean isProTeaserSoundSelected() {
+        return getGameConfig().isProTeaserSoundSelected();
     }
 
     /**

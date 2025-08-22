@@ -78,8 +78,8 @@ abstract class PartSetConstructor<T extends PartSet> extends GameElementSetConst
     }
 
     @Override
-    protected final PartSetWrapper<T> createSet(String type, String name, boolean hidden, Node node, GameConfig config) {
-        return new PartSetWrapper<>(createPartSet(type, name, hidden, node));
+    protected final PartSetWrapper<T> createSet(String type, String name, boolean hidden, boolean proTeaser, Node node, GameConfig config) {
+        return new PartSetWrapper<>(createPartSet(type, name, hidden, proTeaser, node));
     }
 
     @Override
@@ -101,13 +101,14 @@ abstract class PartSetConstructor<T extends PartSet> extends GameElementSetConst
     /**
      * Creates a part set with the specified values.
      *
-     * @param type   The part set's type (only necessary for PartSet).
-     * @param name   Name of the new part set.
-     * @param hidden The flag if the set is hidden.
-     * @param node   The XML node for additional information.
+     * @param type      The part set's type (only necessary for PartSet).
+     * @param name      Name of the new part set.
+     * @param hidden    The flag if the set is hidden.
+     * @param proTeaser The flag if the element set is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param node      The XML node for additional information.
      * @return A new part set (PieceSet/CardSet).
      */
-    protected abstract T createPartSet(String type, String name, boolean hidden, Node node);
+    protected abstract T createPartSet(String type, String name, boolean hidden, boolean proTeaser, Node node);
 
     @Override
     protected final ColorValuePart createElement(PartSetWrapper<T> set, Node node, int sequence, boolean proTeaser, GameConfig config) {
