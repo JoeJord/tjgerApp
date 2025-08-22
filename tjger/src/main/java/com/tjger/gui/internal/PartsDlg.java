@@ -537,6 +537,8 @@ public class PartsDlg extends GameElementsDlg<Arrangement> {
     @Override
     protected boolean isArrangementElement(Arrangement arrangement, String type) {
         switch (type) {
+            case ConstantValue.CONFIG_BACKCOLOR:
+                return Objects.equals(arrangement.getBackgroundColor(), getSelectedBackgroundColor());
             case ConstantValue.CONFIG_BACKGROUND:
                 return isArrangementElement(arrangement.getBackground(), getSelectedBackground());
             case ConstantValue.CONFIG_BOARD:
