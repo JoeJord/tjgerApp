@@ -76,7 +76,7 @@ public class SoundSetListPreference extends HGBaseSoundListPreference {
      * @return The sounds of the sound set.
      */
     protected Sound[] loadSounds(String soundSetType, String soundSetName) {
-        return GameConfig.getInstance().getSoundSet(soundSetType, soundSetName).getSounds().toArray(Sound[]::new);
+        return GameConfig.getInstance().getSoundSet(soundSetType, soundSetName).getSounds().toArray(new Sound[0]);
     }
 
     /**

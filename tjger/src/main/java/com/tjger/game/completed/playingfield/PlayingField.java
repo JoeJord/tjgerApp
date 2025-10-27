@@ -611,7 +611,7 @@ public class PlayingField {
         if (neighbours == null || neighbours.isEmpty()) {
             return Collections.emptySet();
         }
-        return neighbours.keySet().stream().filter(target -> condition.test(field, target)).collect(Collectors.toUnmodifiableSet());
+        return Collections.unmodifiableSet(neighbours.keySet().stream().filter(target -> condition.test(field, target)).collect(Collectors.toSet()));
     }
 
     /**
