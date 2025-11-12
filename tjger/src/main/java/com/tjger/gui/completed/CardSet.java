@@ -17,8 +17,8 @@ public class CardSet extends PartSet {
         this(ConstantValue.CONFIG_CARDSET, name, hidden);
     }*/
 
-    public CardSet(String cardSetType, String name, boolean hidden, boolean proTeaser) {
-        super(cardSetType, name, hidden, proTeaser);
+    public CardSet(String cardSetType, String name, boolean hidden, boolean proTeaser, String productId) {
+        super(cardSetType, name, hidden, proTeaser, productId);
     }
 
     /**

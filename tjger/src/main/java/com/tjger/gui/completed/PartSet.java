@@ -21,8 +21,8 @@ public class PartSet extends Part {
 
     final private Map<String, List<ColorValuePart>> partMap = new LinkedHashMap<>();
 
-    public PartSet(String partType, String name, boolean hidden, boolean proTeaser) {
-        super(partType, name, null, hidden, proTeaser);
+    public PartSet(String partType, String name, boolean hidden, boolean proTeaser, String productId) {
+        super(partType, name, null, hidden, proTeaser, productId);
     }
 
     /* (non-Javadoc)

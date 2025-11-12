@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -36,6 +37,7 @@ import at.hagru.hgbase.android.awt.Insets;
 import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseTools;
 import at.hagru.hgbase.lib.internal.IntBooleanStringMap;
+import at.hagru.hgbase.lib.internal.billing.HGBaseBillingHelper;
 
 /**
  * Contains all game specific configurations.  Do not inherit from this class.
@@ -71,6 +73,10 @@ public final class GameConfig {
     String advertisementErrorPageURL;
     int advertisementWidthPercent;
     int advertisementHeightPercent;
+    /**
+     * The id of the In-App-Purchase-Product to remove advertisements.
+     */
+    String advertisementProductId;
     BackgroundColor backgroundColor;
     Background[] backgrounds;
     Board[] boards;
@@ -242,6 +248,15 @@ public final class GameConfig {
      */
     public int getAdvertisementWidthPercent() {
         return advertisementWidthPercent;
+    }
+
+    /**
+     * Returns the id of the In-App-Purchase-Product to remove advertisements.
+     *
+     * @return The id of the In-App-Purchase-Product to remove advertisements.
+     */
+    public String getAdvertisementProductId() {
+        return advertisementProductId;
     }
 
     /**
@@ -1514,22 +1529,87 @@ public final class GameConfig {
     }
 
     /**
+     * Returns all available parts (arrangements included).
+     *
+     * @return All available parts (arrangements included).
+     */
+    private List<Part> getAllParts() {
+        List<Part> parts = new ArrayList<>();
+        parts.addAll(Arrays.asList(getArrangements()));
+        parts.addAll(Arrays.asList(getBackgrounds()));
+        parts.addAll(Arrays.asList(getBoards()));
+        parts.addAll(Arrays.asList(getPieceSets()));
+        parts.addAll(Arrays.asList(getCardSets()));
+        parts.addAll(Arrays.asList(getCovers()));
+        Arrays.stream(getCardSetTypes()).forEach(cardSetType -> parts.addAll(Arrays.asList(getCardSets(cardSetType))));
+        Arrays.stream(getPartTypes()).forEach(partType -> parts.addAll(Arrays.asList(getParts(partType))));
+        Arrays.stream(getPartSetTypes()).forEach(partSetType -> parts.addAll(Arrays.asList(getPartSets(partSetType))));
+        return parts;
+    }
+
+    /**
+     * Returns all available sounds (arrangements included).
+     *
+     * @return All available sounds (arrangements included).
+     */
+    private List<GameElement> getAllSounds() {
+        List<GameElement> sounds = new ArrayList<>(Arrays.asList(getSoundArrangements()));
+        Arrays.stream(getSoundSetTypes()).forEach(soundSetType -> sounds.addAll(Arrays.asList(getSoundSets(soundSetType))));
+        Arrays.stream(getSoundTypes()).forEach(soundType -> sounds.addAll(Arrays.asList(getSounds(soundType))));
+        return sounds;
+    }
+
+    /**
+     * Returns all available game elements (arrangements included).
+     *
+     * @return All available game elements (arrangements included).
+     */
+    private List<GameElement> getAllGameElements() {
+        List<GameElement> elements = new ArrayList<>();
+        elements.addAll(getAllParts());
+        elements.addAll(getAllSounds());
+        return elements;
+    }
+
+    /**
+     * Returns a list of all active parts.
+     *
+     * @return A list of all active parts.
+     */
+    private List<Part> getActiveParts() {
+        List<Part> activeParts = new ArrayList<>();
+        activeParts.add(getActiveArrangement());
+        activeParts.add(getActiveBackground());
+        activeParts.add(getActiveBoard());
+        activeParts.add(getActivePieceSet());
+        activeParts.add(getActiveCardSet());
+        activeParts.add(getActiveCover());
+        Arrays.stream(getCardSetTypes()).forEach(cardSetType -> activeParts.add(getActiveCardSet(cardSetType)));
+        Arrays.stream(getPartTypes()).forEach(partType -> activeParts.add(getActivePart(partType)));
+        Arrays.stream(getPartSetTypes()).forEach(partSetType -> activeParts.add(getActivePartSet(partSetType)));
+        return activeParts;
+    }
+
+    /**
+     * Returns a list of all active sounds.
+     *
+     * @return A list of all active sounds.
+     */
+    private List<GameElement> getActiveSounds() {
+        List<GameElement> activeSounds = new ArrayList<>();
+        activeSounds.add(getActiveSoundArrangement());
+        Arrays.stream(getSoundSetTypes()).forEach(soundSetType -> activeSounds.add(getActiveSoundSet(soundSetType)));
+        Arrays.stream(getSoundTypes()).forEach(soundType -> activeSounds.add(getActiveSound(soundType)));
+        return activeSounds;
+    }
+
+    /**
      * Returns {@code true} if at least one selected part is only available in the pro version but should be shown in the free version as teaser for the the pro version.
      *
      * @return {@code true} if at least one selected part is only available in the pro version but should be shown in the free version as teaser for the the pro version.
      */
     public boolean isProTeaserPartSelected() {
-        ArrayList<Part> partsToCheck = new ArrayList<>();
-        partsToCheck.add(getActiveArrangement());
-        partsToCheck.add(getActiveBackground());
-        partsToCheck.add(getActiveBoard());
-        partsToCheck.add(getActivePieceSet());
-        partsToCheck.add(getActiveCardSet());
-        partsToCheck.add(getActiveCover());
-        Arrays.stream(getCardSetTypes()).forEach(cardSetType -> partsToCheck.add(getActiveCardSet(cardSetType)));
-        Arrays.stream(getPartTypes()).forEach(partType -> partsToCheck.add(getActivePart(partType)));
-        Arrays.stream(getPartSetTypes()).forEach(partSetType -> partsToCheck.add(getActivePartSet(partSetType)));
-        return partsToCheck.stream().filter(Objects::nonNull).anyMatch(Part::isProTeaser);
+        return getActiveParts().stream().filter(Objects::nonNull).anyMatch(Part::isProTeaser);
     }
 
     /**
@@ -1538,11 +1618,60 @@ public final class GameConfig {
      * @return {@code true} if at least one selected sound is only available in the pro version but should be shown in the free version as teaser for the pro version.
      */
     public boolean isProTeaserSoundSelected() {
-        ArrayList<GameElement> soundsToCheck = new ArrayList<>();
-        soundsToCheck.add(getActiveSoundArrangement());
-        Arrays.stream(getSoundSetTypes()).forEach(soundSetType -> soundsToCheck.add(getActiveSoundSet(soundSetType)));
-        Arrays.stream(getSoundTypes()).forEach(soundType -> soundsToCheck.add(getActiveSound(soundType)));
-        return soundsToCheck.stream().filter(Objects::nonNull).anyMatch(GameElement::isProTeaser);
+        return getActiveSounds().stream().filter(Objects::nonNull).anyMatch(GameElement::isProTeaser);
+    }
+
+    /**
+     * Returns {@code true} if at least one selected part is not purchased.
+     *
+     * @return {@code true} if at least one selected part is not purchased.
+     */
+    public boolean isUnpurchasedPartSelected() {
+        return getActiveParts().stream().filter(Objects::nonNull).anyMatch(this::isUnpurchasedGameElement);
+    }
+
+    /**
+     * Returns {@code true} if at least one selected sound is not purchased.
+     *
+     * @return {@code true} if at least one selected sound is not purchased.
+     */
+    public boolean isUnpurchasedSoundSelected() {
+        return getActiveSounds().stream().filter(Objects::nonNull).anyMatch(this::isUnpurchasedGameElement);
+    }
+
+    /**
+     * Returns {@code true} if the specified game element is not purchased.
+     *
+     * @param element The game element to check.
+     * @return {@code true} if the specified game element is not purchased.
+     */
+    public boolean isUnpurchasedGameElement(GameElement element) {
+        if ((element == null) || (!HGBaseTools.hasContent(element.getProductId()))) {
+            return false;
+        }
+        return !HGBaseBillingHelper.getInstance().isPurchased(element.getProductId());
+    }
+
+    /**
+     * Returns the ids of the In-App-Purchase-Products of all game elements.
+     *
+     * @return The ids of the In-App-Purchase-Products of all game elements.
+     */
+    public List<String> getGameElementsProductIds() {
+        return getAllGameElements().stream().map(GameElement::getProductId).filter(HGBaseTools::hasContent).distinct().collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the ids of all available products for In-App-Purchases.
+     *
+     * @return The ids of all available products for In-App-Purchases.
+     */
+    public List<String> getProductIds() {
+        List<String> productIds = getGameElementsProductIds();
+        if (HGBaseTools.hasContent((advertisementProductId))) {
+            productIds.add(advertisementProductId);
+        }
+        return productIds;
     }
 
     /**

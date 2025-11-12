@@ -18,6 +18,7 @@ import com.tjger.game.completed.GameManager;
 import com.tjger.game.completed.PlayerManager;
 import com.tjger.gui.GameDialogs;
 import com.tjger.gui.GamePanel;
+import com.tjger.gui.actions.RemoveAdvertisementsAction;
 import com.tjger.gui.actions.ShowCreditsDlgAction;
 import com.tjger.gui.actions.ShowGameHintsDlgAction;
 import com.tjger.gui.actions.ShowGameInfoDlgAction;
@@ -41,6 +42,7 @@ import org.w3c.dom.Element;
 
 import java.io.File;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import at.hagru.hgbase.HGBaseWelcomeActivity;
@@ -53,6 +55,7 @@ import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseFileTools;
 import at.hagru.hgbase.lib.HGBaseSound;
 import at.hagru.hgbase.lib.HGBaseTools;
+import at.hagru.hgbase.lib.internal.billing.HGBaseBillingHelper;
 import at.hagru.hgbase.lib.xml.HGBaseXMLTools;
 
 /**
@@ -121,10 +124,25 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
         if (gameManager.getGameConfig().hasErrors()) {
             throw new GameConfigurationException();
         }
+        initInAppPurchases(gameManager.getGameConfig());
+    }
+
+    /**
+     * Initializes the billing service (for In-App-Purchases).
+     *
+     * @param gameConfig The game configuration object.
+     */
+    protected void initInAppPurchases(GameConfig gameConfig) {
+        List<String> productIds = gameConfig.getProductIds();
+        if (productIds != null && (!productIds.isEmpty())) {
+            HGBaseBillingHelper.init(this, productIds);
+        }
     }
 
     @Override
     protected void onDestroy() {
+        HGBaseBillingHelper.getInstance().removeAllListener();
+        HGBaseBillingHelper.getInstance().release();
         MainFrame.instance = null;
         super.onDestroy();
     }
@@ -149,6 +167,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
         registerAction(MainMenu.MENU_ID_SETTINGS_SOUNDS, new ShowSoundSettingsDlgAction(this));
         registerAction(MainMenu.MENU_ID_SETTINGS_PLAYSOUND, new SoundConfigurationAction(this));
         registerAction(MainMenu.MENU_ID_CREDITS, new ShowCreditsDlgAction(this));
+        registerAction(MainMenu.MENU_ID_REMOVE_ADS, new RemoveAdvertisementsAction(this));
     }
 
     /**
@@ -488,7 +507,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * @return {@code true} if it is allowed to resume a game.
      */
     public boolean isResumeGameAllowed() {
-        return (isAutosaveFileAvailable()) && ((isProVersion()) || (!isProTeaserElementSelected()));
+        return (isAutosaveFileAvailable()) && ((isProVersion()) || (!isProTeaserElementSelected())) && (!isUnpurchasedElementSelected());
     }
 
     /**
@@ -497,7 +516,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      * @return {@code true} if it is allowed to start a new game.
      */
     public boolean isNewGameAllowed() {
-        return (isProVersion()) || (!isProTeaserElementSelected());
+        return ((isProVersion()) || (!isProTeaserElementSelected())) && (!isUnpurchasedElementSelected());
     }
 
     /**
@@ -534,6 +553,72 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      */
     private boolean isProTeaserPlayerTypeSelected() {
         return PlayerManager.getInstance().isProTeaserPlayerTypeSelected();
+    }
+
+    /**
+     * Returns {@code true} if at least one of the selected elements is not purchased.
+     *
+     * @return {@code true} if at least one of the selected elements is not purchased.
+     */
+    private boolean isUnpurchasedElementSelected() {
+        return (isUnpurchasedPartSelected()) || (isUnpurchasedSoundSelected());
+    }
+
+    /**
+     * Returns {@code true} if at least one of the selected parts is not purchased.
+     *
+     * @return {@code true} if at least one of the selected parts is not purchased.
+     */
+    private boolean isUnpurchasedPartSelected() {
+        return getGameConfig().isUnpurchasedPartSelected();
+    }
+
+    /**
+     * Returns {@code true} if at least one of the selected sounds is not purchased.
+     *
+     * @return {@code true} if at least one of the selected sounds is not purchased.
+     */
+    private boolean isUnpurchasedSoundSelected() {
+        return getGameConfig().isUnpurchasedSoundSelected();
+    }
+
+    /**
+     * Returns {@code true} if advertisements are available.
+     *
+     * @return {@code true} if advertisements are available.
+     */
+    public boolean isAdvertisementAvailable() {
+        return isAdvertisementAvailable(getGameConfig());
+    }
+
+    /**
+     * Returns {@code true} if advertisements are available.
+     *
+     * @param config The game configuration.
+     * @return {@code true} if advertisements are available.
+     */
+    public boolean isAdvertisementAvailable(GameConfig config) {
+        if (isProVersion()) {
+            return false; // No advertisements in pro version.
+        }
+        if (!config.hasAdvertisements()) {
+            return false; // No advertisements configured.
+        }
+        return !isRemoveAdvertisementPurchased(config);
+    }
+
+    /**
+     * Returns {@code true} if the product to remove advertisements is purchased.
+     *
+     * @param config The game configuration.
+     * @return {@code true} if the product to remove advertisements is purchased.
+     */
+    public boolean isRemoveAdvertisementPurchased(GameConfig config) {
+        String productId = config.getAdvertisementProductId();
+        if (!HGBaseTools.hasContent(productId)) {
+            return false; // No product to purchase defined.
+        }
+        return HGBaseBillingHelper.getInstance().isPurchased(productId);
     }
 
     /**

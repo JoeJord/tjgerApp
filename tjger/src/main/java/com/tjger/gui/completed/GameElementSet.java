@@ -18,9 +18,10 @@ public class GameElementSet extends GameElement {
      * @param name        The name of the element set.
      * @param hidden      The flag if the element set is hidden.
      * @param proTeaser   The flag if the element set is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId   The id of the In-App-Purchase-Product. If not {@code null} then the element set is only available if the product is purchased.
      */
-    protected GameElementSet(String elementType, String name, boolean hidden, boolean proTeaser) {
-        super(elementType, name, hidden, proTeaser);
+    protected GameElementSet(String elementType, String name, boolean hidden, boolean proTeaser, String productId) {
+        super(elementType, name, hidden, proTeaser, productId);
     }
 
     /**

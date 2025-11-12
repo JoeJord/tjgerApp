@@ -24,9 +24,10 @@ public class SoundArrangement extends Sound {
      *
      * @param name      The name of the sound arrangement.
      * @param proTeaser The flag if the sound arrangement is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
      */
-    public SoundArrangement(String name, boolean proTeaser) {
-        super(ConstantValue.CONFIG_SOUND_ARRANGEMENT, name, null, false, proTeaser);
+    public SoundArrangement(String name, boolean proTeaser, String productId) {
+        super(ConstantValue.CONFIG_SOUND_ARRANGEMENT, name, null, false, proTeaser, productId);
     }
 
     /**

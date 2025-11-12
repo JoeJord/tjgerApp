@@ -29,8 +29,8 @@ public class Arrangement extends Part {
     private final Map<String, String> mapPartSets = new LinkedHashMap<>();
     private final Map<String, Color> mapColors = new LinkedHashMap<>();
 
-    public Arrangement(String name, Color defaultBackColor, String defaultBack, String defaultBoard, String defaultPieceSet, String defaultCover, String cardSet, boolean proTeaser) {
-        super(ConstantValue.CONFIG_ARRANGEMENT, name, null, false, proTeaser);
+    public Arrangement(String name, Color defaultBackColor, String defaultBack, String defaultBoard, String defaultPieceSet, String defaultCover, String cardSet, boolean proTeaser, String productId) {
+        super(ConstantValue.CONFIG_ARRANGEMENT, name, null, false, proTeaser, productId);
         this.backgroundColor = defaultBackColor;
         this.background = defaultBack;
         this.board = defaultBoard;

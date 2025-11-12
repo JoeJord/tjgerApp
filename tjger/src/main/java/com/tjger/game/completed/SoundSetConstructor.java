@@ -54,13 +54,13 @@ abstract class SoundSetConstructor extends GameElementSetConstructor<SoundSet, S
     }
 
     @Override
-    protected SoundSet createSet(String type, String name, boolean hidden, boolean proTeaser, Node node, GameConfig config) {
-        return new SoundSet(type, name, hidden, proTeaser);
+    protected SoundSet createSet(String type, String name, boolean hidden, boolean proTeaser, String productId, Node node, GameConfig config) {
+        return new SoundSet(type, name, hidden, proTeaser, productId);
     }
 
     @Override
-    protected Sound createElement(SoundSet set, Node node, int sequence, boolean proTeaser, GameConfig config) {
-        return new Sound(set.getType(), set.getName(), sequence, getElementFilePath(node, sequence, set, config), false, proTeaser);
+    protected Sound createElement(SoundSet set, Node node, int sequence, boolean proTeaser, String productId, GameConfig config) {
+        return new Sound(set.getType(), set.getName(), sequence, getElementFilePath(node, sequence, set, config), false, proTeaser, productId);
     }
 
     @Override

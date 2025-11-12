@@ -5,10 +5,12 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Handler;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceScreen;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.billingclient.api.ProductDetails;
 import com.tjger.MainFrame;
 import com.tjger.R;
 import com.tjger.game.completed.GameConfig;
@@ -25,13 +27,15 @@ import at.hagru.hgbase.gui.config.HGBaseConfigTools;
 import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseText;
 import at.hagru.hgbase.lib.HGBaseTools;
+import at.hagru.hgbase.lib.internal.billing.HGBaseBillingHelper;
+import at.hagru.hgbase.lib.internal.billing.HGBaseBillingListener;
 
 /**
  * The dialog template for choosing game elements.
  *
  * @param <A> The type of the arrangement.
  */
-public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfigStateDialog implements OnSharedPreferenceChangeListener {
+public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfigStateDialog implements OnSharedPreferenceChangeListener, HGBaseBillingListener {
     /**
      * The arrangement when the user combines elements that are no predefined arrangement.
      */
@@ -64,16 +68,35 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
         this.configKeyArrangement = configKeyArrangement;
         onChangeArrangement = false;
         HGBaseConfig.getPreferences().registerOnSharedPreferenceChangeListener(this);
+        HGBaseBillingHelper.getInstance().addListener(this);
     }
 
     @Override
     protected void createComponents() {
         completeArrangement = isCompleteArrangement();
+        loadAndAddConfigItems();
+    }
+
+    /**
+     * Loads the configuration items and adds a preference to the dialog for each item.
+     */
+    protected void loadAndAddConfigItems() {
         onChangeArrangement = true;
         configItemList = loadConfigItems();
         configItemList.removeIf(Objects::isNull);
         addPreferences(configItemList);
         onChangeArrangement = false;
+    }
+
+    /**
+     * Reloads the dialog.
+     */
+    protected void reloadDialog() {
+        PreferenceScreen screen = getPreferenceScreen();
+        if (screen != null) {
+            screen.removeAll();
+        }
+        loadAndAddConfigItems();
     }
 
     /**
@@ -419,6 +442,33 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
     }
 
     /**
+     * Returns {@code true} if the specified game element is not already purchased.
+     *
+     * @param element The game element to check.
+     * @return {@code true} if the specified game element is not already purchased.
+     */
+    protected boolean isUnpurchasedGameElement(GameElement element) {
+        return GameConfig.getInstance().isUnpurchasedGameElement(element);
+    }
+
+    /**
+     * Checks if the specified game element is purchased and launches the purchase flow if it is not purchased.
+     *
+     * @param gameElement The game element to check.
+     */
+    protected void checkGameElementPurchased(GameElement gameElement) {
+        if (isUnpurchasedGameElement(gameElement)) {
+            HGBaseBillingHelper.getInstance().launchPurchase(this, gameElement.getProductId());
+        }
+    }
+
+    @Override
+    protected void onPreferenceChange(Preference preference, Object newValue) {
+        super.onPreferenceChange(preference, newValue);
+        checkGameElementPurchased(getCombobox(preference.getKey()).getItem((String) newValue));
+    }
+
+    /**
      * @noinspection deprecation
      */
     @Override
@@ -472,7 +522,26 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
     @Override
     public void onBackPressed() {
         MainFrame.getInstance().checkNewGame(); // Check if it is allowed to start a new game with the current selection.
+        MainFrame.getInstance().checkResumeGame(); // Check if it is allowed to resume a game with the current selection.
         super.onBackPressed();
+    }
+
+    @Override
+    public void onBillingError(@NonNull String message) {
+        // Nothing to do.
+    }
+
+    @Override
+    public void onProductsLoaded(@NonNull List<ProductDetails> products) {
+        // Nothing to do.
+    }
+
+    @Override
+    public void onPurchaseSuccess(@NonNull String productId) {
+        if (GameConfig.getInstance().getGameElementsProductIds().contains(productId)) {
+            // Reload the dialog when a game element was successfully purchased.
+            runOnUiThread(this::reloadDialog);
+        }
     }
 
     /**
@@ -508,7 +577,7 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
          * Constructs a new instance.
          */
         public UserDefinedArrangement() {
-            super(ARRANGE_USERDEFINED_ID, ARRANGE_USERDEFINED_ID, false, false);
+            super(ARRANGE_USERDEFINED_ID, ARRANGE_USERDEFINED_ID, false, false, null);
         }
     }
 
@@ -550,7 +619,24 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
          * @return The created preference.
          */
         protected ListPreference createPreference(String id, String[] values, String defaultValue) {
-            return HGBaseConfigTools.createListPreference(GameElementsDlg.this, id, values, defaultValue, true);
+            ListPreference listPreference = HGBaseConfigTools.createListPreference(GameElementsDlg.this, id, values, defaultValue, true);
+            addUnpurchasedInformation(listPreference);
+            return listPreference;
+        }
+
+        /**
+         * Adds to each unpurchased entry of the specified preference an information about that.
+         *
+         * @param preference The preference to check.
+         */
+        protected void addUnpurchasedInformation(ListPreference preference) {
+            CharSequence[] entries = preference.getEntries();
+            for (int i = 0; i < entries.length; i++) {
+                if (isUnpurchasedGameElement(elements[i])) {
+                    entries[i] = entries[i] + " " + HGBaseText.getText("unpurchased_marker");
+                }
+            }
+            preference.setEntries(entries);
         }
 
         /**
@@ -608,8 +694,7 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
          * @noinspection deprecation
          */
         public GameElement getSelectedItem() {
-            String partId = preference.getValue();
-            return (HGBaseTools.hasContent(partId)) ? HGBaseTools.findItemById(elements, partId) : null;
+            return getItem(preference.getValue());
         }
 
         /**
@@ -623,6 +708,16 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
                 return;
             }
             preference.setValue(element.getId());
+        }
+
+        /**
+         * Returns the item with the specified id.
+         *
+         * @param id The id of the item to retrieve.
+         * @return The item with the specified id.
+         */
+        public GameElement getItem(String id) {
+            return (HGBaseTools.hasContent(id)) ? HGBaseTools.findItemById(elements, id) : null;
         }
     }
 }

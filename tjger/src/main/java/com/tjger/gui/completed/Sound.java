@@ -21,9 +21,10 @@ public class Sound extends GameElement {
      * @param filename  The name of the sound file.
      * @param hidden    The flag if the sound is hidden.
      * @param proTeaser The flag if the sound is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
      */
-    public Sound(String soundType, String name, int sequence, String filename, boolean hidden, boolean proTeaser) {
-        super(soundType, name, hidden, proTeaser);
+    public Sound(String soundType, String name, int sequence, String filename, boolean hidden, boolean proTeaser, String productId) {
+        super(soundType, name, hidden, proTeaser, productId);
         this.sequence = sequence;
         this.filename = filename;
     }
@@ -36,9 +37,10 @@ public class Sound extends GameElement {
      * @param filename  The name of the sound file.
      * @param hidden    The flag if the sound is hidden.
      * @param proTeaser The flag if the sound is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
      */
-    public Sound(String soundType, String name, String filename, boolean hidden, boolean proTeaser) {
-        this(soundType, name, 1, filename, hidden, proTeaser);
+    public Sound(String soundType, String name, String filename, boolean hidden, boolean proTeaser, String productId) {
+        this(soundType, name, 1, filename, hidden, proTeaser, productId);
     }
 
     /**

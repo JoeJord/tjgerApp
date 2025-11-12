@@ -17,8 +17,8 @@ public class Background extends Part {
     private boolean ignoreZoom;
     private int zoom;
 
-    public Background(String name, Bitmap image, boolean repeat, boolean ignoreZoom, boolean hidden, int zoom, boolean proTeaser) {
-        super(ConstantValue.CONFIG_BACKGROUND, name, image, hidden, proTeaser);
+    public Background(String name, Bitmap image, boolean repeat, boolean ignoreZoom, boolean hidden, int zoom, boolean proTeaser, String productId) {
+        super(ConstantValue.CONFIG_BACKGROUND, name, image, hidden, proTeaser, productId);
         this.repeatMode = repeat;
         this.ignoreZoom = ignoreZoom;
         this.zoom = (zoom > 0) ? zoom : 100;

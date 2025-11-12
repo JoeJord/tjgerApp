@@ -15,8 +15,8 @@ import at.hagru.hgbase.lib.HGBaseTools;
  */
 public class PieceSet extends PartSet {
 
-    public PieceSet(String name, boolean hidden, boolean proTeaser) {
-        super(ConstantValue.CONFIG_PIECESET, name, hidden, proTeaser);
+    public PieceSet(String name, boolean hidden, boolean proTeaser, String productId) {
+        super(ConstantValue.CONFIG_PIECESET, name, hidden, proTeaser, productId);
     }
 
     /**

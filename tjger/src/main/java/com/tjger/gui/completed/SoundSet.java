@@ -11,9 +11,10 @@ public class SoundSet extends GameElementSet {
      * @param name      The name of the sound set.
      * @param hidden    The flag if the sound set is hidden.
      * @param proTeaser The flag if the element set is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
      */
-    public SoundSet(String soundType, String name, boolean hidden, boolean proTeaser) {
-        super(soundType, name, hidden, proTeaser);
+    public SoundSet(String soundType, String name, boolean hidden, boolean proTeaser, String productId) {
+        super(soundType, name, hidden, proTeaser, productId);
     }
 
     /**

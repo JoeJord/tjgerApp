@@ -30,7 +30,7 @@ public class PartSetWrapper<T extends PartSet> extends GameElementSet {
      * @param partSet The partset to wrap.
      */
     public PartSetWrapper(T partSet) {
-        super(partSet.getType(), partSet.getName(), partSet.isHidden(), partSet.isProTeaser());
+        super(partSet.getType(), partSet.getName(), partSet.isHidden(), partSet.isProTeaser(), partSet.getProductId());
         this.partSet = partSet;
     }
 

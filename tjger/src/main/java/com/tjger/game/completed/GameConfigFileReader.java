@@ -93,6 +93,10 @@ class GameConfigFileReader {
      * The configuration tag for the end sequence.
      */
     public static final String CONFIG_SEQUENCE_END = "sequenceend";
+    /**
+     * The configuration tag for the product id of an In-App-Purchase-Product.
+     */
+    public static final String CONFIG_PRODUCTID = "productid";
     static final String CONFIG_NAME = "name";
     static final String CONFIG_IMAGE = "image";
     static final String CONFIG_TYPE = "type";
@@ -476,7 +480,7 @@ class GameConfigFileReader {
                     String pieceset = HGBaseXMLTools.getAttributeValue(node, CONFIG_PIECESET);
                     String cover = HGBaseXMLTools.getAttributeValue(node, CONFIG_COVER);
                     String cardset = HGBaseXMLTools.getAttributeValue(node, CONFIG_CARDSET);
-                    Arrangement newArrangement = new Arrangement(name, backColor, back, board, pieceset, cover, cardset, isProTeaser(node));
+                    Arrangement newArrangement = new Arrangement(name, backColor, back, board, pieceset, cover, cardset, isProTeaser(node), getProductId(node));
                     arrangementList.add(newArrangement);
                     // look for user defined parts and part sets
                     ChildNodeIterator.run(new ChildNodeIterator(node, CONFIG_ARRANGEMENT, newArrangement) {
@@ -543,7 +547,7 @@ class GameConfigFileReader {
         boolean hidden = isHiddenPart(node, config);
         boolean proTeaser = isProTeaser(node);
         List<Sound> listSound = getListFromMap(config.soundMap, type);
-        listSound.add(new Sound(type, name, soundFilename, hidden, proTeaser));
+        listSound.add(new Sound(type, name, soundFilename, hidden, proTeaser, getProductId(node)));
     }
 
     /**
@@ -583,7 +587,7 @@ class GameConfigFileReader {
     protected static void readSoundArrangement(Node node) {
         String name = HGBaseXMLTools.getAttributeValue(node, CONFIG_NAME);
         boolean proTeaser = isProTeaser(node);
-        SoundArrangement newSoundArrangement = new SoundArrangement(name, proTeaser);
+        SoundArrangement newSoundArrangement = new SoundArrangement(name, proTeaser, getProductId(node));
         soundArrangementList.add(newSoundArrangement);
         readSoundArrangementSounds(node, newSoundArrangement);
     }
@@ -890,6 +894,16 @@ class GameConfigFileReader {
     }
 
     /**
+     * Returns the product id of the specified node or {@code null} if it is not specified.
+     *
+     * @param node The node where to read the product id from.
+     * @return The product id of the specified node or {@code null} if it is not specified.
+     */
+    protected static String getProductId(Node node) {
+        return HGBaseXMLTools.getAttributeValue(node, CONFIG_PRODUCTID);
+    }
+
+    /**
      * Returns the list for the given type. If it does not exist, it will be created.
      *
      * @param map  The part or part set map.
@@ -967,7 +981,7 @@ class GameConfigFileReader {
             newPart = ClassFactory.createClass(partClass, Part.class, CONFIG_CVPCLASS, classes, params);
         }
         if (newPart == null) {
-            newPart = new Part(type, name, imgPart, hidden, isProTeaser(node));
+            newPart = new Part(type, name, imgPart, hidden, isProTeaser(node), getProductId(node));
         }
         setEffectsForPart(newPart, node, topLevelEffects);
         listPart.add(newPart);
@@ -1000,7 +1014,7 @@ class GameConfigFileReader {
         // look for part sets
         new PartSetConstructor<>(CONFIG_PARTS, CONFIG_PARTSET, CONFIG_PART, config.partSetMap) {
             @Override
-            protected PartSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, Node node) {
+            protected PartSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, String productId, Node node) {
                 String setClass = config.extendPartSetMap.get(type);
                 PartSet newPartSet = null;
                 if (setClass != null) {
@@ -1009,14 +1023,14 @@ class GameConfigFileReader {
                     newPartSet = ClassFactory.createClass(setClass, PartSet.class, CONFIG_SETCLASS, classes, params);
                 }
                 if (newPartSet == null) {
-                    newPartSet = new PartSet(type, name, hidden, proTeaser);
+                    newPartSet = new PartSet(type, name, hidden, proTeaser, productId);
                 }
                 setEffectsForPart(newPartSet, node, topLevelEffects);
                 return newPartSet;
             }
 
             @Override
-            protected ColorValuePart createColorValuePart(PartSet set, String color, int sequence, int value, Bitmap image, Node node) {
+            protected ColorValuePart createColorValuePart(PartSet set, String color, int sequence, int value, Bitmap image, boolean proTeaser, String productId, Node node) {
                 final String partType = set.getType() + CONFIG_EXT_PART;
                 String cvpClass = config.extendCvpMap.get(set.getType());
                 ColorValuePart newCVP = null;
@@ -1026,7 +1040,7 @@ class GameConfigFileReader {
                     newCVP = ClassFactory.createClass(cvpClass, ColorValuePart.class, CONFIG_CVPCLASS, classes, params);
                 }
                 if (newCVP == null) {
-                    newCVP = new ColorValuePart(set, partType, color, sequence, value, image, isProTeaser(node));
+                    newCVP = new ColorValuePart(set, partType, color, sequence, value, image, proTeaser, productId);
                 }
                 setEffectsForPart(newCVP, node, set);
                 return newCVP;
@@ -1069,15 +1083,15 @@ class GameConfigFileReader {
         config.helpHidden = isHiddenEntry(node);
         new PartSetConstructor<>(CONFIG_PIECES, CONFIG_PIECESET, CONFIG_PIECE, pieceSetList) {
             @Override
-            protected PieceSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, Node node) {
-                PieceSet pieceSetPart = new PieceSet(name, hidden, proTeaser);
+            protected PieceSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, String productId, Node node) {
+                PieceSet pieceSetPart = new PieceSet(name, hidden, proTeaser, productId);
                 setEffectsForPart(pieceSetPart, node, topLevelEffects);
                 return pieceSetPart;
             }
 
             @Override
-            protected ColorValuePart createColorValuePart(PieceSet set, String color, int sequence, int value, Bitmap image, Node node) {
-                Piece piecePart = new Piece(set, color, sequence, value, image, isProTeaser(node));
+            protected ColorValuePart createColorValuePart(PieceSet set, String color, int sequence, int value, Bitmap image, boolean proTeaser, String productId, Node node) {
+                Piece piecePart = new Piece(set, color, sequence, value, image, proTeaser, productId);
                 setEffectsForPart(piecePart, node, set);
                 return piecePart;
             }
@@ -1113,15 +1127,15 @@ class GameConfigFileReader {
         config.helpHidden = isHiddenEntry(node);
         new PartSetConstructor<>(CONFIG_CARDS, CONFIG_CARDSET, CONFIG_CARD, config.cardSetsMap) {
             @Override
-            protected CardSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, Node node) {
-                CardSet cardSetPart = new CardSet(type, name, hidden, proTeaser);
+            protected CardSet createPartSet(String type, String name, boolean hidden, boolean proTeaser, String productId, Node node) {
+                CardSet cardSetPart = new CardSet(type, name, hidden, proTeaser, productId);
                 setEffectsForPart(cardSetPart, node, topLevelEffects);
                 return cardSetPart;
             }
 
             @Override
-            protected ColorValuePart createColorValuePart(CardSet set, String color, int sequence, int value, Bitmap image, Node node) {
-                Card cardPart = new Card(set, color, sequence, value, image, isProTeaser(node));
+            protected ColorValuePart createColorValuePart(CardSet set, String color, int sequence, int value, Bitmap image, boolean proTeaser, String productId, Node node) {
+                Card cardPart = new Card(set, color, sequence, value, image, proTeaser, productId);
                 setEffectsForPart(cardPart, node, set);
                 return cardPart;
             }
@@ -1173,7 +1187,7 @@ class GameConfigFileReader {
                     Bitmap imgCover = HGBaseGuiTools.loadImage(image);
                     boolean hidden = isHiddenPart(node, config);
                     if (imgCover != null) {
-                        Cover coverPart = new Cover(name, imgCover, hidden, isProTeaser(node));
+                        Cover coverPart = new Cover(name, imgCover, hidden, isProTeaser(node), getProductId(node));
                         setEffectsForPart(coverPart, node, topLevelEffects);
                         coverList.add(coverPart);
                     } else {
@@ -1213,7 +1227,7 @@ class GameConfigFileReader {
             }
             boolean hidden = isHiddenPart(node, config);
             if (imgBoard != null) {
-                Board boardPart = new Board(name, imgBoard, xPos, yPos, hidden, zoom, isProTeaser(node));
+                Board boardPart = new Board(name, imgBoard, xPos, yPos, hidden, zoom, isProTeaser(node), getProductId(node));
                 setEffectsForPart(boardPart, node, topLevelEffects);
                 boardList.add(boardPart);
             } else {
@@ -1262,7 +1276,7 @@ class GameConfigFileReader {
                 if (zoom == HGBaseTools.INVALID_INT) {
                     zoom = 100;
                 }
-                Background backPart = new Background(name, imgBack, repeat, ignoreZoom, hidden, zoom, isProTeaser(node));
+                Background backPart = new Background(name, imgBack, repeat, ignoreZoom, hidden, zoom, isProTeaser(node), getProductId(node));
                 if (!repeat) {
                     setEffectsForPart(backPart, node, topLevelEffects);
                 }
@@ -1284,11 +1298,11 @@ class GameConfigFileReader {
         // read the background color from the root (either color or backcolor attribute)
         int rgb = HGBaseTools.toInt(HGBaseXMLTools.getAttributeValue(node, CONFIG_COLOR));
         if (HGBaseTools.isValid(rgb)) {
-            backgroundColor = new BackgroundColor(new Color(rgb), config.helpHidden, isProTeaser(node));
+            backgroundColor = new BackgroundColor(new Color(rgb), config.helpHidden, isProTeaser(node), getProductId(node));
         } else {
             rgb = HGBaseTools.toInt(HGBaseXMLTools.getAttributeValue(node, CONFIG_BACKCOLOR));
             if (HGBaseTools.isValid(rgb)) {
-                backgroundColor = new BackgroundColor(new Color(rgb), config.helpHidden, isProTeaser(node));
+                backgroundColor = new BackgroundColor(new Color(rgb), config.helpHidden, isProTeaser(node), getProductId(node));
             }
         }
         // read all the background images
@@ -1703,6 +1717,7 @@ class GameConfigFileReader {
             config.advertisementErrorPageURL = HGBaseXMLTools.getAttributeValue(node, CONFIG_ADVERTISEMENTERRORPAGEURL);
             config.advertisementWidthPercent = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_ADVERTISEMENTWIDTHPERCENT, HGBaseTools.INVALID_INT);
             config.advertisementHeightPercent = HGBaseXMLTools.getAttributeIntValue(node, CONFIG_ADVERTISEMENTHEIGHTPERCENT, HGBaseTools.INVALID_INT);
+            config.advertisementProductId = HGBaseXMLTools.getAttributeValue(node, CONFIG_PRODUCTID);
         }
     }
 

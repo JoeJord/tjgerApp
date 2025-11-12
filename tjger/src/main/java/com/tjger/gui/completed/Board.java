@@ -17,8 +17,8 @@ public class Board extends Part {
     final private int yPos;
     final private int zoom;
 
-    public Board(String name, Bitmap image, int xPos, int yPos, boolean hidden, int zoom, boolean proTeaser) {
-        super(ConstantValue.CONFIG_BOARD, name, image, hidden, proTeaser);
+    public Board(String name, Bitmap image, int xPos, int yPos, boolean hidden, int zoom, boolean proTeaser, String productId) {
+        super(ConstantValue.CONFIG_BOARD, name, image, hidden, proTeaser, productId);
         this.xPos = xPos;
         this.yPos = yPos;
         this.zoom = (zoom > 0) ? zoom : 100;

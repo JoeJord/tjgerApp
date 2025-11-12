@@ -15,8 +15,8 @@ public class Part extends GameElement {
     private ImageShadow shadow;
     private ImageReflection reflection;
 
-    public Part(String partType, String name, Bitmap image, boolean hidden, boolean proTeaser) {
-        super(partType, name, hidden, proTeaser);
+    public Part(String partType, String name, Bitmap image, boolean hidden, boolean proTeaser, String productId) {
+        super(partType, name, hidden, proTeaser, productId);
         this.image = image;
     }
 

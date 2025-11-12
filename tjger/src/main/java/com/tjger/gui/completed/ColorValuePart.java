@@ -23,8 +23,8 @@ public class ColorValuePart extends Part {
     private final int value;
     protected PartSet partSet;
 
-    public ColorValuePart(PartSet partSet, String partType, String color, int sequence, int value, Bitmap image, boolean proTeaser) {
-        super(partType, partSet.getName() + "." + color + "." + sequence, image, false, proTeaser);
+    public ColorValuePart(PartSet partSet, String partType, String color, int sequence, int value, Bitmap image, boolean proTeaser, String productId) {
+        super(partType, partSet.getName() + "." + color + "." + sequence, image, false, proTeaser, productId);
         this.partSet = partSet;
         this.color = color;
         this.sequence = sequence;

@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import at.hagru.hgbase.gui.config.HGBaseConfigTools;
+import at.hagru.hgbase.gui.config.HGBaseSoundListPreference;
 import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseText;
 
@@ -220,7 +221,9 @@ public class SoundsDlg extends GameElementsDlg<SoundArrangement> {
 
         @Override
         protected ListPreference createPreference(String id, String[] values, String defaultValue) {
-            return HGBaseConfigTools.createSoundListPreference(SoundsDlg.this, id, values, defaultValue, true, this::playSound);
+            HGBaseSoundListPreference listPreference = HGBaseConfigTools.createSoundListPreference(SoundsDlg.this, id, values, defaultValue, true, this::playSound);
+            addUnpurchasedInformation(listPreference);
+            return listPreference;
         }
 
         /**
@@ -258,6 +261,7 @@ public class SoundsDlg extends GameElementsDlg<SoundArrangement> {
             list.setEntries(generateListEntries(values));
             list.setValue(HGBaseConfig.get(id, defaultValue));
             list.setSummary("%s");
+            addUnpurchasedInformation(list);
             return list;
         }
 

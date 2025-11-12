@@ -1,17 +1,22 @@
 package com.tjger;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
@@ -19,6 +24,9 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.PopupMenu;
 import android.widget.ScrollView;
 
+import androidx.annotation.NonNull;
+
+import com.android.billingclient.api.ProductDetails;
 import com.tjger.game.GameState;
 import com.tjger.game.completed.GameConfig;
 import com.tjger.game.completed.GameEngine;
@@ -33,6 +41,7 @@ import com.tjger.lib.ConstantValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import at.hagru.hgbase.android.HGBaseAppTools;
 import at.hagru.hgbase.android.HGBaseResources;
@@ -41,6 +50,8 @@ import at.hagru.hgbase.gui.config.HGBaseConfigDialog;
 import at.hagru.hgbase.gui.menu.IMenuAction;
 import at.hagru.hgbase.lib.HGBaseConfig;
 import at.hagru.hgbase.lib.HGBaseTools;
+import at.hagru.hgbase.lib.internal.billing.HGBaseBillingHelper;
+import at.hagru.hgbase.lib.internal.billing.HGBaseBillingListener;
 
 /**
  * The game's main/starting menu displays some basic buttons.<p>
@@ -73,6 +84,10 @@ public class MainMenu extends Fragment {
      * The menu id for the show credits dialog action.
      */
     public static final String MENU_ID_CREDITS = "action_credits";
+    /**
+     * The menu id of the remove advertisement action.
+     */
+    public static final String MENU_ID_REMOVE_ADS = "menu_remove_ads";
     public static final String MAIN_MENU_IMAGE = "main_menu";
     public static final String MAIN_MENU_BUTTON = "main_menu_button";
     public static final int MENU_ICON_SIZE = 64;
@@ -134,7 +149,110 @@ public class MainMenu extends Fragment {
         rootView.addView(scrollView);
         ViewGroup buttonView = createDefaultActionButtons(inflater);
         scrollView.addView(buttonView);
+
+        addLeftSideIcons(rootView);
+
         return rootView;
+    }
+
+    /**
+     * Adds icons to the left side of the main screen.<br>
+     * bases on {@code main_left.xml}.
+     *
+     * @param parent The parent view.
+     */
+    protected void addLeftSideIcons(ViewGroup parent) {
+        Context context = getActivity();
+        Menu menu = new PopupMenu(context, null).getMenu();
+
+        MenuInflater inflater = new MenuInflater(context);
+        inflater.inflate(R.menu.main_left, menu);
+
+        int iconSize = (int) (48 * context.getResources().getDisplayMetrics().density);
+        int margin = (int) (8 * context.getResources().getDisplayMetrics().density);
+        int topOffset = margin;
+
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            int itemId = item.getItemId();
+            String itemName = context.getResources().getResourceEntryName(itemId);
+            if ((item.getIcon() == null) || (!isMenuItemAvailable(itemName))) {
+                continue;
+            }
+            ImageButton icon = createIcon(context, item);
+            if (MENU_ID_REMOVE_ADS.equals(itemName)) {
+                HGBaseBillingHelper.getInstance().addListener(new HGBaseBillingListener() {
+                    @Override
+                    public void onProductsLoaded(@NonNull List<ProductDetails> products) {
+                        // Nothing to do.
+                    }
+
+                    @Override
+                    public void onPurchaseSuccess(@NonNull String productId) {
+                        if ((icon != null) && (icon.getParent() instanceof ViewGroup) && (Objects.equals(getGameManager().getGameConfig().getAdvertisementProductId(), productId))) {
+                            ((ViewGroup) icon.getParent()).removeView(icon);
+                        }
+                    }
+
+                    @Override
+                    public void onBillingError(@NonNull String message) {
+                        // Nothing to do.
+                    }
+                });
+            }
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(iconSize, iconSize, Gravity.TOP | Gravity.START);
+            params.setMargins(margin, topOffset, 0, 0);
+            icon.setLayoutParams(params);
+            icon.setOnClickListener(v -> {
+                IMenuAction action = getMainFrame().getOptionsMenuAction(itemId);
+                if (action != null) {
+                    action.perform(itemId, item);
+                }
+            });
+
+            parent.addView(icon);
+
+            topOffset += iconSize + margin;
+        }
+    }
+
+    /**
+     * Returns {@code true}, if the specified menu item is available.
+     *
+     * @param itemId The id of the menu item to check.
+     * @return {@code true}, if the specified menu item is available.
+     */
+    protected boolean isMenuItemAvailable(String itemId) {
+        if (MENU_ID_REMOVE_ADS.equals(itemId)) {
+            return isRemoveAdvertisementsAvailable();
+        }
+        return true;
+    }
+
+    /**
+     * Returns {@code true}, if the menu item to remove advertisements is available.
+     *
+     * @return {@code true}, if the menu item to remove advertisements is available.
+     */
+    public boolean isRemoveAdvertisementsAvailable() {
+        return getMainFrame().isAdvertisementAvailable();
+    }
+
+    /**
+     * Creates a clickable icon for the specified menu item.
+     *
+     * @param context The context.
+     * @param item    The menu item.
+     * @return The created icon.
+     */
+    protected ImageButton createIcon(Context context, MenuItem item) {
+        ImageButton button = new ImageButton(context);
+        button.setImageDrawable(item.getIcon());
+        button.setBackgroundColor(Color.TRANSPARENT);
+        button.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        button.setContentDescription(item.getTitle());
+        return button;
     }
 
     @Override

@@ -11,8 +11,8 @@ import com.tjger.lib.ConstantValue;
  */
 public class Piece extends ColorValuePart {
 
-    public Piece(PieceSet pieceSet, String color, int sequence, int value, Bitmap image, boolean proTeaser) {
-        super(pieceSet, ConstantValue.CONFIG_PIECE, color, sequence, value, image, proTeaser);
+    public Piece(PieceSet pieceSet, String color, int sequence, int value, Bitmap image, boolean proTeaser, String productId) {
+        super(pieceSet, ConstantValue.CONFIG_PIECE, color, sequence, value, image, proTeaser, productId);
     }
 
     /**

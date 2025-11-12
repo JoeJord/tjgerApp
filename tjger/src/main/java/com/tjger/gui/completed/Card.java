@@ -11,8 +11,8 @@ import com.tjger.lib.ConstantValue;
  */
 public class Card extends ColorValuePart {
 
-    public Card(CardSet cardSet, String color, int sequence, int value, Bitmap image, boolean proTeaser) {
-        super(cardSet, ConstantValue.CONFIG_CARD, color, sequence, value, image, proTeaser);
+    public Card(CardSet cardSet, String color, int sequence, int value, Bitmap image, boolean proTeaser, String productId) {
+        super(cardSet, ConstantValue.CONFIG_CARD, color, sequence, value, image, proTeaser, productId);
     }
 
     /**

@@ -16,8 +16,8 @@ public class BackgroundColor extends Part {
 
     private Color defaultColor;
 
-    public BackgroundColor(Color defaultColor, boolean hidden, boolean proTeaser) {
-        super(ConstantValue.CONFIG_BACKCOLOR, "background_color", null, hidden, proTeaser);
+    public BackgroundColor(Color defaultColor, boolean hidden, boolean proTeaser, String productId) {
+        super(ConstantValue.CONFIG_BACKCOLOR, "background_color", null, hidden, proTeaser, productId);
         this.defaultColor = defaultColor;
     }
 

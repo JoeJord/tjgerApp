@@ -22,6 +22,10 @@ public class GameElement implements HGBaseItem, Comparable<GameElement> {
      * The flag if the element is only available in the pro version but should be shown in the free version as teaser for the pro version.
      */
     private final boolean proTeaser;
+    /**
+     * The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
+     */
+    private final String productId;
 
     /**
      * Constructs a new instance.
@@ -30,12 +34,14 @@ public class GameElement implements HGBaseItem, Comparable<GameElement> {
      * @param name        The name of the element.
      * @param hidden      The flag if the element is hidden.
      * @param proTeaser   The flag if the element is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId   The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
      */
-    protected GameElement(String elementType, String name, boolean hidden, boolean proTeaser) {
+    protected GameElement(String elementType, String name, boolean hidden, boolean proTeaser, String productId) {
         this.type = elementType;
         this.name = name;
         this.hidden = hidden;
         this.proTeaser = proTeaser;
+        this.productId = productId;
     }
 
     /**
@@ -102,5 +108,14 @@ public class GameElement implements HGBaseItem, Comparable<GameElement> {
      */
     public boolean isProTeaser() {
         return proTeaser;
+    }
+
+    /**
+     * Returns the id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
+     *
+     * @return The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
+     */
+    public String getProductId() {
+        return productId;
     }
 }

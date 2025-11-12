@@ -71,11 +71,12 @@ abstract class GameElementSetConstructor<S extends GameElementSet, E extends Gam
      * @param name      The name of the set.
      * @param hidden    The flag if the set is hidden.
      * @param proTeaser The flag if the element set is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
      * @param node      The set node to read additional information from the XML document.
      * @param config    The game configuration object.
      * @return The created set.
      */
-    protected abstract S createSet(String type, String name, boolean hidden, boolean proTeaser, Node node, GameConfig config);
+    protected abstract S createSet(String type, String name, boolean hidden, boolean proTeaser, String productId, Node node, GameConfig config);
 
     /**
      * Creates one element.
@@ -84,10 +85,11 @@ abstract class GameElementSetConstructor<S extends GameElementSet, E extends Gam
      * @param node      The element node to read additional information from the XML document.
      * @param sequence  The sequence of the element in the set.
      * @param proTeaser The flag if the element is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
      * @param config    The game configuration object.
      * @return The created element.
      */
-    protected abstract E createElement(S set, Node node, int sequence, boolean proTeaser, GameConfig config);
+    protected abstract E createElement(S set, Node node, int sequence, boolean proTeaser, String productId, GameConfig config);
 
     /**
      * Method to be called for reading the XML structure.
@@ -135,7 +137,8 @@ abstract class GameElementSetConstructor<S extends GameElementSet, E extends Gam
         }
         boolean hidden = GameConfigFileReader.isHiddenPart(node, config);
         boolean proTeaser = GameConfigFileReader.isProTeaser(node);
-        S newSet = createSet(type, name, hidden, proTeaser, node, config);
+        String productId = HGBaseXMLTools.getAttributeValue(node, GameConfigFileReader.CONFIG_PRODUCTID);
+        S newSet = createSet(type, name, hidden, proTeaser, productId, node, config);
         readSetElements(node, config, newSet);
 
         if (!newSet.isEmpty()) {
@@ -218,7 +221,7 @@ abstract class GameElementSetConstructor<S extends GameElementSet, E extends Gam
      * @param config   The game configuration object.
      */
     private void readElementSingleSequence(Node node, int sequence, S set, GameConfig config) {
-        E element = createElement(set, node, sequence, GameConfigFileReader.isProTeaser(node), config);
+        E element = createElement(set, node, sequence, GameConfigFileReader.isProTeaser(node), GameConfigFileReader.getProductId(node), config);
         if (element != null) {
             set.addElement(element);
         }

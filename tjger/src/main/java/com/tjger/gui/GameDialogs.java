@@ -525,8 +525,8 @@ public class GameDialogs {
      *
      * @param pnStats        The panel displaying the game statistics.
      * @param playerProfiles The player profiles.
-     * @param config The game configuration.
-     * @param statistics The game statistics.
+     * @param config         The game configuration.
+     * @param statistics     The game statistics.
      * @return The panel with the buttons.
      */
     protected View createGameStatisticsButtons(final ViewGroup pnStats, final PlayerProfiles playerProfiles, final GameStatistics statistics, final GameConfig config) {
@@ -859,7 +859,7 @@ public class GameDialogs {
      * @param hintType   The hint type as defined in ConstantValue (HINTS_MOVE, HINTS_TURN, HINTS_ROUND, HINTS_GAME) or null.
      * @param hintUrls   The urls with possible hints.
      * @param gameEngine The game engine.
-     * @param config The game configuration.
+     * @param config     The game configuration.
      * @return The panel with game hints.
      */
     protected HintPanel createGameHintsPanel(String hintType, Uri[] hintUrls, GameEngine gameEngine, GameConfig config) {
@@ -905,7 +905,7 @@ public class GameDialogs {
      * @param config    the game configuration
      */
     public void showAdvertisementDialog(MainFrame mainFrame, GameConfig config) {
-        if (config.hasAdvertisements() && !config.isProVersion()) {
+        if (mainFrame.isAdvertisementAvailable(config)) {
             HGBaseAdvertisements.showAdvertisementDialog(mainFrame);
         }
     }

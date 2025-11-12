@@ -11,8 +11,8 @@ import com.tjger.lib.ConstantValue;
  */
 public class Cover extends Part {
 
-    public Cover(String name, Bitmap image, boolean hidden, boolean proTeaser) {
-        super(ConstantValue.CONFIG_COVER, name, image, hidden, proTeaser);
+    public Cover(String name, Bitmap image, boolean hidden, boolean proTeaser, String productId) {
+        super(ConstantValue.CONFIG_COVER, name, image, hidden, proTeaser, productId);
     }
 
 }

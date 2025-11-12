@@ -78,8 +78,8 @@ abstract class PartSetConstructor<T extends PartSet> extends GameElementSetConst
     }
 
     @Override
-    protected final PartSetWrapper<T> createSet(String type, String name, boolean hidden, boolean proTeaser, Node node, GameConfig config) {
-        return new PartSetWrapper<>(createPartSet(type, name, hidden, proTeaser, node));
+    protected final PartSetWrapper<T> createSet(String type, String name, boolean hidden, boolean proTeaser, String productId, Node node, GameConfig config) {
+        return new PartSetWrapper<>(createPartSet(type, name, hidden, proTeaser, productId, node));
     }
 
     @Override
@@ -105,13 +105,14 @@ abstract class PartSetConstructor<T extends PartSet> extends GameElementSetConst
      * @param name      Name of the new part set.
      * @param hidden    The flag if the set is hidden.
      * @param proTeaser The flag if the element set is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId The id of the In-App-Purchase-Product. If not {@code null} then the element is only available if the product is purchased.
      * @param node      The XML node for additional information.
      * @return A new part set (PieceSet/CardSet).
      */
-    protected abstract T createPartSet(String type, String name, boolean hidden, boolean proTeaser, Node node);
+    protected abstract T createPartSet(String type, String name, boolean hidden, boolean proTeaser, String productId, Node node);
 
     @Override
-    protected final ColorValuePart createElement(PartSetWrapper<T> set, Node node, int sequence, boolean proTeaser, GameConfig config) {
+    protected final ColorValuePart createElement(PartSetWrapper<T> set, Node node, int sequence, boolean proTeaser, String productId, GameConfig config) {
         String color = HGBaseXMLTools.getAttributeValue(node, GameConfigFileReader.CONFIG_COLOR);
         int value = HGBaseXMLTools.getAttributeIntValue(node, GameConfigFileReader.CONFIG_VALUE);
         String imagePath = getElementFilePath(node, sequence, set, config);
@@ -120,7 +121,7 @@ abstract class PartSetConstructor<T extends PartSet> extends GameElementSetConst
             HGBaseLog.logWarn("The " + elementConfigKey + "'s image file " + imagePath + " was not found!");
             return null;
         }
-        return createColorValuePart(set.getPartSet(), color, sequence, getPartValue(value, sequence), image, node);
+        return createColorValuePart(set.getPartSet(), color, sequence, getPartValue(value, sequence), image, proTeaser, productId, node);
     }
 
     @Override
@@ -144,15 +145,17 @@ abstract class PartSetConstructor<T extends PartSet> extends GameElementSetConst
     /**
      * Creates a part with the specified values.
      *
-     * @param set      The part set.
-     * @param color    The color of the new part.
-     * @param sequence The unique sequence of the new part.
-     * @param value    The value of the new part.
-     * @param image    The image for the new part.
-     * @param node     The original XML node the part data were read from.
+     * @param set       The part set.
+     * @param color     The color of the new part.
+     * @param sequence  The unique sequence of the new part.
+     * @param value     The value of the new part.
+     * @param image     The image for the new part.
+     * @param proTeaser The flag if the part is only available in the pro version but should be shown in the free version as teaser for the pro version.
+     * @param productId The id of the In-App-Purchase-Product. If not {@code null} then the part is only available if the product is purchased.
+     * @param node      The original XML node the part data were read from.
      * @return A new part.
      */
-    protected abstract ColorValuePart createColorValuePart(T set, String color, int sequence, int value, Bitmap image, Node node);
+    protected abstract ColorValuePart createColorValuePart(T set, String color, int sequence, int value, Bitmap image, boolean proTeaser, String productId, Node node);
 
     /**
      * Returns the value of this part.
