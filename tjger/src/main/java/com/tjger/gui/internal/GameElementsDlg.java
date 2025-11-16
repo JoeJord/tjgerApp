@@ -495,6 +495,10 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
      * @return The message that should be displayed as a warning.
      */
     private Integer getWarningMessage() {
+        Integer unpurchasedWarning = getUnpurchasedWarning();
+        if (unpurchasedWarning != null) {
+            return unpurchasedWarning;
+        }
         return getTeaserPartWarning();
     }
 
@@ -514,6 +518,23 @@ public abstract class GameElementsDlg<A extends GameElement> extends HGBaseConfi
     private Integer getTeaserPartWarning() {
         GameConfig gameConfig = GameConfig.getInstance();
         return (!gameConfig.isProVersion() && isProTeaserElementSelected(gameConfig)) ? R.string.teaser_part_warning : null;
+    }
+
+    /**
+     * Returns {@code true} if at least one selected game element is not purchased.
+     *
+     * @param config The game configuration.
+     * @return {@code true} if at least one selected game element is not purchased.
+     */
+    protected abstract boolean isUnpurchasedElementSelected(GameConfig config);
+
+    /**
+     * Returns the warning message if an unpurchased element is selected or {@code null} if no warning is needed.
+     *
+     * @return The warning message if an unpurchased element is selected or {@code null} if no warning is needed.
+     */
+    protected Integer getUnpurchasedWarning() {
+        return isUnpurchasedElementSelected(GameConfig.getInstance()) ? R.string.unpurchased_warning : null;
     }
 
     /**

@@ -198,6 +198,11 @@ public class SoundsDlg extends GameElementsDlg<SoundArrangement> {
         return config.isProTeaserSoundSelected();
     }
 
+    @Override
+    protected boolean isUnpurchasedElementSelected(GameConfig config) {
+        return config.isUnpurchasedSoundSelected();
+    }
+
     /**
      * A combobox for sounds.
      */

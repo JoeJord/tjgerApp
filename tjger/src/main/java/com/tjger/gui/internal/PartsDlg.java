@@ -587,6 +587,11 @@ public class PartsDlg extends GameElementsDlg<Arrangement> {
         return config.isProTeaserPartSelected();
     }
 
+    @Override
+    protected boolean isUnpurchasedElementSelected(GameConfig config) {
+        return config.isUnpurchasedPartSelected();
+    }
+
     /**
      * Returns the supplier for the parts.
      *

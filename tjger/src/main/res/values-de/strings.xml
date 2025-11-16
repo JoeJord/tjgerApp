@@ -98,6 +98,7 @@
 
     <string name="teaser_part_warning">Es wurde ein Vorschau-Element ausgewählt. Es kann damit das Spiel nicht gespielt werden!</string>
     <string name="teaser_player_warning">Es wurde ein Vorschau-Element ausgewählt. Es kann damit das Spiel nicht gespielt werden!</string>
+    <string name="unpurchased_warning">Es wurde ein noch nicht erworbenes Element ausgewählt. Es kann damit das Spiel nicht gespielt werden!</string>
 
     <string name="action_credits">Credits</string>
     <string name="credits_dlg_title">Credits</string>

@@ -98,6 +98,7 @@
 
     <string name="teaser_part_warning">A preview item has been selected. It cannot be used to play the game!</string>
     <string name="teaser_player_warning">A preview item has been selected. It cannot be used to play the game!</string>
+    <string name="unpurchased_warning">An unpurchased item has been selected. It cannot be used to play the game!</string>
 
     <string name="action_credits">Credits</string>
     <string name="credits_dlg_title">Credits</string>
