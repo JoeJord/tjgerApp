@@ -168,7 +168,7 @@ public class MainMenu extends Fragment {
         MenuInflater inflater = new MenuInflater(context);
         inflater.inflate(R.menu.main_left, menu);
 
-        int iconSize = (int) (48 * context.getResources().getDisplayMetrics().density);
+        int iconSize = (int) (72 * context.getResources().getDisplayMetrics().density);
         int margin = (int) (8 * context.getResources().getDisplayMetrics().density);
         int topOffset = margin;
 
