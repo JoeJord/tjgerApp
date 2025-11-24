@@ -524,7 +524,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      *
      * @return {@code true} if at least one of the selected elements is a teaser for the pro version of the app.
      */
-    private boolean isProTeaserElementSelected() {
+    public boolean isProTeaserElementSelected() {
         return (isProTeaserPartSelected()) || (isProTeaserSoundSelected()) || (isProTeaserPlayerTypeSelected());
     }
 
@@ -560,7 +560,7 @@ public abstract class MainFrame extends HGBaseWelcomeActivity {
      *
      * @return {@code true} if at least one of the selected elements is not purchased.
      */
-    private boolean isUnpurchasedElementSelected() {
+    public boolean isUnpurchasedElementSelected() {
         return (isUnpurchasedPartSelected()) || (isUnpurchasedSoundSelected());
     }
 

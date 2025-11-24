@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.PopupMenu;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -49,6 +50,7 @@ import at.hagru.hgbase.gui.HGBaseGuiTools;
 import at.hagru.hgbase.gui.config.HGBaseConfigDialog;
 import at.hagru.hgbase.gui.menu.IMenuAction;
 import at.hagru.hgbase.lib.HGBaseConfig;
+import at.hagru.hgbase.lib.HGBaseText;
 import at.hagru.hgbase.lib.HGBaseTools;
 import at.hagru.hgbase.lib.internal.billing.HGBaseBillingHelper;
 import at.hagru.hgbase.lib.internal.billing.HGBaseBillingListener;
@@ -88,6 +90,10 @@ public class MainMenu extends Fragment {
      * The menu id of the remove advertisement action.
      */
     public static final String MENU_ID_REMOVE_ADS = "menu_remove_ads";
+    /**
+     * The menu id of the of the information about what is preventing a game start.
+     */
+    private static final String MENU_ID_PREVENT_GAME_START_INFO = "prevent_game_start_info";
     public static final String MAIN_MENU_IMAGE = "main_menu";
     public static final String MAIN_MENU_BUTTON = "main_menu_button";
     public static final int MENU_ICON_SIZE = 64;
@@ -151,33 +157,61 @@ public class MainMenu extends Fragment {
         scrollView.addView(buttonView);
 
         addLeftSideIcons(rootView);
+        addFooterInfo(rootView);
 
         return rootView;
     }
 
     /**
+     * Inflates a menu from the specified resource.
+     *
+     * @param context The context for the menu.
+     * @param menuRes The menu resource.
+     * @return The inflated menu.
+     */
+    protected Menu inflateMenu(Context context, int menuRes) {
+        Menu menu = new PopupMenu(context, null).getMenu();
+        MenuInflater inflater = new MenuInflater(context);
+        inflater.inflate(menuRes, menu);
+        return menu;
+    }
+
+    /**
+     * Returns a list with all items of the specified menu.
+     *
+     * @param menu The menu from which the items should be retrieved.
+     * @return A list with all items of the specified menu.
+     */
+    protected List<MenuItem> getMenuItems(Menu menu) {
+        List<MenuItem> items = new ArrayList<>();
+        if (menu == null) {
+            return items;
+        }
+        for (int itemIndex = 0; itemIndex < menu.size(); itemIndex++) {
+            items.add(menu.getItem(itemIndex));
+        }
+        return items;
+    }
+
+    /**
      * Adds icons to the left side of the main screen.<br>
-     * bases on {@code main_left.xml}.
+     * Based on {@code main_left.xml}.
      *
      * @param parent The parent view.
      */
     protected void addLeftSideIcons(ViewGroup parent) {
         Context context = getActivity();
-        Menu menu = new PopupMenu(context, null).getMenu();
-
-        MenuInflater inflater = new MenuInflater(context);
-        inflater.inflate(R.menu.main_left, menu);
+        Menu menu = inflateMenu(context, R.menu.main_left);
 
         int iconSize = (int) (72 * context.getResources().getDisplayMetrics().density);
         int margin = (int) (8 * context.getResources().getDisplayMetrics().density);
-        int topOffset = margin;
+        final int[] topOffset = {margin};
 
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
+        getMenuItems(menu).forEach(item -> {
             int itemId = item.getItemId();
             String itemName = context.getResources().getResourceEntryName(itemId);
             if ((item.getIcon() == null) || (!isMenuItemAvailable(itemName))) {
-                continue;
+                return;
             }
             ImageButton icon = createIcon(context, item);
             if (MENU_ID_REMOVE_ADS.equals(itemName)) {
@@ -202,7 +236,7 @@ public class MainMenu extends Fragment {
             }
 
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(iconSize, iconSize, Gravity.TOP | Gravity.START);
-            params.setMargins(margin, topOffset, 0, 0);
+            params.setMargins(margin, topOffset[0], 0, 0);
             icon.setLayoutParams(params);
             icon.setOnClickListener(v -> {
                 IMenuAction action = getMainFrame().getOptionsMenuAction(itemId);
@@ -213,8 +247,40 @@ public class MainMenu extends Fragment {
 
             parent.addView(icon);
 
-            topOffset += iconSize + margin;
-        }
+            topOffset[0] += iconSize + margin;
+        });
+    }
+
+    /**
+     * Adds a footer information to the bottom of the main screen.<br>
+     * Based on {@code main_footer.xml}.
+     *
+     * @param parent The parent view.
+     */
+    protected void addFooterInfo(ViewGroup parent) {
+        Context context = getActivity();
+        Menu menu = inflateMenu(context, R.menu.main_footer);
+
+        getMenuItems(menu).forEach(item -> {
+            int itemId = item.getItemId();
+            String itemName = context.getResources().getResourceEntryName(itemId);
+            if (!isMenuItemAvailable(itemName)) {
+                return;
+            }
+            TextView textView = new TextView(context);
+            textView.setTextColor(getFooterTextColor());
+            textView.setTextSize(20);
+            textView.setPadding(16, 16, 16, 16);
+            textView.setGravity(Gravity.CENTER);
+            textView.setText(getFooterText(item, itemName));
+            textView.setId(itemId);
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+            params.bottomMargin = 50;
+            textView.setLayoutParams(params);
+
+            parent.addView(textView);
+        });
     }
 
     /**
@@ -226,6 +292,8 @@ public class MainMenu extends Fragment {
     protected boolean isMenuItemAvailable(String itemId) {
         if (MENU_ID_REMOVE_ADS.equals(itemId)) {
             return isRemoveAdvertisementsAvailable();
+        } else if (MENU_ID_PREVENT_GAME_START_INFO.equals(itemId)) {
+            return isPreventGameStartInfoAvailable();
         }
         return true;
     }
@@ -237,6 +305,52 @@ public class MainMenu extends Fragment {
      */
     public boolean isRemoveAdvertisementsAvailable() {
         return getMainFrame().isAdvertisementAvailable();
+    }
+
+    /**
+     * Returns {@code true}, if the information about what is preventing a game start is available.
+     *
+     * @return {@code true}, if the information about what is preventing a game start is available.
+     */
+    protected boolean isPreventGameStartInfoAvailable() {
+        return (!getMainFrame().isResumeGameAllowed()) || (!getMainFrame().isNewGameAllowed());
+    }
+
+    /**
+     * Returns the for the footer information.
+     *
+     * @param item The footer item.
+     * @param itemId The id of the footer item.
+     * @return The for the footer information.
+     */
+    protected String getFooterText(MenuItem item, String itemId) {
+        if (MENU_ID_PREVENT_GAME_START_INFO.equals(itemId)) {
+            return getPreventGameStartInfo();
+        }
+        return (String) item.getTitle();
+    }
+
+    /**
+     * Returns the information about what is preventing a game start.
+     *
+     * @return The information about what is preventing a game start.
+     */
+    protected String getPreventGameStartInfo() {
+        if (getMainFrame().isUnpurchasedElementSelected()) {
+            return HGBaseText.getText(R.string.prevent_game_start_info_unpurchased);
+        } else if ((!getMainFrame().isProVersion()) && (getMainFrame().isProTeaserElementSelected())) {
+            return HGBaseText.getText(R.string.prevent_game_start_info_teaser);
+        }
+        return "";
+    }
+
+    /**
+     * Returns the text color for the footer information.
+     *
+     * @return The text color for the footer information.
+     */
+    protected int getFooterTextColor() {
+        return Color.RED;
     }
 
     /**
@@ -618,6 +732,7 @@ public class MainMenu extends Fragment {
         if (btResume != null) {
             btResume.setEnabled(resumePossible);
             setResumeButtonColors(resumePossible);
+            setPreventStartGameFooterInfo();
         }
     }
 
@@ -630,7 +745,19 @@ public class MainMenu extends Fragment {
         if (btNewGame != null) {
             btNewGame.setEnabled(newGamePossible);
             setNewGameButtonColors(newGamePossible);
+            setPreventStartGameFooterInfo();
         }
+    }
+
+    /**
+     * Sets the footer information about what prevents a game from starting.
+     */
+    protected void setPreventStartGameFooterInfo() {
+        TextView preventGameStartInfo = rootView.findViewById(R.id.prevent_game_start_info);
+        if (preventGameStartInfo == null) {
+            return;
+        }
+        preventGameStartInfo.setText(getPreventGameStartInfo());
     }
 
     /**

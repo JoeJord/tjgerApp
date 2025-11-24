@@ -106,5 +106,8 @@
 
     <string name="unpurchased_marker">🔒</string>
     <string name="menu_remove_ads">Werbung entfernen</string>
+    <string name="prevent_game_start_info">⚠️ Mit den aktuellen Einstellungen kann kein Spiel gestartet werden!</string>
+    <string name="prevent_game_start_info_unpurchased">⚠️ Es wurde ein noch nicht erworbenes Element ausgewählt. Daher kann kein Spiel gestartet werden!</string>
+    <string name="prevent_game_start_info_teaser">⚠️ Es wurde ein Vorschau-Element ausgewählt. Daher kann kein Spiel gestartet werden!</string>
 
 </resources>

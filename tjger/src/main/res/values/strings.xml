@@ -106,5 +106,8 @@
 
     <string name="unpurchased_marker">🔒</string>
     <string name="menu_remove_ads">Remove ads</string>
+    <string name="prevent_game_start_info">⚠️ With the current settings, no game can be started!</string>
+    <string name="prevent_game_start_info_unpurchased">⚠️ An unpurchased item has been selected. Therefore, no game can be started!</string>
+    <string name="prevent_game_start_info_teaser">⚠️ An preview item has been selected. Therefore, no game can be started!</string>
 
 </resources>

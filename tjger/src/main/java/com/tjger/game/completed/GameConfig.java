@@ -183,14 +183,33 @@ public final class GameConfig {
     }
 
     /**
+     * Returns the configuration key for the player name of the player with the specified index.
+     *
+     * @param playerIndex The index of the player.
+     * @return The configuration key for the player name of the player with the specified index.
+     */
+    private static String getPlayerNameConfigKey(int playerIndex) {
+        return ConstantValue.CONFIG_PLAYERNAME + ((playerIndex == PlayerManager.HUMAN_PLAYER_INDEX) ? "" : playerIndex);
+    }
+
+    /**
      * Returns the name of the player with the specified index.
      *
      * @param playerIndex The index of the player for which the name should be returned.
      * @return The name of the player with the specified index.
      */
     public static String getPlayerName(int playerIndex) {
-        String nameConfigKey = ConstantValue.CONFIG_PLAYERNAME + ((playerIndex == PlayerManager.HUMAN_PLAYER_INDEX) ? "" : playerIndex);
-        return HGBaseConfig.get(nameConfigKey);
+        return HGBaseConfig.get(getPlayerNameConfigKey(playerIndex));
+    }
+
+    /**
+     * Sets the name of the player with the specified index.
+     *
+     * @param playerIndex The index of the player for which the name should be set.
+     * @param playerName The name to set.
+     */
+    public static void setPlayerNmae(int playerIndex, String playerName) {
+        HGBaseConfig.set(getPlayerNameConfigKey(playerIndex), playerName);
     }
 
     /**
