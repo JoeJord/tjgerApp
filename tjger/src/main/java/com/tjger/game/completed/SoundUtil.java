@@ -5,6 +5,7 @@ import com.tjger.gui.completed.SoundSet;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import at.hagru.hgbase.lib.HGBaseSound;
 
@@ -25,7 +26,7 @@ public class SoundUtil {
     }
 
     /**
-     * Plays the specified sound.
+     * Plays the specified sound, ignoring the current sound configuration (on/off).
      *
      * @param sound The sound to play.
      */
@@ -37,43 +38,55 @@ public class SoundUtil {
     }
 
     /**
-     * Plays the sound specified by type and name.
+     * Plays the sound specified by type and name.<br>
+     * Use {@link SoundUtil#playSound(Sound)} as {@code soundPLayer} to play the sound ignoring the current sound configuration (on/off).<br>
+     * Use {@link com.tjger.MainFrame#playAudio(Sound)} to play the sound only if the sound configuration allows it (on/off).
      *
-     * @param type The type of the sound to play.
-     * @param name The name of the sound to play.
+     * @param type        The type of the sound to play.
+     * @param name        The name of the sound to play.
+     * @param soundPlayer The method that plays the sound.
      */
-    public static void playSound(String type, String name) {
-        playSound(GameConfig.getInstance().getSound(type, name));
+    public static void playSound(String type, String name, Consumer<Sound> soundPlayer) {
+        soundPlayer.accept(GameConfig.getInstance().getSound(type, name));
     }
 
     /**
-     * Plays the active sound of the specified type.
+     * Plays the active sound of the specified type.<br>
+     * Use {@link SoundUtil#playSound(Sound)} as {@code soundPLayer} to play the sound ignoring the current sound configuration (on/off).<br>
+     * Use {@link com.tjger.MainFrame#playAudio(Sound)} to play the sound only if the sound configuration allows it (on/off).
      *
-     * @param type The type of the sound to play.
+     * @param type        The type of the sound to play.
+     * @param soundPlayer The method that plays the sound.
      */
-    public static void playActiveSound(String type) {
-        playSound(GameConfig.getInstance().getActiveSound(type));
+    public static void playActiveSound(String type, Consumer<Sound> soundPlayer) {
+        soundPlayer.accept(GameConfig.getInstance().getActiveSound(type));
     }
 
     /**
-     * Plays from the specified soundset the sound with the specified sequence.
+     * Plays from the specified soundset the sound with the specified sequence.<br>
+     * Use {@link SoundUtil#playSound(Sound)} as {@code soundPLayer} to play the sound ignoring the current sound configuration (on/off).<br>
+     * Use {@link com.tjger.MainFrame#playAudio(Sound)} to play the sound only if the sound configuration allows it (on/off).
      *
-     * @param soundSet The soundset from which the sound should be played.
-     * @param sequence The sequence of the sound in the soundset.
+     * @param soundSet    The soundset from which the sound should be played.
+     * @param sequence    The sequence of the sound in the soundset.
+     * @param soundPlayer The method that plays the sound.
      */
-    public static void playSoundSetSound(SoundSet soundSet, int sequence) {
+    public static void playSoundSetSound(SoundSet soundSet, int sequence, Consumer<Sound> soundPlayer) {
         if (soundSet == null) {
             return;
         }
-        playSound(soundSet.getSound(sequence));
+        soundPlayer.accept(soundSet.getSound(sequence));
     }
 
     /**
-     * Plays a random sound from the specified soundset.
+     * Plays a random sound from the specified soundset.<br>
+     * Use {@link SoundUtil#playSound(Sound)} as {@code soundPLayer} to play the sound ignoring the current sound configuration (on/off).<br>
+     * Use {@link com.tjger.MainFrame#playAudio(Sound)} to play the sound only if the sound configuration allows it (on/off).
      *
-     * @param soundSet The soundset from which a sound should be played.
+     * @param soundSet    The soundset from which a sound should be played.
+     * @param soundPlayer The method that plays the sound.
      */
-    public static void playSoundSetRandomSound(SoundSet soundSet) {
+    public static void playSoundSetRandomSound(SoundSet soundSet, Consumer<Sound> soundPlayer) {
         if (soundSet == null) {
             return;
         }
@@ -81,25 +94,31 @@ public class SoundUtil {
         if ((sounds == null) || (sounds.isEmpty())) {
             return;
         }
-        playSound(sounds.get(random.nextInt(sounds.size())));
+        soundPlayer.accept(sounds.get(random.nextInt(sounds.size())));
     }
 
     /**
-     * Plays from the active soundset of the specified type the sound with the specified sequence.
+     * Plays from the active soundset of the specified type the sound with the specified sequence.<br>
+     * Use {@link SoundUtil#playSound(Sound)} as {@code soundPLayer} to play the sound ignoring the current sound configuration (on/off).<br>
+     * Use {@link com.tjger.MainFrame#playAudio(Sound)} to play the sound only if the sound configuration allows it (on/off).
      *
-     * @param type     The type of the sound set.
-     * @param sequence The sequence of the sound in the soundset.
+     * @param type        The type of the sound set.
+     * @param sequence    The sequence of the sound in the soundset.
+     * @param soundPlayer The method that plays the sound.
      */
-    public static void playActiveSoundSetSound(String type, int sequence) {
-        playSoundSetSound(GameConfig.getInstance().getActiveSoundSet(type), sequence);
+    public static void playActiveSoundSetSound(String type, int sequence, Consumer<Sound> soundPlayer) {
+        playSoundSetSound(GameConfig.getInstance().getActiveSoundSet(type), sequence, soundPlayer);
     }
 
     /**
-     * Plays from the active soundset of the specified type a random sound.
+     * Plays from the active soundset of the specified type a random sound.<br>
+     * Use {@link SoundUtil#playSound(Sound)} as {@code soundPLayer} to play the sound ignoring the current sound configuration (on/off).<br>
+     * Use {@link com.tjger.MainFrame#playAudio(Sound)} to play the sound only if the sound configuration allows it (on/off).
      *
-     * @param type The type of the soundset.
+     * @param type        The type of the soundset.
+     * @param soundPlayer The method that plays the sound.
      */
-    public static void playActiveSoundSetRandomSound(String type) {
-        playSoundSetRandomSound(GameConfig.getInstance().getActiveSoundSet(type));
+    public static void playActiveSoundSetRandomSound(String type, Consumer<Sound> soundPlayer) {
+        playSoundSetRandomSound(GameConfig.getInstance().getActiveSoundSet(type), soundPlayer);
     }
 }

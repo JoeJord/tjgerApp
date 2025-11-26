@@ -237,7 +237,7 @@ public class SoundsDlg extends GameElementsDlg<SoundArrangement> {
          * @param soundName The name of the sound to play.
          */
         protected void playSound(String soundName) {
-            SoundUtil.playSound(id, soundName);
+            SoundUtil.playSound(id, soundName, SoundUtil::playSound);
         }
     }
 
